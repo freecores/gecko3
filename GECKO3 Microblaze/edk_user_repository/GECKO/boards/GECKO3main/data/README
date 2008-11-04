@@ -1,0 +1,6 @@
+Compatible with EDK 8.2 and 9.1. 
+
+Known issues:
+EDK 9.2 and above is not supported yet (Xilinx changed the IP-Core they use for memory interfaces. This gives us a lot of problems)
+
+The 128 Mbyte DDR RAM configurations does not work yet. I'm unsure where the problem is.
