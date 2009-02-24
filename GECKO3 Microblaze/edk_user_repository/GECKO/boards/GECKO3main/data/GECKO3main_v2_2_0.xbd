@@ -3,7 +3,7 @@
 #  GECKO3 Microblaze
 #   ___    ___   _   _
 #  (  _`\ (  __)( ) ( )   
-#  | (_) )| (   | |_| |   Berne University of Applied Sciences
+#  | (_) )| (   | |_| |   Bern University of Applied Sciences
 #  |  _ <'|  _) |  _  |   School of Engineering and
 #  | (_) )| |   | | | |   Information Technology
 #  (____/'(_)   (_) (_)
@@ -85,6 +85,99 @@ BEGIN IO_INTERFACE
    PARAMETER RST_POLARITY =0, IO_IS=polarity, VALUE_NOTE=Active Low
    # push button 1 is dedicated to system reset.
    PORT RESET = CONN_RESET, IO_IS=ext_rst
+END
+
+# Uses Micron device MT46V32M16-5B
+BEGIN IO_INTERFACE
+  ATTRIBUTE IOTYPE = XIL_DDR_V1
+   ATTRIBUTE INSTANCE = DDR_SDRAM_64Mx16
+   ATTRIBUTE EXCLUSIVE = DDR_MEMORY
+   ATTRIBUTE ALERT = 'DDR device on this board requires minimum clock frequency of 66Mhz to operate properly.'
+   PARAMETER C_DDR_ASYNC_SUPPORT=1, IO_IS=C_DDR_ASYNC_SUPPORT
+   PARAMETER C_INCLUDE_BURST_SUPPORT=1, IO_IS=C_INCLUDE_BURST_SUPPORT
+   PARAMETER C_REG_DIMM=0, IO_IS=C_REG_DIMM
+   PARAMETER C_EXTRA_TSU=0, IO_IS=C_EXTRA_TSU
+   PARAMETER C_NUM_BANKS_MEM=1, IO_IS=C_NUM_BANKS_MEM 
+   PARAMETER C_NUM_CLK_PAIRS=1, IO_IS=C_NUM_CLK_PAIRS 
+   PARAMETER C_DDR_TMRD=15000, IO_IS=C_DDR_TMRD 
+   PARAMETER C_DDR_TWR=15000, IO_IS=C_DDR_TWR 
+   PARAMETER C_DDR_TWTR=1, IO_IS=C_DDR_TWTR 
+   PARAMETER C_DDR_TRAS=40000, IO_IS=C_DDR_TRAS 
+   PARAMETER C_DDR_TRC=65000, IO_IS=C_DDR_TRC 
+   PARAMETER C_DDR_TRFC=75000, IO_IS=C_DDR_TRFC 
+   PARAMETER C_DDR_TRCD=20000, IO_IS=C_DDR_TRCD 
+   PARAMETER C_DDR_TRRD=15000, IO_IS=C_DDR_TRRD 
+   PARAMETER C_DDR_TREFC=70000000, IO_IS=C_DDR_TREFC 
+   PARAMETER C_DDR_TREFI=7800000, IO_IS=C_DDR_TREFI 
+   PARAMETER C_DDR_TRP=20000, IO_IS=C_DDR_TRP 
+   PARAMETER C_DDR_CAS_LAT=3, IO_IS=C_DDR_CAS_LAT 
+   PARAMETER C_DDR_DWIDTH=16, IO_IS=C_DDR_DWIDTH 
+   PARAMETER C_DDR_AWIDTH=14, IO_IS=C_DDR_AWIDTH 
+   PARAMETER C_DDR_COL_AWIDTH=10, IO_IS=C_DDR_COL_AWIDTH 
+   PARAMETER C_DDR_BANK_AWIDTH=2, IO_IS=C_DDR_BANK_AWIDTH 
+   PARAMETER C_MCH0_ACCESSBUF_DEPTH = 16, IO_IS=C_MCH0_ACCESSBUF_DEPTH
+   PARAMETER C_MCH0_RDDATABUF_DEPTH = 0, IO_IS=C_MCH0_RDDATABUF_DEPTH
+   PARAMETER C_XCL0_LINESIZE = 4, IO_IS=C_XCL0_LINESIZE
+   PARAMETER C_XCL0_WRITEXFER = 0, IO_IS=C_XCL0_WRITEXFER
+   PARAMETER C_MCH1_ACCESSBUF_DEPTH = 16, IO_IS=C_MCH1_ACCESSBUF_DEPTH
+   PARAMETER C_MCH1_RDDATABUF_DEPTH = 0, IO_IS=C_MCH1_RDDATABUF_DEPTH
+   PARAMETER C_XCL1_LINESIZE = 4, IO_IS=C_XCL1_LINESIZE
+   PARAMETER C_XCL1_WRITEXFER = 1, IO_IS=C_XCL1_WRITEXFER
+   PARAMETER C_MEM0_BASEADDR=0x00000000, IO_IS=C_BASEADDR, SHORT_DESC=DDR_SDRAM
+   PARAMETER C_MEM0_HIGHADDR=0x03ffffff, IO_IS=C_HIGHADDR
+  
+   PORT DDR_CLK  = ddr_clk,     IO_IS = ddr_clk_out
+   PORT DDR_CLKn = ddr_clk_n,   IO_IS = ddr_clk_out_n
+   PORT DDR_CLK_FB  = ddr_clk_fb, IO_IS=feedback_clock, FEEDBACK_PHASE=0
+
+   PORT DDR_A0   = ddr_addr_0_,  IO_IS = address[13]
+   PORT DDR_A1   = ddr_addr_1_,  IO_IS = address[12]
+   PORT DDR_A2   = ddr_addr_2_,  IO_IS = address[11]
+   PORT DDR_A3   = ddr_addr_3_,  IO_IS = address[10]
+   PORT DDR_A4   = ddr_addr_4_,  IO_IS = address[9]
+   PORT DDR_A5   = ddr_addr_5_,  IO_IS = address[8]
+   PORT DDR_A6   = ddr_addr_6_,  IO_IS = address[7]
+   PORT DDR_A7   = ddr_addr_7_,  IO_IS = address[6]
+   PORT DDR_A8   = ddr_addr_8_,  IO_IS = address[5]
+   PORT DDR_A9   = ddr_addr_9_,  IO_IS = address[4]
+   PORT DDR_A10  = ddr_addr_10_, IO_IS = address[3]
+   PORT DDR_A11  = ddr_addr_11_, IO_IS = address[2]
+   PORT DDR_A12  = ddr_addr_12_, IO_IS = address[1]
+   PORT DDR_A13  = ddr_addr_13_, IO_IS = address[0]
+ 
+   PORT DDR_BA0  = ddr_ba_0_,    IO_IS = bank_addr[1]
+   PORT DDR_BA1  = ddr_ba_1_,    IO_IS = bank_addr[0]
+ 
+   PORT DDR_CASn = ddr_cas_n,    IO_IS = col_addr_select
+   PORT DDR_CKE  = ddr_cke,      IO_IS = clk_enable
+   PORT DDR_CSn  = ddr_cs_n,     IO_IS = chip_select
+   PORT DDR_RASn = ddr_ras_n,    IO_IS = row_addr_select
+   PORT DDR_WEn  = ddr_we_n,     IO_IS = write_enable
+ 
+   # Point-to-point connections for data pins from FPGA to DDR SDRAM devices
+   PORT DDR_LDM  = ddr_dm_0_,    IO_IS = data_mask[1]
+   PORT DDR_UDM  = ddr_dm_1_,    IO_IS = data_mask[0]
+
+   PORT DDR_LDQS = ddr_dqs_0_,   IO_IS = data_strobe[1]
+   PORT DDR_UDQS = ddr_dqs_1_,   IO_IS = data_strobe[0]
+ 
+   PORT DDR_DQ0  = ddr_dq_0_,    IO_IS = data[15]
+   PORT DDR_DQ1  = ddr_dq_1_,    IO_IS = data[14]
+   PORT DDR_DQ2  = ddr_dq_2_,    IO_IS = data[13]
+   PORT DDR_DQ3  = ddr_dq_3_,    IO_IS = data[12]
+   PORT DDR_DQ4  = ddr_dq_4_,    IO_IS = data[11]
+   PORT DDR_DQ5  = ddr_dq_5_,    IO_IS = data[10]
+   PORT DDR_DQ6  = ddr_dq_6_,    IO_IS = data[9]
+   PORT DDR_DQ7  = ddr_dq_7_,    IO_IS = data[8]
+   PORT DDR_DQ8  = ddr_dq_8_,    IO_IS = data[7]
+   PORT DDR_DQ9  = ddr_dq_9_,    IO_IS = data[6]
+   PORT DDR_DQ10 = ddr_dq_10_,   IO_IS = data[5]
+   PORT DDR_DQ11 = ddr_dq_11_,   IO_IS = data[4]
+   PORT DDR_DQ12 = ddr_dq_12_,   IO_IS = data[3]
+   PORT DDR_DQ13 = ddr_dq_13_,   IO_IS = data[2]
+   PORT DDR_DQ14 = ddr_dq_14_,   IO_IS = data[1]
+   PORT DDR_DQ15 = ddr_dq_15_,   IO_IS = data[0]
+   
 END
 
 # Uses two Micron device MT46V32M16-5B
@@ -306,99 +399,6 @@ BEGIN IO_ADAPTER
   PORT Res[18] = ddr32b_we_n
   PORT Res[19] = ddr32b_ba_0_
   PORT Res[20] = ddr32b_ba_1_
-END
-
-# Uses Micron device MT46V32M16-5B
-BEGIN IO_INTERFACE
-  ATTRIBUTE IOTYPE = XIL_DDR_V1
-   ATTRIBUTE INSTANCE = DDR_SDRAM_64Mx16
-   ATTRIBUTE EXCLUSIVE = DDR_MEMORY
-   ATTRIBUTE ALERT = 'DDR device on this board requires minimum clock frequency of 66Mhz to operate properly.'
-   PARAMETER C_DDR_ASYNC_SUPPORT=1, IO_IS=C_DDR_ASYNC_SUPPORT
-   PARAMETER C_INCLUDE_BURST_SUPPORT=1, IO_IS=C_INCLUDE_BURST_SUPPORT
-   PARAMETER C_REG_DIMM=0, IO_IS=C_REG_DIMM
-   PARAMETER C_EXTRA_TSU=0, IO_IS=C_EXTRA_TSU
-   PARAMETER C_NUM_BANKS_MEM=1, IO_IS=C_NUM_BANKS_MEM 
-   PARAMETER C_NUM_CLK_PAIRS=1, IO_IS=C_NUM_CLK_PAIRS 
-   PARAMETER C_DDR_TMRD=15000, IO_IS=C_DDR_TMRD 
-   PARAMETER C_DDR_TWR=15000, IO_IS=C_DDR_TWR 
-   PARAMETER C_DDR_TWTR=1, IO_IS=C_DDR_TWTR 
-   PARAMETER C_DDR_TRAS=40000, IO_IS=C_DDR_TRAS 
-   PARAMETER C_DDR_TRC=65000, IO_IS=C_DDR_TRC 
-   PARAMETER C_DDR_TRFC=75000, IO_IS=C_DDR_TRFC 
-   PARAMETER C_DDR_TRCD=20000, IO_IS=C_DDR_TRCD 
-   PARAMETER C_DDR_TRRD=15000, IO_IS=C_DDR_TRRD 
-   PARAMETER C_DDR_TREFC=70000000, IO_IS=C_DDR_TREFC 
-   PARAMETER C_DDR_TREFI=7800000, IO_IS=C_DDR_TREFI 
-   PARAMETER C_DDR_TRP=20000, IO_IS=C_DDR_TRP 
-   PARAMETER C_DDR_CAS_LAT=3, IO_IS=C_DDR_CAS_LAT 
-   PARAMETER C_DDR_DWIDTH=16, IO_IS=C_DDR_DWIDTH 
-   PARAMETER C_DDR_AWIDTH=14, IO_IS=C_DDR_AWIDTH 
-   PARAMETER C_DDR_COL_AWIDTH=10, IO_IS=C_DDR_COL_AWIDTH 
-   PARAMETER C_DDR_BANK_AWIDTH=2, IO_IS=C_DDR_BANK_AWIDTH 
-   PARAMETER C_MCH0_ACCESSBUF_DEPTH = 16, IO_IS=C_MCH0_ACCESSBUF_DEPTH
-   PARAMETER C_MCH0_RDDATABUF_DEPTH = 0, IO_IS=C_MCH0_RDDATABUF_DEPTH
-   PARAMETER C_XCL0_LINESIZE = 4, IO_IS=C_XCL0_LINESIZE
-   PARAMETER C_XCL0_WRITEXFER = 0, IO_IS=C_XCL0_WRITEXFER
-   PARAMETER C_MCH1_ACCESSBUF_DEPTH = 16, IO_IS=C_MCH1_ACCESSBUF_DEPTH
-   PARAMETER C_MCH1_RDDATABUF_DEPTH = 0, IO_IS=C_MCH1_RDDATABUF_DEPTH
-   PARAMETER C_XCL1_LINESIZE = 4, IO_IS=C_XCL1_LINESIZE
-   PARAMETER C_XCL1_WRITEXFER = 1, IO_IS=C_XCL1_WRITEXFER
-   PARAMETER C_MEM0_BASEADDR=0x00000000, IO_IS=C_BASEADDR, SHORT_DESC=DDR_SDRAM
-   PARAMETER C_MEM0_HIGHADDR=0x03ffffff, IO_IS=C_HIGHADDR
-  
-   PORT DDR_CLK  = ddr_clk,     IO_IS = ddr_clk_out
-   PORT DDR_CLKn = ddr_clk_n,   IO_IS = ddr_clk_out_n
-   PORT DDR_CLK_FB  = ddr_clk_fb, IO_IS=feedback_clock, FEEDBACK_PHASE=0
-
-   PORT DDR_A0   = ddr_addr_0_,  IO_IS = address[13]
-   PORT DDR_A1   = ddr_addr_1_,  IO_IS = address[12]
-   PORT DDR_A2   = ddr_addr_2_,  IO_IS = address[11]
-   PORT DDR_A3   = ddr_addr_3_,  IO_IS = address[10]
-   PORT DDR_A4   = ddr_addr_4_,  IO_IS = address[9]
-   PORT DDR_A5   = ddr_addr_5_,  IO_IS = address[8]
-   PORT DDR_A6   = ddr_addr_6_,  IO_IS = address[7]
-   PORT DDR_A7   = ddr_addr_7_,  IO_IS = address[6]
-   PORT DDR_A8   = ddr_addr_8_,  IO_IS = address[5]
-   PORT DDR_A9   = ddr_addr_9_,  IO_IS = address[4]
-   PORT DDR_A10  = ddr_addr_10_, IO_IS = address[3]
-   PORT DDR_A11  = ddr_addr_11_, IO_IS = address[2]
-   PORT DDR_A12  = ddr_addr_12_, IO_IS = address[1]
-   PORT DDR_A13  = ddr_addr_13_, IO_IS = address[0]
- 
-   PORT DDR_BA0  = ddr_ba_0_,    IO_IS = bank_addr[1]
-   PORT DDR_BA1  = ddr_ba_1_,    IO_IS = bank_addr[0]
- 
-   PORT DDR_CASn = ddr_cas_n,    IO_IS = col_addr_select
-   PORT DDR_CKE  = ddr_cke,      IO_IS = clk_enable
-   PORT DDR_CSn  = ddr_cs_n,     IO_IS = chip_select
-   PORT DDR_RASn = ddr_ras_n,    IO_IS = row_addr_select
-   PORT DDR_WEn  = ddr_we_n,     IO_IS = write_enable
- 
-   # Point-to-point connections for data pins from FPGA to DDR SDRAM devices
-   PORT DDR_LDM  = ddr_dm_0_,    IO_IS = data_mask[1]
-   PORT DDR_UDM  = ddr_dm_1_,    IO_IS = data_mask[0]
-
-   PORT DDR_LDQS = ddr_dqs_0_,   IO_IS = data_strobe[1]
-   PORT DDR_UDQS = ddr_dqs_1_,   IO_IS = data_strobe[0]
- 
-   PORT DDR_DQ0  = ddr_dq_0_,    IO_IS = data[15]
-   PORT DDR_DQ1  = ddr_dq_1_,    IO_IS = data[14]
-   PORT DDR_DQ2  = ddr_dq_2_,    IO_IS = data[13]
-   PORT DDR_DQ3  = ddr_dq_3_,    IO_IS = data[12]
-   PORT DDR_DQ4  = ddr_dq_4_,    IO_IS = data[11]
-   PORT DDR_DQ5  = ddr_dq_5_,    IO_IS = data[10]
-   PORT DDR_DQ6  = ddr_dq_6_,    IO_IS = data[9]
-   PORT DDR_DQ7  = ddr_dq_7_,    IO_IS = data[8]
-   PORT DDR_DQ8  = ddr_dq_8_,    IO_IS = data[7]
-   PORT DDR_DQ9  = ddr_dq_9_,    IO_IS = data[6]
-   PORT DDR_DQ10 = ddr_dq_10_,   IO_IS = data[5]
-   PORT DDR_DQ11 = ddr_dq_11_,   IO_IS = data[4]
-   PORT DDR_DQ12 = ddr_dq_12_,   IO_IS = data[3]
-   PORT DDR_DQ13 = ddr_dq_13_,   IO_IS = data[2]
-   PORT DDR_DQ14 = ddr_dq_14_,   IO_IS = data[1]
-   PORT DDR_DQ15 = ddr_dq_15_,   IO_IS = data[0]
-   
 END
 
 BEGIN IO_INTERFACE
