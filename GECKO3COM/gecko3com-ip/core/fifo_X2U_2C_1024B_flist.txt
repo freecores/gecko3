@@ -1,0 +1,11 @@
+# Output products list for <fifo_X2U_2C_1024B>
+fifo_X2U_2C_1024B.ngc
+fifo_X2U_2C_1024B_flist.txt
+fifo_X2U_2C_1024B.asy
+fifo_X2U_2C_1024B.vhd
+fifo_X2U_2C_1024B.vho
+fifo_X2U_2C_1024B.xco
+fifo_X2U_2C_1024B_xmdf.tcl
+fifo_X2U_2C_1024B.v
+fifo_X2U_2C_1024B.veo
+fifo_X2U_2C_1024B.sym

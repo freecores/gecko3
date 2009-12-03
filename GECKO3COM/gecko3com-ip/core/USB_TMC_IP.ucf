@@ -1,0 +1,43 @@
+
+# connection clk and rst
+net "i_nReset" loc = "AE24";
+net "i_IFCLK"  loc = "AA11";
+
+# connection of controll bus signals
+net "i_WRU"    loc = "AC5";
+net "i_RDYU"   loc = "AB5";
+net "o_WRX"    loc = "AC14";
+net "o_RDYX"   loc = "AD14";
+
+# connection of data bus signals
+net "b_dbus<0>"  loc = "AA12";
+net "b_dbus<1>"  loc = "AB12";
+net "b_dbus<2>"  loc = "AB13";
+net "b_dbus<3>"  loc = "AC13";
+net "b_dbus<4>"  loc = "AA14";
+net "b_dbus<5>"  loc = "Y14";
+net "b_dbus<6>"  loc = "W14";
+net "b_dbus<7>"  loc = "Y15";
+net "b_dbus<8>"  loc = "AE7";
+net "b_dbus<9>"  loc = "Y13";
+net "b_dbus<10>" loc = "W13";
+net "b_dbus<11>" loc = "AF7";
+net "b_dbus<12>" loc = "AF13";
+net "b_dbus<13>" loc = "AD12";
+net "b_dbus<14>" loc = "Y12";
+net "b_dbus<15>" loc = "W12";
+
+
+# switches
+#net "i_Switches<0>" loc = "C5";
+#net "i_Switches<1>" loc = "D5";
+#net "i_Switches<2>" loc = "E5";
+#net "i_Switches<3>" loc = "C4";
+
+# LEDs
+
+net "o_LEDrx" loc = "C6";
+net "o_LEDtx" loc = "F7";
+net "o_LEDrun"  loc = "D7";
+
+
