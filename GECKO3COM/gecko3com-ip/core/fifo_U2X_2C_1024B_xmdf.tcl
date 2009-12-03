@@ -36,24 +36,12 @@ utilities_xmdf::xmdfSetData $instance FileSet $fcount type logical_library
 utilities_xmdf::xmdfSetData $instance FileSet $fcount logical_library unisim
 incr fcount
 
-utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_U2X_2C_1024B_xmdf.tcl
-utilities_xmdf::xmdfSetData $instance FileSet $fcount type AnyView
-incr fcount
-
-utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_U2X_2C_1024B.vho
-utilities_xmdf::xmdfSetData $instance FileSet $fcount type vhdl_template
-incr fcount
-
-utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_U2X_2C_1024B.vhd
-utilities_xmdf::xmdfSetData $instance FileSet $fcount type vhdl
-incr fcount
-
 utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_U2X_2C_1024B.asy
 utilities_xmdf::xmdfSetData $instance FileSet $fcount type asy
 incr fcount
 
-utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_U2X_2C_1024B.veo
-utilities_xmdf::xmdfSetData $instance FileSet $fcount type verilog_template
+utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_U2X_2C_1024B.ndf
+utilities_xmdf::xmdfSetData $instance FileSet $fcount type AnyView
 incr fcount
 
 utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_U2X_2C_1024B.ngc
@@ -68,8 +56,28 @@ utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_U2X_2C_
 utilities_xmdf::xmdfSetData $instance FileSet $fcount type verilog
 incr fcount
 
+utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_U2X_2C_1024B.veo
+utilities_xmdf::xmdfSetData $instance FileSet $fcount type verilog_template
+incr fcount
+
+utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_U2X_2C_1024B.vhd
+utilities_xmdf::xmdfSetData $instance FileSet $fcount type vhdl
+incr fcount
+
+utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_U2X_2C_1024B.vho
+utilities_xmdf::xmdfSetData $instance FileSet $fcount type vhdl_template
+incr fcount
+
 utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_U2X_2C_1024B.xco
 utilities_xmdf::xmdfSetData $instance FileSet $fcount type coregen_ip
+incr fcount
+
+utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_U2X_2C_1024B_padded.ngc
+utilities_xmdf::xmdfSetData $instance FileSet $fcount type ngc
+incr fcount
+
+utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_U2X_2C_1024B_xmdf.tcl
+utilities_xmdf::xmdfSetData $instance FileSet $fcount type AnyView
 incr fcount
 
 utilities_xmdf::xmdfSetData $instance FileSet $fcount associated_module fifo_U2X_2C_1024B

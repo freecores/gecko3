@@ -38,6 +38,7 @@ net "b_dbus<15>" loc = "W12";
 
 net "o_LEDrx" loc = "C6";
 net "o_LEDtx" loc = "F7";
-net "o_LEDrun"  loc = "D7";
+net "o_LEDrun"loc = "D7";
+
 
 

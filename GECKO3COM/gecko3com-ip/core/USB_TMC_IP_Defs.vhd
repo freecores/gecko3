@@ -33,39 +33,20 @@ library XilinxCoreLib;
 package USB_TMC_IP_Defs is
 
  -- constants
-  constant SIZE_DBUS_GPIF     : INTEGER := 16;  -- SIZE in bit
-  constant SIZE_DBUS_FPGA 	   : INTEGER := 32;  -- SIZE in bit
-  constant SETUP_TIME        : INTEGER := 10;  -- setuptime for FIFO value between 0 and 15
-  constant BYTE				   : INTEGER := 8;
+  constant SIZE_DBUS_GPIF 	: INTEGER := 16;  -- SIZE in bit
+  constant SIZE_DBUS_FPGA 	: INTEGER := 32;  -- SIZE in bit
+  constant SETUP_TIME     	: INTEGER := 10;  -- setuptime for FIFO value between 0 and 15
+  constant BYTE				: INTEGER := 8;
 	 
-  constant NUMBER_OF_SW		   : INTEGER := 4;
-  constant USBTMC_HEADER_SIZE : INTEGER := 12;
+  constant NUMBER_OF_SW		: INTEGER := 4;
   
-  constant HEAD_EXT_VAL       : INTEGER := 6;
   
-						
-						
-  type tHeaderReg is RECORD
-     MsgID  : std_logic_vector(BYTE-1 downto 0);
-	  bTag   : std_logic_vector(BYTE-1 downto 0);
-	  bTagInv: std_logic_vector(BYTE-1 downto 0);
-	  res1   : std_logic_vector(BYTE-1 downto 0);
-	  TfSize : std_logic_vector((4*BYTE)-1 downto 0);
-	  bmTfAtt: std_logic_vector((BYTE)-1 downto 0);
-	  GPByte1: std_logic_vector((BYTE)-1 downto 0);
-	  GPByte2: std_logic_vector((BYTE)-1 downto 0);
-	  GPByte3: std_logic_vector((BYTE)-1 downto 0);
-	end record;
-	
-	subtype tByte is std_logic_vector(BYTE-1 downto 0);
-	  
- -- USBTMC
-  constant DEV_DEP_MSG_OUT            : tByte := x"01";
-  constant REQUEST_DEV_DEP_MSG_IN     : tByte := x"02";
-  constant DEV_DEP_MSG_IN             : tByte := x"02";
-  
-  constant VENDOR_SPECIFIC_OUT        : tByte := x"7E";
-  constant REQUEST_VENDOR_SPECIFIC_IN : tByte := x"7F";
-  constant VENDOR_SPECIFIC_IN         : tByte := x"7F";
-  
+ -- types  
+
+
+
+
+
+
+
 end USB_TMC_IP_Defs;

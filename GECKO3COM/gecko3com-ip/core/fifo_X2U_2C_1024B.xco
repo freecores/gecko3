@@ -1,7 +1,7 @@
 ##############################################################
 #
-# Xilinx Core Generator version IP3_J.9
-# Date: Mon Jun 15 11:40:53 2009
+# Xilinx Core Generator version 11.1
+# Date: Mon Nov 30 21:50:07 2009
 #
 ##############################################################
 #
@@ -74,4 +74,3 @@ CSET write_data_count_width=9
 # END Parameters
 GENERATE
 # CRC: 6c77f886
-

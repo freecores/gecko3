@@ -11,9 +11,9 @@ library XilinxCoreLib;
 
 library work;
 use work.USB_TMC_IP_Defs.all;
+use work.USB_TMC_cmp.all;
 
 entity USB_TMC_IP_tb is
-
 end USB_TMC_IP_tb;
 
 
@@ -66,7 +66,7 @@ end component USB_TMC_IP;
   signal sim_clk : std_logic;
   signal sim_rst : std_logic;
 
-  signal s_RxD, s_TxD, s_LEDrun, s_LEDrxtx : std_logic;
+  signal s_LEDrun, s_LEDtx, s_LEDrx : std_logic;
   signal s_Switches : std_logic_vector(NUMBER_OF_SW-1 downto 0);
   
   
@@ -263,9 +263,11 @@ DUT : USB_TMC_IP
     if(WRX = '0') then
       assert WRX = '0' report "WRX : Waiting on incoming MSG ...." severity note;
       wait on WRX until WRX= '1';
+		wait for 7*CLK_PERIOD;
 		RDYU <= '1';
 		assert WRX = '1' report "CORE send data RQ >>>" severity note;
     else
+	   wait for 7*CLK_PERIOD;
 		RDYU <= '1';
 		assert WRX = '1' report "CORE send data RQ >>>" severity note;
     end if;

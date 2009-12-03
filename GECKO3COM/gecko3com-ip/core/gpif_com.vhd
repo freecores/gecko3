@@ -49,21 +49,24 @@ architecture com_core of gpif_com is
   -- interconection signals
 
   signal s_bus_trans_dir     : t_busAccess;
-  signal s_FIFOrst           : std_logic;
+  signal s_FIFOrst,
+         s_RDYX,
+         s_WRX           : std_logic;
 
      -- U2X
-  signal s_U2X_FULL,
-         s_U2X_AM_FULL  : std_logic;
+  signal s_U2X_WR_EN : std_logic;
 
      -- X2U
-  signal s_X2U_EMPTY,
-         s_X2U_AM_EMPTY : std_logic;
+  signal s_X2U_RD_EN   : std_logic;
  
 begin
 
-
-
-
+  o_FIFOrst   <= s_FIFOrst;
+  o_X2U_RD_EN <= s_X2U_RD_EN;
+  o_WRX       <= s_WRX;                    
+  o_RDYX      <= s_RDYX; 
+  o_U2X_WR_EN <= 	s_U2X_WR_EN;			     
+	 
   -----------------------------------------------------------------------------
   -- Data bus access
   -----------------------------------------------------------------------------
@@ -115,17 +118,17 @@ begin
 
 
     -- comb logic
-    transaction : process(pr_state, i_WRU, i_RDYU, s_U2X_AM_FULL, s_X2U_EMPTY)
+    transaction : process(pr_state, i_WRU, i_RDYU, i_U2X_AM_FULL, i_X2U_EMPTY)
     begin  -- process transaction
 	 
 	    -- default signal sets to avoid latches
 		  s_FIFOrst       <= '0';
 		  s_bus_trans_dir <= readFromGPIF;
-		  o_U2X_WR_EN 		<= '0';
-		  o_X2U_RD_EN		<= '0';
+		  s_U2X_WR_EN 		<= '0';
+		  s_X2U_RD_EN		<= '0';
 		  nx_state 		   <= idle;
-		  o_WRX				<= '0';
-		  o_RDYX				<= '0';
+		  s_WRX				<= '0';
+		  s_RDYX				<= '0';
 		  o_LEDrun			<= '1';
 		  o_LEDrx			<= '0';
 		  o_LEDtx			<= '0';
@@ -136,30 +139,34 @@ begin
         when rst =>
 				-- out signal states
            s_FIFOrst       <= '1';
-           o_WRX           <= '0';
-           o_RDYX          <= '0';
+           s_WRX           <= '0';
+           s_RDYX          <= '0';
+           s_U2X_WR_EN     <= '0';
+           s_X2U_RD_EN     <= '0';
            
            s_bus_trans_dir <= readFromGPIF;
 			  
 			    -- state decisions
            nx_state        <= idle;
 			  o_LEDrun			<= '0';
+			  
         
         when idle =>
 				-- out signal states
           s_FIFOrst       <= '0';
-          o_WRX           <= '0';
-          o_RDYX          <= '0';
-          o_U2X_WR_EN     <= '0';
-          o_X2U_RD_EN     <= '0';
+          s_WRX           <= '0';
+          s_RDYX          <= '0';
+          s_U2X_WR_EN     <= '0';
+          s_X2U_RD_EN     <= '0';
           s_bus_trans_dir <= readFromGPIF;
+			 
 
 			    -- state decisions
           if i_WRU = '1' and i_RDYU = '1' then
             nx_state <= rst;
           elsif i_WRU = '1' and i_RDYU = '0' then
             nx_state <= inRQ;
-          elsif i_WRU = '0' and s_X2U_EMPTY = '0' then
+          elsif i_WRU = '0' and i_X2U_EMPTY = '0' then
             nx_state <= outRQ;
           else
             nx_state <= idle;
@@ -168,39 +175,39 @@ begin
         -- in trans
         when inRQ =>
 				-- out signal states
-          o_WRX  <= '0';
-          o_RDYX <= '0';
+          s_WRX  <= '0';
+          s_RDYX <= '0';
 			    -- state decisions
           if i_WRU = '1' and i_RDYU = '1' then
             nx_state <= rst;
-          elsif s_U2X_AM_FULL = '0' then
+          elsif i_U2X_AM_FULL = '0' then
             nx_state <= inACK;
-				o_RDYX		 <= '1';
+				s_RDYX		 <= '1';
           else
             nx_state <= idle;
           end if;
 
         when inACK =>
 				-- out signal states
-          o_WRX  		 <= '0';
-          o_RDYX		 <= '0';
-			 o_U2X_WR_EN <= '0';
+          s_WRX  		 <= '0';
+          s_RDYX		 <= '0';
+			 s_U2X_WR_EN <= '0';
 			 
 			    -- state decisions
 			 if i_WRU = '1' and i_RDYU = '1' then
             nx_state <= rst;
           elsif i_WRU = '1' then
             nx_state    <= inTrans;
-			   o_U2X_WR_EN <= '1';
-				o_RDYX		 <= '1';
+			   s_U2X_WR_EN <= '1';
+				s_RDYX		 <= '1';
           else
             nx_state <= endInTrans;
           end if;
 
         when inTrans =>
 				-- out signal states
-          o_WRX       <= '0';
-          o_RDYX      <= '0';
+          s_WRX       <= '0';
+          s_RDYX      <= '0';
 			 o_LEDrx		 <= '1';
 
 				-- state decisions
@@ -208,29 +215,29 @@ begin
             nx_state <= rst;
           elsif i_WRU = '0' then
             nx_state <= endInTrans;
-				o_RDYX      <= '1';
-	         o_U2X_WR_EN <= '1';
+				s_RDYX      <= '1';
+	         s_U2X_WR_EN <= '1';
           elsif i_U2X_AM_FULL = '1' then
             nx_state <= throt;
-    			o_U2X_WR_EN <= '1';
+    			s_U2X_WR_EN <= '1';
           else
             nx_state <= inTrans;
-	         o_RDYX      <= '1';
-	         o_U2X_WR_EN <= '1';
+	         s_RDYX      <= '1';
+	         s_U2X_WR_EN <= '1';
           end if;
 
         when throt =>
 				-- out signal states
-          o_WRX       <= '0';
-          o_RDYX      <= '0';
-          o_U2X_WR_EN <= '0';
+          s_WRX       <= '0';
+          s_RDYX      <= '0';
+          s_U2X_WR_EN <= '0';
 				-- state decisions
           if i_WRU = '1' and i_RDYU = '1' then
             nx_state <= rst;
           elsif i_U2X_AM_FULL = '0' then
             nx_state <= inACK;
-				o_RDYX      <= '1';
-				o_U2X_WR_EN <= '1';
+				s_RDYX      <= '1';
+				s_U2X_WR_EN <= '1';
           elsif i_WRU = '0' then
             nx_state <= endInTrans;
           else
@@ -239,9 +246,9 @@ begin
  
         when endInTrans =>
 				-- out signal states
-          o_WRX       <= '0';
-          o_RDYX      <= '0';
-          o_U2X_WR_EN <= '1';
+          s_WRX       <= '0';
+          s_RDYX      <= '0';
+          s_U2X_WR_EN <= '1';
 				-- state decisions
           nx_state <= idle;
 
@@ -249,53 +256,53 @@ begin
         -- out trans
         when outRQ =>
 				-- out signal states
-          o_WRX  <= '1';
-          o_RDYX <= '0';
+          s_WRX  <= '1';
+          s_RDYX <= '0';
 				-- state decisions
           if i_WRU = '1' and i_RDYU = '1' then
             nx_state <= rst;
-	         o_WRX    <= '0';
+	         s_WRX    <= '0';
           elsif i_WRU = '1' and i_RDYU = '0' then
             nx_state <= inRQ;
           elsif i_WRU = '0' and i_RDYU = '0' then  -- vervollständigt, wenn ez-usb noch beschäfigt mit altem transfer
-            nx_state        <= outTrans;
+            s_X2U_RD_EN     <= '1';
+				nx_state        <= outTrans;
 --            s_bus_trans_dir <= writeToGPIF;
-          else
+			 else
 				nx_state        <= outRQ;
           end if;
 
 
         when outTrans =>
 				-- out signal states
-           o_WRX           <= '1';
-           o_RDYX          <= '0';
-           o_X2U_RD_EN     <= '1';
+           s_WRX           <= '1';
+           s_RDYX          <= '0';
+           s_X2U_RD_EN     <= '1';
            s_bus_trans_dir <= writeToGPIF;
 			  o_LEDtx			<= '1';
 				-- state decisions
            if i_WRU = '1' and i_RDYU = '1' then
              nx_state <= rst;
-				 o_WRX           <= '0';
-             o_X2U_RD_EN     <= '0';
+				 s_WRX           <= '0';
+             s_X2U_RD_EN     <= '0';
              s_bus_trans_dir <= readFromGPIF;
-           elsif s_X2U_EMPTY = '1' then
+           elsif i_X2U_EMPTY = '1' then
              nx_state <= endOutTrans;
            elsif i_WRU = '0' and i_RDYU = '1' then
              nx_state <= outTrans;
            else
-				 o_X2U_RD_EN     <= '0';		-- to realise a wait case
+				 s_X2U_RD_EN     <= '0';		-- to realise a wait case
 				 nx_state <= outTrans;
            end if;
            
         when endOutTrans =>
 				-- out signal states
-          o_WRX       <= '1';  -- nötig um letzte 16bit an ez-usb zu schreiben
-          o_RDYX      <= '0';
-          o_X2U_RD_EN <= '1';  -- nötig, da empyte flag schon beim ersten fifo zugriff auftaucht, zweite 16bit müssen noch gelesen werden
+			 s_RDYX      <= '0';
+          s_WRX       <= '1';  -- nötig um letzte 16bit an ez-usb zu schreiben
+          s_X2U_RD_EN <= '1';  -- nötig da empyte flag schon beim ersten fifo zugriff auftaucht, zweite 16bit müssen noch gelesen werden
 			 s_bus_trans_dir <= writeToGPIF;
 				-- state decisions
           nx_state <= idle;
-
         -- error case
         when others =>
           nx_state <= idle;

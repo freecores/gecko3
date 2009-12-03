@@ -23,7 +23,7 @@
 --     appliances, devices, or systems. Use in such applications are          --
 --     expressly prohibited.                                                  --
 --                                                                            --
---     (c) Copyright 1995-2007 Xilinx, Inc.                                   --
+--     (c) Copyright 1995-2009 Xilinx, Inc.                                   --
 --     All rights reserved.                                                   --
 --------------------------------------------------------------------------------
 -- You must compile the wrapper file fifo_X2U_2C_1024B.vhd when simulating

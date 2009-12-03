@@ -45,6 +45,7 @@ package USB_TMC_cmp is
 
 -- FIFO IN
 
+
 component fifo_U2X_2C_1024B
         port (
         din          : IN  std_logic_VECTOR(SIZE_DBUS_GPIF-1 downto 0);
@@ -59,6 +60,7 @@ component fifo_U2X_2C_1024B
         empty        : OUT std_logic;
         full         : OUT std_logic);
 end component;
+
 
 attribute box_type of fifo_U2X_2C_1024B : component is "black_box";
 

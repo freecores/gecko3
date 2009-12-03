@@ -36,12 +36,24 @@ utilities_xmdf::xmdfSetData $instance FileSet $fcount type logical_library
 utilities_xmdf::xmdfSetData $instance FileSet $fcount logical_library unisim
 incr fcount
 
+utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_X2U_2C_1024B.asy
+utilities_xmdf::xmdfSetData $instance FileSet $fcount type asy
+incr fcount
+
 utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_X2U_2C_1024B.ngc
 utilities_xmdf::xmdfSetData $instance FileSet $fcount type ngc
 incr fcount
 
-utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_X2U_2C_1024B.asy
-utilities_xmdf::xmdfSetData $instance FileSet $fcount type asy
+utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_X2U_2C_1024B.sym
+utilities_xmdf::xmdfSetData $instance FileSet $fcount type symbol
+incr fcount
+
+utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_X2U_2C_1024B.v
+utilities_xmdf::xmdfSetData $instance FileSet $fcount type verilog
+incr fcount
+
+utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_X2U_2C_1024B.veo
+utilities_xmdf::xmdfSetData $instance FileSet $fcount type verilog_template
 incr fcount
 
 utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_X2U_2C_1024B.vhd
@@ -58,18 +70,6 @@ incr fcount
 
 utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_X2U_2C_1024B_xmdf.tcl
 utilities_xmdf::xmdfSetData $instance FileSet $fcount type AnyView
-incr fcount
-
-utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_X2U_2C_1024B.v
-utilities_xmdf::xmdfSetData $instance FileSet $fcount type verilog
-incr fcount
-
-utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_X2U_2C_1024B.veo
-utilities_xmdf::xmdfSetData $instance FileSet $fcount type verilog_template
-incr fcount
-
-utilities_xmdf::xmdfSetData $instance FileSet $fcount relative_path fifo_X2U_2C_1024B.sym
-utilities_xmdf::xmdfSetData $instance FileSet $fcount type symbol
 incr fcount
 
 utilities_xmdf::xmdfSetData $instance FileSet $fcount associated_module fifo_X2U_2C_1024B

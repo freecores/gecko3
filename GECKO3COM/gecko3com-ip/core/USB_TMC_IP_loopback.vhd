@@ -93,6 +93,7 @@ begin
 		  
 			if i_U2X_AM_EMPTY = '0' and i_X2U_AM_FULL = '0' then
 			  nx_stateLoop <= writeRQ;
+			  s_U2X_RD_EN <= '1';
 			else
 			  nx_stateLoop <= idle;
         end if;
@@ -130,7 +131,7 @@ begin
 		  when writeEnd =>
 				nx_stateLoop <= idle;
 				s_U2X_RD_EN <= '0';
-				s_X2U_WR_EN <= '0';
+				s_X2U_WR_EN <= '1';
 
 
         -- error case

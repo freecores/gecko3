@@ -1,7 +1,7 @@
 ##############################################################
 #
-# Xilinx Core Generator version IP3_J.9
-# Date: Mon Jun 15 11:30:04 2009
+# Xilinx Core Generator version 11.1
+# Date: Mon Nov 30 21:50:47 2009
 #
 ##############################################################
 #
@@ -13,10 +13,10 @@
 ##############################################################
 #
 # BEGIN Project Options
-SET addpads = False
+SET addpads = True
 SET asysymbol = True
 SET busformat = BusFormatAngleBracketNotRipped
-SET createndf = False
+SET createndf = True
 SET designentry = VHDL
 SET device = xc3s1500
 SET devicefamily = spartan3
@@ -73,5 +73,4 @@ CSET write_data_count=false
 CSET write_data_count_width=9
 # END Parameters
 GENERATE
-# CRC: 29c5e3d3
-
+# CRC:  3e26ac0

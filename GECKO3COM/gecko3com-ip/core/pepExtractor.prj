@@ -1,0 +1,5 @@
+work	USB_TMC_IP.vhd
+work	USB_TMC_IP_Defs.vhd
+work	USB_TMC_IP_loopback.vhd
+work	USB_TMC_cmp.vhd
+work	gpif_com.vhd

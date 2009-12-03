@@ -23,7 +23,7 @@
 *     appliances, devices, or systems. Use in such applications are            *
 *     expressly prohibited.                                                    *
 *                                                                              *
-*     (c) Copyright 1995-2007 Xilinx, Inc.                                     *
+*     (c) Copyright 1995-2009 Xilinx, Inc.                                     *
 *     All rights reserved.                                                     *
 *******************************************************************************/
 // The following must be inserted into your Verilog file for this
