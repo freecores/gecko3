@@ -42,6 +42,7 @@
 #include "debugprint.h"
 #include "stdint.h"
 
+
 SPI_flash xdata flash_dr;
 
 
@@ -69,7 +70,7 @@ setup_enables (unsigned char enables)
   // Hardware enables are active low.
 
   if(count_bits8(enables) > 1) {
-    //print_info("en\n");
+    //print_error("en\n");
     return;
   }
   else {
@@ -78,13 +79,18 @@ setup_enables (unsigned char enables)
     enables &= bmSPI_CS_MASK;
     SPI_CS_PORT |= bmSPI_CS_MASK;   //disable all chipselect signals
     SPI_CS_PORT &= ~enables;
-    SPI_CS_OE |= enables;
+    //SPI_CS_OE |= enables;
+    SPI_CS_OE |= bmSPI_CS_MASK;
   }
 }
 
 
 /** disables all SPI devices and sets the SPI and SPI CS signals to tri-state */
-#define disable_all()	{setup_enables (0); SPI_OE &= ~bmSPI_MASK;}  
+#define disable_all()	{	 \
+    setup_enables (0);		 \
+    }    /*    SPI_OE &= ~bmSPI_MASK;		\
+    SPI_CS_OE &= ~bmSPI_CS_MASK; \
+    }  */
 
 
 /** \brief Internal: Writes one byte to the SPI bus
@@ -165,7 +171,7 @@ int8_t init_spiflash(xdata SPI_flash *flashPtr) {
   bitSPI_MOSI = 0;		/* idle state has CLK = 0 */
 
   ptrCheck(flashPtr);
-
+  
   setup_enables(bmSPI_CS_FLASH);
   write_byte_msb(RDID);
   read_bytes_msb (flashID, 3);
@@ -219,6 +225,8 @@ int8_t init_spiflash(xdata SPI_flash *flashPtr) {
   }
   else {
     return UNSUPPORTED_TYPE;
+    /* debug stuff: */
+    //return *idPtr;
   }	
 }
 
@@ -233,8 +241,9 @@ int8_t spiflash_read(xdata SPI_flash *flashPtr, xdata uint32_t *adress, xdata ui
   //print_info("r\n");
 
   /* we do a bit dirty programming here:
-   * the adress of the device is only 24bit long, so we misuse the upper 8bits to send the 
-   * read command to the spi flash. this avoids more complicated constructs. */
+   * the adress of the device is only 24bit long, so we misuse the upper 8bits 
+   * to send the read command to the spi flash. 
+   * this avoids more complicated constructs. */
   *adress &= 0x00FFFFFF; 
   *adress |= 0x03000000; //set the upper 8bit to the READ command
 
@@ -264,8 +273,9 @@ int8_t spiflash_erase(xdata SPI_flash *flashPtr, xdata uint32_t *adress) {
   disable_all();
 
   /* we do a bit dirty programming here:
-   * the adress of the device is only 24bit long, so we misuse the upper 8bits to send the 
-   * read command to the spi flash. this avoids more complicated constructs. */
+   * the adress of the device is only 24bit long, so we misuse the upper 8bits 
+   * to send the read command to the spi flash. 
+   * this avoids more complicated constructs. */
   *adress &= 0x00FFFFFF; 
   *adress |= 0xD8000000; //set the upper 8bit to the SE (sector erase) command
 
@@ -327,8 +337,9 @@ int8_t spiflash_write(xdata SPI_flash *flashPtr, xdata uint32_t *adress, \
     //printf_tiny("%d\n",writeableBytes);    
 
     /* we do a bit dirty programming here:
-     * the adress of the device is only 24bit long, so we misuse the upper 8bits to send the 
-     * read command to the spi flash. this avoids more complicated constructs. */
+     * the adress of the device is only 24bit long, so we misuse the upper 8bits
+     * to send the read command to the spi flash. 
+     * this avoids more complicated constructs. */
     *adress &= 0x00FFFFFF; 
     *adress |= 0x02000000; //set the upper 8bit to the PP (page programm) command
     

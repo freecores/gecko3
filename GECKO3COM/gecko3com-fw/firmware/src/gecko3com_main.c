@@ -306,10 +306,10 @@ uint8_t app_write_conf_to_flash(/* xdata unsigned char *buffer,*/	\
     
     /* select which file slot we have to delete */
     if(buffer[*offset] == '0') {
-      flash_adress = START_ADRESS_SLOT0;
+      flash_adress = start_adress_slot0(flash_dr);
     }
     else if(buffer[*offset] == '1'){
-      flash_adress = START_ADRESS_SLOT1;
+      flash_adress = start_adress_slot1(flash_dr);
     }
     else {
       //print_err("slot\n");
@@ -405,10 +405,10 @@ uint8_t app_gecko3com_flash_delete(/* uint8_t *buffer,*/ idata uint16_t *offset)
     /* select which file slot we have to delete */
     slot = buffer[*offset];
     if(slot == '0') {
-      flash_adress = START_ADRESS_SLOT0;
+      flash_adress = start_adress_slot0(flash_dr);
     }
     else if(slot == '1'){
-      flash_adress = START_ADRESS_SLOT1;
+      flash_adress = start_adress_slot1(flash_dr);
     }
     else {
       //print_err("del\n");
@@ -575,6 +575,7 @@ static void main_loop (void)
 
   buffer = EP2FIFOBUF;
   scpi_scanner.action = NOACTION;
+  index = 0;
 
   while (1){
 
@@ -947,11 +948,11 @@ void main(void)
   /* read which configuration, the first or second, we should use */
   if(get_switch()){
     led_color = GREEN;
-    spi_base_adress = START_ADRESS_SLOT0;
+    spi_base_adress = start_adress_slot0(flash_dr);
   }
   else {
     led_color = RED;
-    spi_base_adress = START_ADRESS_SLOT1;
+    spi_base_adress = start_adress_slot1(flash_dr);
   }
   
   /* read the configuration file size from the spi flash */
@@ -961,6 +962,11 @@ void main(void)
   ((idata uint8_t*)&file_size)[2] = response_queue.buf[2];
   ((idata uint8_t*)&file_size)[3] = response_queue.buf[3];
   spi_base_adress += 4;
+
+  /* debug stuff */
+  response_queue.buf[0] = init_spiflash(&flash_dr);
+  IEEE488_set_mav();
+  response_queue.length = 1;
 
   /* there is nothing to configure when the filesize is 0 or 0xFFFFFFFF */
   if(file_size == 0 || file_size == 0xFFFFFFFF) {

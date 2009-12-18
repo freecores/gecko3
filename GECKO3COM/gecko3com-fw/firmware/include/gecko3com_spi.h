@@ -35,11 +35,11 @@
 #ifndef INCLUDED_GECKO3COM_SPI_H
 #define INCLUDED_GECKO3COM_SPI_H
 
+#include "spi_flash.h"
 
-#define START_ADRESS_SLOT0 0x0 /**< Start adress of the first fpga configuration file in the spi flash */
-#define START_ADRESS_SLOT1 0x00100000 /**< Start adress of the second fpga configuration file in the spi flash */
+#define start_adress_slot0(flash_drv) 0x00 /**< Start adress of the first fpga configuration file in the spi flash */
+#define start_adress_slot1(flash_drv) flash_drv.capacity >> 1 /**< Start adress of the second fpga configuration file in the spi flash */
 
-#define SPIFLASH_SECTOR_LENGTH 0x10000 /**< Length of one sector in the flash, needed for erasing */
-#define SECTORS_PER_SLOT 16 /**< Number of sectors used for each configuration file slot */
+
 
 #endif /* INCLUDED_GECKO3COM_SPI_H */

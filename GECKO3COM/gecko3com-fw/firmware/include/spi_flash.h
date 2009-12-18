@@ -75,6 +75,9 @@ typedef struct
 
 #define FLASH_WRITE_BUFFER_SIZE 0x100   /**< Write Buffer = 256 bytes */
 
+#define SPIFLASH_SECTOR_LENGTH 0x10000 /**< Length of one sector in the flash, needed for erasing */
+#define SECTORS_PER_SLOT 16 /**< Number of sectors used for each configuration file slot */
+
 #define MANUFACTURER_STM 0x20		/**< id of ST microelectronics */
 #define MEMTYPE_STM 0x20		/**< Memory type of M25PXX */
 #define MEMCAPACITY_8MBIT_STM 0x14	/**< 8 MBit memory capacity */

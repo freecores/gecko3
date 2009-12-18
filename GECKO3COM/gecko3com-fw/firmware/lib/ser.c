@@ -82,7 +82,7 @@ ser_init(void)
   
   UART230 = 0x01; /*enable high speed baud rate generator, 115,2 kbaud*/
 
-  /*T2CON = 0x30; /*select timer 2 as baudrate generator*/
+  /*T2CON = 0x30;*/ /*select timer 2 as baudrate generator*/
   /* Baudrate = 19200, oscillator frq. of my processor is 21.4772 MHz */
   /*RCAP2H = 0xFF;*/
   /*RCAP2L = 0xDD;*/
