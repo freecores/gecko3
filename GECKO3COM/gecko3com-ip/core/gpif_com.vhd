@@ -1,11 +1,113 @@
+--  GECKO3COM IP Core
+--
+--  Copyright (C) 2009 by
+--   ___    ___   _   _
+--  (  _ \ (  __)( ) ( )
+--  | (_) )| (   | |_| |   Bern University of Applied Sciences
+--  |  _ < |  _) |  _  |   School of Engineering and
+--  | (_) )| |   | | | |   Information Technology
+--  (____/ (_)   (_) (_)
+--
+--  This program is free software: you can redistribute it and/or modify
+--  it under the terms of the GNU General Public License as published by
+--  the Free Software Foundation, either version 3 of the License, or
+--  (at your option) any later version.
+--
+--  This program is distributed in the hope that it will be useful,
+--  but WITHOUT ANY WARRANTY; without even the implied warranty of
+--  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+--  GNU General Public License for more details. 
+--  You should have received a copy of the GNU General Public License
+--  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+--
+--  URL to the project description: 
+--    http://labs.ti.bfh.ch/gecko/wiki/systems/gecko3com/start
+----------------------------------------------------------------------------------
+--
+--  Author:  Andreas Habegger, Christoph Zimmermann
+--  Date of creation: 8. April 2009
+--  Description:
+--   	GECKO3COM defines the communication between the GECKO3main and a USB Master e.g. a computer.
+--		This file is the top module, it instantiates all required submodules and connects them 
+--		together.
+--
+--  Target Devices:	Xilinx Spartan3 FPGA's (usage of BlockRam in the Datapath)
+--  Tool versions: 	11.1
+--  Dependencies:
+--
+----------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 
 library work;
-use work.USB_TMC_IP_Defs.all;
+use work.GECKO3COM_defines.all;
+use work.USB_TMC_cmp.all;
+
 
 entity gpif_com is
+  port (
+    i_nReset,
+    i_IFCLK,									 -- GPIF CLK (GPIF is Master and provides the clock)
+    i_SYSCLK,									 -- FPGA System CLK
+    i_WRU,                              -- write from GPIF
+    i_RDYU 	  : in   	std_logic;        -- GPIF is ready
+    o_WRX,                              -- To write to GPIF
+    o_RDYX    : out  	std_logic;      -- IP Core is ready
+    o_ABORT   : out   std_logic;  -- Abort detected, you have to flush the data
+    o_RX,                            -- controll LED rx
+    o_TX : out 	 	std_logic; 		 -- controll LED tx
+    b_gpif_bus 	  : inout	std_logic_vector(SIZE_DBUS_GPIF-1 downto 0));  -- bidirect data bus
+end gpif_com;
+
+
+
+architecture structure of gpif_com is
+  
+  -- interconection signals
+
+  signal s_FIFOrst           : std_logic;
+  
+  signal s_ABORT_FSM, s_ABORT_TMP  : std_logic;
+  signal s_RX_FSM, s_RX_TMP  : std_logic;
+  signal s_TX_FSM, s_TX_TMP  : std_logic;
+  
+     -- USB to Xilinx (U2X)
+  signal s_U2X_WR_EN,
+         s_U2X_RD_EN,
+         s_U2X_FULL,
+         s_U2X_AM_FULL,
+         s_U2X_EMPTY,
+         s_U2X_AM_EMPTY : std_logic;
+
+     -- Xilinx to USB (X2U)
+  signal s_X2U_WR_EN,
+         s_X2U_RD_EN,
+         s_X2U_FULL,
+         s_X2U_AM_FULL,
+         s_X2U_EMPTY,
+         s_X2U_AM_EMPTY : std_logic;
+
+  -------------------------------------------------------------------------------
+  -- data bus
+  -------------------------------------------------------------------------------
+
+  -- data signals
+  signal s_dbus_trans_dir     : std_logic;
+	signal s_dbus_in  : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
+	signal s_dbus_out : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
+	
+	signal s_opb_in	: std_logic_vector(SIZE_DBUS_FPGA-1 downto 0);
+	signal s_opb_out	: std_logic_vector(SIZE_DBUS_FPGA-1 downto 0);
+  
+
+  -----------------------------------------------------------------------------
+  -- COMPONENTS
+  -----------------------------------------------------------------------------
+
+  -- FSM GPIF
+  component gpif_com_fsm
   port (
     i_nReset,
     i_IFCLK,									-- GPIF CLK (is Master)
@@ -14,300 +116,133 @@ entity gpif_com is
     i_U2X_FULL,
     i_U2X_AM_FULL,	 -- signals for IN FIFO
     i_X2U_AM_EMPTY,
-	 i_X2U_EMPTY	: in  std_logic;     -- signals for OUT FIFO
-	 i_dbus        : in    std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);	-- OUT FIFO DBUS
-	 o_U2X_WR_EN, 						      -- signals for IN FIFO
-	 o_X2U_RD_EN,								-- signals for OUT FIFO
-	 o_FIFOrst,
+    i_X2U_EMPTY	: in  std_logic;     -- signals for OUT FIFO
+    o_bus_trans_dir        : out    std_logic;
+    o_U2X_WR_EN, 						      -- signals for IN FIFO
+    o_X2U_RD_EN,								-- signals for OUT FIFO
+    o_FIFOrst,
     o_WRX,                             -- To write to GPIF
     o_RDYX    : out   std_logic;       -- Core is ready
-	 o_LEDrx,
-	 o_LEDtx,
-	 o_LEDrun  : out   std_logic; 		--
-	 o_dbus    : out   std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);	-- IN FIFO DBUS
-    b_dbus 	  : inout std_logic_vector(SIZE_DBUS_GPIF-1 downto 0));  -- bidirect data bus
-end gpif_com;
+    o_ABORT   : out   std_logic;       -- abort condition detected. we have to flush the data
+    o_RX,
+    o_TX      : out   std_logic 		--
+  );
+  end component;
 
+  -- FIFO dualclock to cross the clock domain between the GPIF and the FPGA
+  component fifo_dualclock
+  port (
+    i_din          : IN  std_logic_VECTOR(SIZE_DBUS_GPIF-1 downto 0);
+    i_rd_clk       : IN  std_logic;
+    i_rd_en        : IN  std_logic;
+    i_rst          : IN  std_logic;
+    i_wr_clk       : IN  std_logic;
+    i_wr_en        : IN  std_logic;
+    o_almost_empty : OUT std_logic;
+    o_almost_full  : OUT std_logic;
+    o_dout         : OUT std_logic_VECTOR(SIZE_DBUS_GPIF-1 downto 0);
+    o_empty        : OUT std_logic;
+    o_full         : OUT std_logic);
+  end component;
 
-
-architecture com_core of gpif_com is
-
- -----------------------------------------------------------------------------
-  -- FSM
-  -----------------------------------------------------------------------------
-
-  type t_fsmState is (rst, idle,                                  -- controll states
-                     inRQ, inACK, inTrans, throt, endInTrans,  -- in com states
-                     outRQ, outTrans, endOutTrans);             -- out com states
   
-  type t_busAccess is (readFromGPIF, writeToGPIF);
-
-
-  signal pr_state, nx_state : t_fsmState;
-
-
-  -- interconection signals
-
-  signal s_bus_trans_dir     : t_busAccess;
-  signal s_FIFOrst,
-         s_RDYX,
-         s_WRX           : std_logic;
-
-     -- U2X
-  signal s_U2X_WR_EN : std_logic;
-
-     -- X2U
-  signal s_X2U_RD_EN   : std_logic;
- 
 begin
 
-  o_FIFOrst   <= s_FIFOrst;
-  o_X2U_RD_EN <= s_X2U_RD_EN;
-  o_WRX       <= s_WRX;                    
-  o_RDYX      <= s_RDYX; 
-  o_U2X_WR_EN <= 	s_U2X_WR_EN;			     
-	 
+  -----------------------------------------------------------------------------
+  -- Port map
+  -----------------------------------------------------------------------------
+
+  F_IN : fifo_dualclock
+  port map (
+    i_din          => s_dbus_in,
+    i_rd_clk       => i_SYSCLK,
+    i_rd_en        => s_U2X_RD_EN,
+    i_rst          => s_FIFOrst,
+    i_wr_clk       => i_IFCLK ,
+    i_wr_en        => s_U2X_WR_EN,
+    o_almost_empty => s_U2X_AM_EMPTY,
+    o_almost_full  => s_U2X_AM_FULL,
+    o_dout         => s_opb_in,
+    o_empty        => s_U2X_EMPTY,
+    o_full         => s_U2X_FULL
+  );
+
+
+  F_OUT : fifo_dualclock
+  port map (
+    i_din          => s_opb_out,
+    i_rd_clk       => i_IFCLK,
+    i_rd_en        => s_X2U_RD_EN,
+    i_rst          => s_FIFOrst,
+    i_wr_clk       => i_SYSCLK,
+    i_wr_en        => s_X2U_WR_EN,
+    o_almost_empty => s_X2U_AM_EMPTY,
+    o_almost_full  => s_X2U_AM_FULL,
+    o_dout         => s_dbus_out,
+    o_empty        => s_X2U_EMPTY,
+    o_full         => s_X2U_FULL
+  );
+
+
+  FSM_GPIF : gpif_com_fsm
+	port map (
+    i_nReset			=> i_nReset,
+		i_IFCLK			=>	i_IFCLK,								
+		i_WRU				=> i_WRU,                     
+		i_RDYU			=> i_RDYU,
+		i_U2X_FULL		=> s_U2X_FULL,
+		i_U2X_AM_FULL	=> s_U2X_AM_FULL,
+		i_X2U_AM_EMPTY	=> s_X2U_AM_EMPTY,
+		i_X2U_EMPTY		=> s_X2U_EMPTY,
+		o_U2X_WR_EN		=> s_U2X_WR_EN,
+		o_X2U_RD_EN		=> s_X2U_RD_EN,
+		o_FIFOrst		=> s_FIFOrst,
+		o_bus_trans_dir => s_dbus_trans_dir,
+		o_WRX				=> o_WRX,
+		o_RDYX			=> o_RDYX,
+    o_ABORT     => s_ABORT_FSM,
+		o_RX 		   => o_RX,
+		o_TX 		   => o_TX,
+	);
+
+  -- Double buffer the ABORT, RX and TX signal to avoid metastability
+  double_buf_sig : process (i_SYSCLK, i_nReset)
+  begin
+    if i_nReset = '0' then
+      o_ABORT <= '0';
+      s_ABORT_TMP <= '0';
+      s_TX_FSM <= '0'; 
+      s_TX_TMP <= '0';
+      s_RX_FSM <= '0'; 
+      s_TX_TMP <= '0';
+    elsif rising_edge(i_SYSCLK)
+      o_ABORT <= s_ABORT_TMP;
+      s_ABORT_TMP <= s_ABORT_FSM;
+      o_TX <= s_TX_TMP; 
+      s_TX_TMP <= s_TX_FSM;
+      o_RX <= s_RX_TMP; 
+      s_RX_TMP <= s_RX_FSM;
+    end if;
+  end process double_buf_sig;
+  
+
   -----------------------------------------------------------------------------
   -- Data bus access
   -----------------------------------------------------------------------------
 
-  -- purpose: to handle the access on the bidirect bus
+  -- purpose: to handle the access on the bidirectional bus
   -- type   : combinational
   -- inputs : s_bus_trans_dir
   -- outputs: 
-  bus_access : process (i_IFCLK, s_bus_trans_dir)
-
+  bus_access : process (s_dbus_trans_dir, s_dbus_out)
   begin  -- process bus_access
-    if s_bus_trans_dir = writeToGPIF then
-      b_dbus <= i_dbus;
+    if s_dbus_trans_dir = '1' then
+      b_gpifbus <= s_dbus_out;
     else
-      b_dbus <= (others => 'Z');
-      if rising_edge(i_IFCLK) then
-        o_dbus <= b_dbus;
-      end if;
+      b_gpifbus <= (others => 'Z');
     end if;
   end process bus_access;
-
-
-
-
-  -----------------------------------------------------------------------------
-  -- FSM GPIF
-  -----------------------------------------------------------------------------
-
-    -- state reg
-  action : process(i_IFCLK, i_nReset)
-		variable v_setup : integer range 0 to 15;
-    begin
-
-      if i_nReset = '0' then
-        pr_state <= rst;
-		  v_setup := 0;
-        
-      elsif rising_edge(i_IFCLK) then
-		    if v_setup < SETUP_TIME then
-			    v_setup := v_setup + 1;
-			 elsif nx_state = rst then
-				 v_setup := 0;
-				 pr_state <= nx_state;
-			 else
-			    pr_state <= nx_state;
-          end if;
-      end if;
-    end process action;
-
-
-    -- comb logic
-    transaction : process(pr_state, i_WRU, i_RDYU, i_U2X_AM_FULL, i_X2U_EMPTY)
-    begin  -- process transaction
-	 
-	    -- default signal sets to avoid latches
-		  s_FIFOrst       <= '0';
-		  s_bus_trans_dir <= readFromGPIF;
-		  s_U2X_WR_EN 		<= '0';
-		  s_X2U_RD_EN		<= '0';
-		  nx_state 		   <= idle;
-		  s_WRX				<= '0';
-		  s_RDYX				<= '0';
-		  o_LEDrun			<= '1';
-		  o_LEDrx			<= '0';
-		  o_LEDtx			<= '0';
-		  
-      case pr_state is
-        -- controll
-
-        when rst =>
-				-- out signal states
-           s_FIFOrst       <= '1';
-           s_WRX           <= '0';
-           s_RDYX          <= '0';
-           s_U2X_WR_EN     <= '0';
-           s_X2U_RD_EN     <= '0';
-           
-           s_bus_trans_dir <= readFromGPIF;
-			  
-			    -- state decisions
-           nx_state        <= idle;
-			  o_LEDrun			<= '0';
-			  
-        
-        when idle =>
-				-- out signal states
-          s_FIFOrst       <= '0';
-          s_WRX           <= '0';
-          s_RDYX          <= '0';
-          s_U2X_WR_EN     <= '0';
-          s_X2U_RD_EN     <= '0';
-          s_bus_trans_dir <= readFromGPIF;
-			 
-
-			    -- state decisions
-          if i_WRU = '1' and i_RDYU = '1' then
-            nx_state <= rst;
-          elsif i_WRU = '1' and i_RDYU = '0' then
-            nx_state <= inRQ;
-          elsif i_WRU = '0' and i_X2U_EMPTY = '0' then
-            nx_state <= outRQ;
-          else
-            nx_state <= idle;
-          end if;
-
-        -- in trans
-        when inRQ =>
-				-- out signal states
-          s_WRX  <= '0';
-          s_RDYX <= '0';
-			    -- state decisions
-          if i_WRU = '1' and i_RDYU = '1' then
-            nx_state <= rst;
-          elsif i_U2X_AM_FULL = '0' then
-            nx_state <= inACK;
-				s_RDYX		 <= '1';
-          else
-            nx_state <= idle;
-          end if;
-
-        when inACK =>
-				-- out signal states
-          s_WRX  		 <= '0';
-          s_RDYX		 <= '0';
-			 s_U2X_WR_EN <= '0';
-			 
-			    -- state decisions
-			 if i_WRU = '1' and i_RDYU = '1' then
-            nx_state <= rst;
-          elsif i_WRU = '1' then
-            nx_state    <= inTrans;
-			   s_U2X_WR_EN <= '1';
-				s_RDYX		 <= '1';
-          else
-            nx_state <= endInTrans;
-          end if;
-
-        when inTrans =>
-				-- out signal states
-          s_WRX       <= '0';
-          s_RDYX      <= '0';
-			 o_LEDrx		 <= '1';
-
-				-- state decisions
-          if i_WRU = '1' and i_RDYU = '1' then
-            nx_state <= rst;
-          elsif i_WRU = '0' then
-            nx_state <= endInTrans;
-				s_RDYX      <= '1';
-	         s_U2X_WR_EN <= '1';
-          elsif i_U2X_AM_FULL = '1' then
-            nx_state <= throt;
-    			s_U2X_WR_EN <= '1';
-          else
-            nx_state <= inTrans;
-	         s_RDYX      <= '1';
-	         s_U2X_WR_EN <= '1';
-          end if;
-
-        when throt =>
-				-- out signal states
-          s_WRX       <= '0';
-          s_RDYX      <= '0';
-          s_U2X_WR_EN <= '0';
-				-- state decisions
-          if i_WRU = '1' and i_RDYU = '1' then
-            nx_state <= rst;
-          elsif i_U2X_AM_FULL = '0' then
-            nx_state <= inACK;
-				s_RDYX      <= '1';
-				s_U2X_WR_EN <= '1';
-          elsif i_WRU = '0' then
-            nx_state <= endInTrans;
-          else
-            nx_state <= throt;
-          end if;
- 
-        when endInTrans =>
-				-- out signal states
-          s_WRX       <= '0';
-          s_RDYX      <= '0';
-          s_U2X_WR_EN <= '1';
-				-- state decisions
-          nx_state <= idle;
-
-
-        -- out trans
-        when outRQ =>
-				-- out signal states
-          s_WRX  <= '1';
-          s_RDYX <= '0';
-				-- state decisions
-          if i_WRU = '1' and i_RDYU = '1' then
-            nx_state <= rst;
-	         s_WRX    <= '0';
-          elsif i_WRU = '1' and i_RDYU = '0' then
-            nx_state <= inRQ;
-          elsif i_WRU = '0' and i_RDYU = '0' then  -- vervollständigt, wenn ez-usb noch beschäfigt mit altem transfer
-            s_X2U_RD_EN     <= '1';
-				nx_state        <= outTrans;
---            s_bus_trans_dir <= writeToGPIF;
-			 else
-				nx_state        <= outRQ;
-          end if;
-
-
-        when outTrans =>
-				-- out signal states
-           s_WRX           <= '1';
-           s_RDYX          <= '0';
-           s_X2U_RD_EN     <= '1';
-           s_bus_trans_dir <= writeToGPIF;
-			  o_LEDtx			<= '1';
-				-- state decisions
-           if i_WRU = '1' and i_RDYU = '1' then
-             nx_state <= rst;
-				 s_WRX           <= '0';
-             s_X2U_RD_EN     <= '0';
-             s_bus_trans_dir <= readFromGPIF;
-           elsif i_X2U_EMPTY = '1' then
-             nx_state <= endOutTrans;
-           elsif i_WRU = '0' and i_RDYU = '1' then
-             nx_state <= outTrans;
-           else
-				 s_X2U_RD_EN     <= '0';		-- to realise a wait case
-				 nx_state <= outTrans;
-           end if;
-           
-        when endOutTrans =>
-				-- out signal states
-			 s_RDYX      <= '0';
-          s_WRX       <= '1';  -- nötig um letzte 16bit an ez-usb zu schreiben
-          s_X2U_RD_EN <= '1';  -- nötig da empyte flag schon beim ersten fifo zugriff auftaucht, zweite 16bit müssen noch gelesen werden
-			 s_bus_trans_dir <= writeToGPIF;
-				-- state decisions
-          nx_state <= idle;
-        -- error case
-        when others =>
-          nx_state <= idle;
-      end case;
-      
-    end process transaction;
-    
-end com_core;
+  
+  s_dbus_in <= b_gpifbus;
+  
+end structure;
