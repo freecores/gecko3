@@ -106,6 +106,7 @@ ls $(PACKAGE) : $(patsubst %,$(BUILD_DIR)/%,$(OBJS))
 
 %.iic : %.hex
 	$(HEX2BIX) -o $@ $<
+	cp $@ ../../
 
 %.c   : %.re
 	re2c -s -o $@ $<
