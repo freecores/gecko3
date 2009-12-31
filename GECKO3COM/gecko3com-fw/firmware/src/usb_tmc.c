@@ -274,10 +274,11 @@ uint8_t usb_handle_tmc_packet (void){
       usb_tmc_status = TMC_STATUS_SUCCESS;
       {
 	uint8_t i = 0;
-	code char *local_capabilities = &((code char)USB_TMC_CAPABILITIES);
+	//code char *local_capabilities = &((code char)USB_TMC_CAPABILITIES);
 	for(i;i<0x18;i++){
-	  //EP0BUF[i] = (&(uintptr_t)USB_TMC_CAPABILITIES)[i];
-	  EP0BUF[i] = local_capabilities[i];
+	  //EP0BUF[i] = (&(code char)USB_TMC_CAPABILITIES)[i];
+	  //EP0BUF[i] = local_capabilities[i];
+	  EP0BUF[i] = (&(code unsigned char)USB_TMC_CAPABILITIES)[i];
 	}
 	EP0BCH = 0;
 	EP0BCL = 0x18;
