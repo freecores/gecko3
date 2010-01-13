@@ -100,23 +100,20 @@ init_gecko3com (void)
   /* FIFORESET = 8;					SYNCDELAY; */
   FIFORESET = 0;					SYNCDELAY;
   
+
+/* prime the pump */
+  EP0BCH = 0;			SYNCDELAY;
+  EP0BCL = 0;			SYNCDELAY;
+  OUTPKTEND = bmSKIP | 2;       SYNCDELAY; /* because we use quad buffering */ 
+  OUTPKTEND = bmSKIP | 2;       SYNCDELAY; /* we have to flush all for  */ 
+  OUTPKTEND = bmSKIP | 2;       SYNCDELAY; /* buffers before use */
+  OUTPKTEND = bmSKIP | 2;       SYNCDELAY;
+
   /* configure end point FIFOs */
-
-  /* let core see 0 to 1 transistion of autoout bit */
-
   EP2FIFOCFG = bmWORDWIDE;	                SYNCDELAY;
   EP6FIFOCFG = bmWORDWIDE;		        SYNCDELAY;
 
-
-
-  /* prime the pump */
-  EP0BCH = 0;			SYNCDELAY;
-  EP0BCL = 0;			SYNCDELAY;
-  OUTPKTEND = bmSKIP | 2;       SYNCDELAY; /* because we use quad buffering we have to flush all for buffers before use */
-  OUTPKTEND = bmSKIP | 2;       SYNCDELAY;
-  OUTPKTEND = bmSKIP | 2;       SYNCDELAY;
-  OUTPKTEND = bmSKIP | 2;       SYNCDELAY;
-
+ 
 
   /* set autoout length for EP2 and autoin length for EP6 */
   if(USBCS & bmHSM){

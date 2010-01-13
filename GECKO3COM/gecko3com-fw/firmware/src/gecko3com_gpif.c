@@ -92,12 +92,14 @@ isr_gpif_done (void) interrupt
 
   clear_fifo_gpif_irq();
 
-  if((flGPIF & bmGPIF_PENDING_DATA) == bmGPIF_PENDING_DATA) {
+  /* check if there is data available for an OUT transfer */
+  //if((flGPIF & bmGPIF_PENDING_DATA) == bmGPIF_PENDING_DATA) {
+  if(!(EP2468STAT & bmEP2EMPTY)) {
     flGPIF &= ~bmGPIF_PENDING_DATA;
     gpif_trigger_write();
   }
   else {
-    INPKTEND = 0x06;
+    INPKTEND = USB_TMC_EP_IN;
     gpif_trigger_read(); 
   }
 
@@ -115,10 +117,11 @@ isr_endpoint_out_data (void) interrupt
 
   clear_fifo_gpif_irq();
 
-  if((GPIFIDLECTL & bmBIT3) == bmBIT3) {
+  /* check if there is a active IN transfer */
+  /*if((GPIFIDLECTL & bmBIT3) == bmBIT3) {
     flGPIF |= bmGPIF_PENDING_DATA;
   }
-  else {
+  else*/ {
     EA = 0;		/* disable all interrupts */
     GPIFABORT = 0xFF;
     SYNCDELAY;
@@ -145,9 +148,12 @@ void init_gpif (void)
   OUTPKTEND = bmSKIP | USB_TMC_EP_OUT;
 
   /*FIXME  only here for testing */
-  EP6AUTOINLENH = (20) >> 8;	   SYNCDELAY;  /* this is the length for high speed */
-  EP6AUTOINLENL = (20) & 0xff;  SYNCDELAY;
-    
+  //EP6AUTOINLENH = (20) >> 8;	   SYNCDELAY;  /* this is the length for high speed */
+  //EP6AUTOINLENL = (20) & 0xff;  SYNCDELAY;
+  
+  //REVCTL = 0;	  /* set it back to 0 */
+  //SYNCDELAY;
+
   /* enable autoout and autoin feature of the endpoints */
   EP2FIFOCFG |= bmAUTOOUT;
   SYNCDELAY;
@@ -159,7 +165,7 @@ void init_gpif (void)
    * is available and as GPIF flag to stop the flowstate, for this the flag has to change
    * one cycle before the FIFO is completly empty, else we transfer one word too much */
   EP2FIFOPFH = bmDECIS;
-  EP2FIFOPFL = 1;
+  EP2FIFOPFL = 3;
   SYNCDELAY;
 
   EP2GPIFFLGSEL = bmFLAG_PROGRAMMABLE;
@@ -206,6 +212,7 @@ void init_gpif (void)
      to signal the firmware that the GPIF is done */
   hook_fgv(FGV_GPIFWF,(unsigned short) isr_gpif_done);
   hook_fgv(FGV_EP2PF,(unsigned short) isr_endpoint_out_data);
+  hook_fgv(FGV_EP2PF,(unsigned short) isr_endpoint_out_data);
 
   EP2FIFOIE = bmFIFO_PF;
   GPIFIE = bmGPIFWF;
@@ -237,7 +244,7 @@ void abort_gpif(void) {
   GPIFABORT = 0xFF;
   SYNCDELAY;
   while(!(GPIFTRIG & bmGPIF_IDLE));
-  print_info("gpif aborted\n");
+  //print_info("gpif aborted\n");
 
   EA = 1;		/* global interrupt enable */
 
@@ -274,6 +281,10 @@ void deactivate_gpif(void) {
   SYNCDELAY;
 
   flGPIF = 0;  /* unset all internal GPIF flags */
+
+
+  REVCTL = bmDYN_OUT | bmENH_PKT;   /*  restore the setting */
+  SYNCDELAY;
 
 #ifdef GECKO3MAIN
   //EP2FIFOCFG &= ~bmOEP;
