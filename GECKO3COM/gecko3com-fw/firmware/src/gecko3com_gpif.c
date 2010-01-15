@@ -92,17 +92,22 @@ isr_gpif_done (void) interrupt
 
   clear_fifo_gpif_irq();
 
-  /* check if there is data available for an OUT transfer */
-  //if((flGPIF & bmGPIF_PENDING_DATA) == bmGPIF_PENDING_DATA) {
-  if(!(EP2468STAT & bmEP2EMPTY)) {
+  //EA = 0;		/* disable all interrupts */
+
+  /* check if there is data available for an OUT transfer */  
+  if((flGPIF & bmGPIF_PENDING_DATA) == bmGPIF_PENDING_DATA) {
+  //if(!(EP2468STAT & bmEP2EMPTY)) {
     flGPIF &= ~bmGPIF_PENDING_DATA;
+    GPIFABORT = 0xFF;
+    SYNCDELAY;
     gpif_trigger_write();
   }
   else {
     INPKTEND = USB_TMC_EP_IN;
     gpif_trigger_read(); 
   }
-
+  //EA = 1;		/* global interrupt enable */
+  
   ISR_DEBUG_PORT &= ~bmGPIF_DONE;
 }
 
@@ -118,16 +123,16 @@ isr_endpoint_out_data (void) interrupt
   clear_fifo_gpif_irq();
 
   /* check if there is a active IN transfer */
-  /*if((GPIFIDLECTL & bmBIT3) == bmBIT3) {
+  if((GPIFIDLECTL & bmBIT3) == bmBIT3) {
     flGPIF |= bmGPIF_PENDING_DATA;
   }
-  else*/ {
-    EA = 0;		/* disable all interrupts */
+  else {
+    //EA = 0;		/* disable all interrupts */
     GPIFABORT = 0xFF;
     SYNCDELAY;
-    EA = 1;		/* global interrupt enable */
-
+    
     gpif_trigger_write(); 
+    //EA = 1;		/* global interrupt enable */
   }
 
   ISR_DEBUG_PORT &= ~bmFIFO_PF;
@@ -150,9 +155,6 @@ void init_gpif (void)
   /*FIXME  only here for testing */
   //EP6AUTOINLENH = (20) >> 8;	   SYNCDELAY;  /* this is the length for high speed */
   //EP6AUTOINLENL = (20) & 0xff;  SYNCDELAY;
-  
-  //REVCTL = 0;	  /* set it back to 0 */
-  //SYNCDELAY;
 
   /* enable autoout and autoin feature of the endpoints */
   EP2FIFOCFG |= bmAUTOOUT;
@@ -161,15 +163,16 @@ void init_gpif (void)
   SYNCDELAY;
 
   /* set endpoint 2 fifo (out) programmable flag to "higher or equal 3" 
-   * we use the programmable flag as interrupt source to detect if data for the FPGA 
-   * is available and as GPIF flag to stop the flowstate, for this the flag has to change
-   * one cycle before the FIFO is completly empty, else we transfer one word too much */
+   * we use the programmable flag as interrupt source to detect if data for the
+   * FPGA is available and as GPIF flag to stop the flowstate, for this the 
+   * flag has to change one cycle before the FIFO is completly empty, else we 
+   * transfer one word too much */
   EP2FIFOPFH = bmDECIS;
-  EP2FIFOPFL = 3;
+  EP2FIFOPFL = 1;
   SYNCDELAY;
 
-  EP2GPIFFLGSEL = bmFLAG_PROGRAMMABLE;
-  // EP2GPIFFLGSEL = bmFLAG_EMPTY;
+  //EP2GPIFFLGSEL = bmFLAG_PROGRAMMABLE;
+  EP2GPIFFLGSEL = bmFLAG_EMPTY;
   SYNCDELAY;
   EP6GPIFFLGSEL = bmFLAG_FULL;
   SYNCDELAY;
@@ -211,7 +214,6 @@ void init_gpif (void)
   /* due to big problems with the done interrupt, we use the WAVEFORM interrupt
      to signal the firmware that the GPIF is done */
   hook_fgv(FGV_GPIFWF,(unsigned short) isr_gpif_done);
-  hook_fgv(FGV_EP2PF,(unsigned short) isr_endpoint_out_data);
   hook_fgv(FGV_EP2PF,(unsigned short) isr_endpoint_out_data);
 
   EP2FIFOIE = bmFIFO_PF;
@@ -283,9 +285,6 @@ void deactivate_gpif(void) {
   flGPIF = 0;  /* unset all internal GPIF flags */
 
 
-  REVCTL = bmDYN_OUT | bmENH_PKT;   /*  restore the setting */
-  SYNCDELAY;
-
 #ifdef GECKO3MAIN
   //EP2FIFOCFG &= ~bmOEP;
   EP2FIFOCFG &= ~bmAUTOOUT;  /* disable AutoOUT feature */
@@ -298,5 +297,5 @@ void deactivate_gpif(void) {
   EA = 1;		/* global interrupt enable */
 
 
-  print_info("gpif deactivated\n");
+  //print_info("gpif deactivated\n");
 }

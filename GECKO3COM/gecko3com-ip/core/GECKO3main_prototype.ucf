@@ -39,6 +39,8 @@
 net "i_nReset" loc = "AE24";
 
 net "i_SYSCLK"		loc = "AF14";
+#net "i_SYSCLK"		loc = "AA11"; # IFCLK, to test as a synchronus system
+#net "i_SYSCLK" CLOCK_DEDICATED_ROUTE = FALSE; # also needed when IFCLK used as SYSCLK
 net "i_SYSCLK" tnm_net = "SYSCLK";
 timespec "TS_SYSCLK" = period "SYSCLK" 20.0 ns HIGH 50%; # 50 MHz system clock
 
@@ -54,22 +56,22 @@ net "o_WRX"    loc = "AC14";
 net "o_RDYX"   loc = "AD14";
 
 # connection of data bus signals
-net "b_dbus<0>"  loc = "AA12";
-net "b_dbus<1>"  loc = "AB12";
-net "b_dbus<2>"  loc = "AB13";
-net "b_dbus<3>"  loc = "AC13";
-net "b_dbus<4>"  loc = "AA14";
-net "b_dbus<5>"  loc = "Y14";
-net "b_dbus<6>"  loc = "W14";
-net "b_dbus<7>"  loc = "Y15";
-net "b_dbus<8>"  loc = "AE7";
-net "b_dbus<9>"  loc = "Y13";
-net "b_dbus<10>" loc = "W13";
-net "b_dbus<11>" loc = "AF7";
-net "b_dbus<12>" loc = "AF13";
-net "b_dbus<13>" loc = "AD12";
-net "b_dbus<14>" loc = "Y12";
-net "b_dbus<15>" loc = "W12";
+net "b_gpif_bus<0>"  loc = "AA12";
+net "b_gpif_bus<1>"  loc = "AB12";
+net "b_gpif_bus<2>"  loc = "AB13";
+net "b_gpif_bus<3>"  loc = "AC13";
+net "b_gpif_bus<4>"  loc = "AA14";
+net "b_gpif_bus<5>"  loc = "Y14";
+net "b_gpif_bus<6>"  loc = "W14";
+net "b_gpif_bus<7>"  loc = "Y15";
+net "b_gpif_bus<8>"  loc = "AE7";
+net "b_gpif_bus<9>"  loc = "Y13";
+net "b_gpif_bus<10>" loc = "W13";
+net "b_gpif_bus<11>" loc = "AF7";
+net "b_gpif_bus<12>" loc = "AF13";
+net "b_gpif_bus<13>" loc = "AD12";
+net "b_gpif_bus<14>" loc = "Y12";
+net "b_gpif_bus<15>" loc = "W12";
 
 
 # switches
@@ -83,6 +85,9 @@ net "b_dbus<15>" loc = "W12";
 net "o_LEDrx" loc = "C6"; # LED0, green
 net "o_LEDtx" loc = "F7"; # LED1, red
 net "o_LEDrun"loc = "D7"; # LED2, green
+
+# dummy output, only needed for the gpif_com_test
+net "o_dummy" loc = "AF16";
 
 
 

@@ -30,7 +30,7 @@ use UNISIM.VComponents.all;
 library XilinxCoreLib;
 
 library work;
-use work.USB_TMC_IP_Defs.all;
+use work.GECKO3COM_defines.all;
 
 
 package USB_TMC_cmp is

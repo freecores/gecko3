@@ -848,6 +848,13 @@ static void main_loop (void)
       }     
     } /* end of IN Transfer clause */
 
+    /* if(!(EP2468STAT & bmEP2EMPTY) && flLOCAL == GECKO3COM_REMOTE) { */
+    /*   flGPIF &= ~bmGPIF_PENDING_DATA; */
+    /*   OUTPKTEND = USB_TMC_EP_OUT; */
+    /*   gpif_trigger_write(); */
+    /*   EP2FIFOCFG |= bmAUTOOUT; */
+    /* } */
+
     /* if the LED flag is set to off, disable the external LED */
     if(flLED == LEDS_OFF) {
       set_led_ext(LEDS_OFF);

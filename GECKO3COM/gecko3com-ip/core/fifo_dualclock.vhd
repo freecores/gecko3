@@ -85,10 +85,10 @@ component coregenerator_fifo_dualclock
         almost_full  : OUT std_logic;
         dout         : OUT std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
         empty        : OUT std_logic;
-        full         : OUT std_logic;
-        PROG_EMPTY_THRESH         : IN  std_logic;
-        PROG_EMPTY_THRESH_ASSERT  : IN  std_logic;
-        PROG_EMPTY_THRESH_NEGATE  : IN  std_logic);
+        full         : OUT std_logic);
+        --PROG_EMPTY_THRESH         : IN  std_logic;
+        --PROG_EMPTY_THRESH_ASSERT  : IN  std_logic;
+        --PROG_EMPTY_THRESH_NEGATE  : IN  std_logic);
 end component;
 attribute box_type of coregenerator_fifo_dualclock : component is "black_box";
   
@@ -110,10 +110,10 @@ FIFO : coregenerator_fifo_dualclock
                         almost_full  => o_almost_full,
                         dout         => o_dout,
                         empty        => o_empty,
-                        full         => o_full,
-                        PROG_EMPTY_THRESH         => '0',
-                        PROG_EMPTY_THRESH_ASSERT  => '0',
-                        PROG_EMPTY_THRESH_NEGATE  => '0'
+                        full         => o_full
+                        --PROG_EMPTY_THRESH         => '0',
+                        --PROG_EMPTY_THRESH_ASSERT  => '0',
+                        --PROG_EMPTY_THRESH_NEGATE  => '0'
                         );
 
 end wrapper;

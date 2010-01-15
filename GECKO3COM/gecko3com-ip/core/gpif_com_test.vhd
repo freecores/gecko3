@@ -22,13 +22,13 @@
 --
 --  URL to the project description: 
 --    http://labs.ti.bfh.ch/gecko/wiki/systems/gecko3com/start
-----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --
 --  Author: Christoph Zimmermann
 --  Date of creation: 8. April 2009
 --  Description:
---   	First test scenario for the GECKO3com IP core. 
---		This module (to be implemented as top module) is used to test the
+--    First test scenario for the GECKO3com IP core. 
+--    This module (to be implemented as top module) is used to test the
 --    low-level communication between the GPIF from the EZ-USB and the FPGA.
 --    For this, it instantiates the the gpif_com module, reads all the 
 --    received data from the FIFO (and puts them to nowhere) and writes a pre
@@ -38,205 +38,200 @@
 --    ROM content in this file (don't forget to adjust the the transfer size 
 --    field AND the counter limit).
 --
---  Target Devices:	Xilinx Spartan3 FPGA's (usage of BlockRam in the Datapath)
---  Tool versions: 	11.1
+--  Target Devices:     Xilinx Spartan3 FPGA's (usage of BlockRam in the
+--                      Datapath)
+--  Tool versions:      11.1
 --  Dependencies:
 --
-----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.std_logic_unsigned.all;
 
 library work;
 use work.GECKO3COM_defines.all;
 
 entity gpif_com_test is
   port (
-    i_nReset,
-    i_IFCLK,									 -- GPIF CLK (GPIF is Master and provides the clock)
-    i_SYSCLK,									 -- FPGA System CLK
-    i_WRU,                              -- write from GPIF
-    i_RDYU 	  : in   	std_logic;        -- GPIF is ready
-    o_WRX,                              -- To write to GPIF
-    o_RDYX    : out  	std_logic;      -- IP Core is ready
-    o_LEDrx,                            -- controll LED rx
-    o_LEDtx : out 	 	std_logic; 		 -- controll LED tx
-    o_LEDrun  : out  	std_logic;      -- controll LED running signalisation
-    b_gpif_bus 	  : inout	std_logic_vector(SIZE_DBUS_GPIF-1 downto 0));  -- bidirect data bus
-	);
+    i_nReset   : in    std_logic;
+    i_IFCLK    : in    std_logic;       -- GPIF CLK (GPIF is Master and provides the clock)
+    i_SYSCLK   : in    std_logic;       -- FPGA System CLK
+    i_WRU      : in    std_logic;       -- write from GPIF
+    i_RDYU     : in    std_logic;       -- GPIF is ready
+    o_WRX      : out   std_logic;       -- To write to GPIF
+    o_RDYX     : out   std_logic;       -- IP Core is ready
+    b_gpif_bus : inout std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);  -- bidirect data bus
+    o_LEDrx    : out   std_logic;       -- controll LED rx
+    o_LEDtx    : out   std_logic;       -- controll LED tx
+    o_LEDrun   : out   std_logic;       -- controll LED running signalisation
+    o_dummy    : out   std_logic        -- dummy output for RX data consumer
+    );
 end gpif_com_test;
 
 
 
-architecture loopback of gpif_com_test is
+architecture behaviour of gpif_com_test is
 
-  
-  type t_fsmLoop is (rst, idle, writeRQ, writeIn, writeEnd);
-  
-  signal pr_stateLoop, nx_stateLoop : t_fsmLoop;
-  
-  signal  i_U2X_AM_EMPTY,
-          i_U2X_EMPTY,
-          i_X2U_AM_FULL,
-          i_X2U_FULL	    : in  std_logic;
-	signal  i_U2X_DATA     : in  std_logic_vector(SIZE_DBUS_FPGA-1 downto 0);
-	signal  o_U2X_RD_EN,
-          o_X2U_WR_EN    : out std_logic;
-  signal  o_X2U_DATA     : out std_logic_vector(SIZE_DBUS_FPGA-1 downto 0)
 
   -----------------------------------------------------------------------------
   -- controll bus
   -----------------------------------------------------------------------------
-	 signal	s_U2X_RD_EN,
-				s_X2U_WR_EN : std_logic;
+  signal s_EMPTY, s_FULL : std_logic;
+  signal s_RX_DATA : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
+  signal s_RD_EN, s_WR_EN : std_logic;
+  signal s_TX_DATA : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
+  signal s_RDYX : std_logic;
+
+  signal s_ABORT, s_ABORT_TMP : std_logic;
   
+  signal s_RX_DATA_TMP : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
+  signal s_EMPTY_TMP, s_FULL_TMP : std_logic;
   
-  --------------------------------------------------------------------------------- 
+  signal s_rom_adress : std_logic_vector(4 downto 0);
+
+
+  ----------------------------------------------------------------------------- 
   --     COMPONENTS  
-  ---------------------------------------------------------------------------------
-
-  component gpif_com
-  port (
-    i_nReset,
-    i_IFCLK,									 -- GPIF CLK (GPIF is Master and provides the clock)
-    i_SYSCLK,									 -- FPGA System CLK
-    i_WRU,                              -- write from GPIF
-    i_RDYU 	  : in   	std_logic;        -- GPIF is ready
-    o_WRX,                              -- To write to GPIF
-    o_RDYX    : out  	std_logic;      -- IP Core is ready
-    o_ABORT   : out   std_logic;  -- Abort detected, you have to flush the data
-    o_RX,                            -- controll LED rx
-    o_TX : out 	 	std_logic; 		 -- controll LED tx
-    b_gpif_bus 	  : inout	std_logic_vector(SIZE_DBUS_GPIF-1 downto 0));  -- bidirect data bus
-  end USB_TMC_IP;
+  -----------------------------------------------------------------------------
   
-begin
+  component gpif_com
+    port (
+      i_nReset   : in    std_logic;
+      i_SYSCLK   : in    std_logic;
+      o_ABORT    : out   std_logic;
+      o_RX       : out   std_logic;
+      o_TX       : out   std_logic;
+      i_RD_EN    : in    std_logic;
+      o_EMPTY    : out   std_logic;
+      o_RX_DATA  : out   std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
+      i_WR_EN    : in    std_logic;
+      o_FULL     : out   std_logic;
+      i_TX_DATA  : in    std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
+      i_IFCLK    : in    std_logic;
+      i_WRU      : in    std_logic;
+      i_RDYU     : in    std_logic;
+      o_WRX      : out   std_logic;
+      o_RDYX     : out   std_logic;
+      b_gpif_bus : inout std_logic_vector(SIZE_DBUS_GPIF-1 downto 0));
+  end component;
 
-	 o_U2X_RD_EN  <=  s_U2X_RD_EN;
-	 o_X2U_WR_EN  <=  s_X2U_WR_EN;
-   
-   o_LEDrun <= '1';
-   
-   
-   GPIF_INTERFACE : gpif_com
-   port map (
-    i_nReset    =>  i_nReset,
-    i_IFCLK     =>  i_IFCLK,									 -- GPIF CLK (GPIF is Master and provides the clock)
-    i_SYSCLK    =>  i_SYSCLK,									 -- FPGA System CLK
-    i_WRU       =>  i_WRU,                              -- write from GPIF
-    i_RDYU      =>  i_RDYU,        -- GPIF is ready
-    o_WRX       =>  o_WRX,                              -- To write to GPIF
-    o_RDYX      =>  o_RDYX,      -- IP Core is ready
-    o_ABORT     =>  o_ABORT,  -- Abort detected, you have to flush the data
-    o_LEDrx     =>  o_LEDrx,                            -- controll LED rx
-    o_LEDtx     =>  o_LEDtx, 		 -- controll LED tx
-    o_LEDrun    =>  o_LEDrun,      -- controll LED running signalisation
-    b_gpif_bus  =>  b_gpif_buf
-   );
+  component message_rom
+    port (
+      A : in  std_logic_vector(4 downto 0);
+      D : out std_logic_vector(15 downto 0));
+  end component;
 
-    ---------------------------------------------------------------------------
-    -- FPGA CLK DOMAIN -> opb site
-    ---------------------------------------------------------------------------
+begin  -- behaviour
 
-  bus_loop_Dmap : process (i_SYSCLK)
-
-  begin  -- process bus_access
-    if rising_edge(i_SYSCLK) then
-          o_X2U_DATA <= i_U2X_DATA;
-    end if;
-  end process bus_loop_Dmap;
+  GPIF_INTERFACE: gpif_com
+    port map (
+      i_nReset   => i_nReset,
+      i_SYSCLK   => i_SYSCLK,
+      o_ABORT    => s_ABORT,
+      o_RX       => o_LEDrx,
+      o_TX       => o_LEDtx,
+      i_RD_EN    => s_RD_EN,
+      o_EMPTY    => s_EMPTY,
+      o_RX_DATA  => s_RX_DATA,
+      i_WR_EN    => s_WR_EN,
+      o_FULL     => s_FULL,
+      i_TX_DATA  => s_TX_DATA,
+      --i_IFCLK    => i_SYSCLK,
+      i_IFCLK    => i_IFCLK,
+      i_WRU      => i_WRU,
+      i_RDYU     => i_RDYU,
+      o_WRX      => o_WRX,
+      o_RDYX     => o_RDYX,
+      b_gpif_bus => b_gpif_bus);
 
 
- -----------------------------------------------------------------------------
-  -- FSM Loop
+  
+  o_LEDrun <= '1';
+
+
+  -----------------------------------------------------------------------------
+  --     RX DATA CONSUMER WITH THROTLING  
   -----------------------------------------------------------------------------
 
-    -- state reg
-  actionLoop : process(i_SYSCLK, i_nReset)
-    begin
-
-      if i_nReset = '0' then
-        pr_stateLoop <= rst;
-
-      elsif rising_edge(i_SYSCLK) then
-
-		  pr_stateLoop <= nx_stateLoop;
-
+  -- purpose: activates the read enable signal of the receive FIFO as slow as
+  -- you want.
+  -- type   : sequential
+  -- inputs : i_SYSCLK
+  -- outputs: s_RX_DATA_TMP
+  rx_throtling: process (i_SYSCLK, i_nReset)
+    variable v_rx_throtle_count : std_logic_vector(6 downto 0);  -- counter variable
+  begin
+    if i_nReset = '0' then
+      v_rx_throtle_count := (others => '0');
+      s_RD_EN <= '0';
+    elsif i_SYSCLK = '1' and i_SYSCLK'event then
+      if v_rx_throtle_count >= 63 then
+        s_RD_EN <= '1';
+        v_rx_throtle_count := (others => '0');
+      else
+        v_rx_throtle_count := v_rx_throtle_count + 1;
+        s_RD_EN <= '0';
       end if;
-    end process actionLoop;
+    end if;
+  end process rx_throtling;
+
+  -- purpose: reads the receive data from the GPIF interface
+  -- type   : sequential
+  -- inputs : i_SYSCLK
+  -- outputs: s_RX_DATA_TMP
+  rx_consumer: process (i_SYSCLK)
+  begin  -- process rx_consumer
+    if i_SYSCLK = '1' and i_SYSCLK'event then
+      s_RX_DATA_TMP <= s_RX_DATA;
+      s_EMPTY_TMP <= s_EMPTY;
+      s_FULL_TMP <= s_FULL;
+      s_ABORT_TMP <= s_ABORT;
+    end if;
+  end process rx_consumer;
 
 
-    -- comb logic
-    loopTrans : process(pr_stateLoop, i_U2X_AM_EMPTY, i_U2X_EMPTY, i_X2U_AM_FULL )
-    begin  -- process transaction
-	 
-	    -- default signal sets to avoid latches
-			 s_X2U_WR_EN <= '0';
-          s_U2X_RD_EN <= '0';
-			 
-      case pr_stateLoop is
-        -- controll
+  -- dummy logic to "use" these signals and avoid that they are removed by
+  -- the optimizer
+  process(s_RX_DATA_TMP, s_EMPTY_TMP, s_FULL_TMP, s_ABORT_TMP, s_RDYX)
+    variable result : std_logic := '0';
+  begin
+    result := '0';
+    for i in s_RX_DATA_TMP'range loop
+      result := result or s_RX_DATA_TMP(i);
+    end loop;
+    o_dummy <= result or s_EMPTY_TMP or s_FULL_TMP or s_ABORT_TMP;
+  end process;
 
-        when rst =>
-			 s_X2U_WR_EN <= '0';
-          s_U2X_RD_EN <= '0';
-          nx_stateLoop <= idle;
-			 			 
-        when idle =>
-		   -- when the input fifo has data (is not empty) and the output fifo is not full:
-			if i_U2X_AM_EMPTY = '0' and i_X2U_AM_FULL = '0' then
-			  nx_stateLoop <= writeRQ;
-			  s_U2X_RD_EN <= '1';
-			else
-			  nx_stateLoop <= idle;
-        end if;
-		  
-        when writeRQ =>
-		    -- enable read from input fifo. wait one cycle untill the data is available to be written
-          s_U2X_RD_EN <= '1';
-			 s_X2U_WR_EN <= '0';
-			 nx_stateLoop <= writeIn;
-			 
-		  when writeIn =>
-			
- 			 if i_U2X_EMPTY = '1' and i_X2U_AM_FULL = '0' then
-			      -- input fifo is empty, end the transfer
-		  		  	nx_stateLoop <= writeEnd;
-					s_U2X_RD_EN <= '1'; -- i guess that this should be '0' here. zac1
-					s_X2U_WR_EN <= '1';
-					
-			 elsif i_U2X_EMPTY = '0' and i_X2U_AM_FULL = '1' then
-			      -- output data is full, still data in the input fifo
-					nx_stateLoop <= writeEnd;
-					s_U2X_RD_EN <= '0';
-					s_X2U_WR_EN <= '1';
-					
-			 elsif i_U2X_EMPTY = '1' and i_X2U_AM_FULL = '1' then
-					-- input fifo empty and output fifo full
-					nx_stateLoop <= writeEnd; --idle;
-					s_U2X_RD_EN <= '0';
-					s_X2U_WR_EN <= '1'; ---s_X2U_WR_EN <= '0';
-					
-			  else
-			      -- input fifo has data, output fifo has free space
-			      nx_stateLoop <= writeIn;
-					s_X2U_WR_EN <= '1';
-					s_U2X_RD_EN <= '1';
-			 end if;
-
-				
-		  when writeEnd =>
-		      -- copy the last data from the register to the output fifo
-				nx_stateLoop <= idle;
-				s_U2X_RD_EN <= '0';
-				s_X2U_WR_EN <= '1';
-
-
-        -- error case
-        when others =>
-          nx_stateLoop <= idle;
-      end case;
-      
-    end process loopTrans;
-            
-end loopback;
+  -----------------------------------------------------------------------------
+  --     RESPONSE MESSAGE GENERATOR  
+  -----------------------------------------------------------------------------
+  
+  message_rom_1: message_rom
+    port map (
+      A => s_rom_adress,
+      D => s_TX_DATA);
+  
+  -- purpose: counts up the rom adress lines to read out the response message
+  -- type   : sequential
+  -- inputs : i_SYSCLK
+  -- outputs: s_RX_DATA_TMP
+  rom_adress_counter: process (i_SYSCLK, i_nReset)
+  begin
+    if i_nReset = '0' then
+      s_rom_adress <= (others => '0');
+      --DEBUG s_WR_EN <= '1';
+      s_WR_EN <= '0';
+    elsif i_SYSCLK = '1' and i_SYSCLK'event then
+      if s_rom_adress = 24 then
+        s_rom_adress <= s_rom_adress;
+        s_WR_EN <= '0';
+      else
+        s_rom_adress <= s_rom_adress + 1;
+        --DEBUG s_WR_EN <= '1';
+        s_WR_EN <= '0';
+      end if;
+    end if;
+  end process rom_adress_counter;
+  
+end behaviour;

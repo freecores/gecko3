@@ -24,8 +24,8 @@
 // CTL 0    = RDYU     CMOS        
 // CTL 1    = WRU      CMOS        
 // CTL 2    = RDYU     CMOS        
-// CTL 3    = intern   CMOS        
-// CTL 4    = unused   CMOS        
+// CTL 3    = X2U_ex   CMOS        
+// CTL 4    = U2X_th   CMOS        
 // CTL 5    = unused   CMOS        
                                
 // GPIF Rdy Inputs         
@@ -60,8 +60,8 @@
 // RDYU         0         0         0         0         0         0         0         0    
 // WRU          0         0         0         0         0         0         0         0    
 // RDYU         0         1         1         1         1         1         1         0    
-// intern       0         0         0         0         0         0         0         0    
-// unused       0         0         0         0         0         0         0         0    
+// X2U_ex       0         0         0         0         0         0         0         0    
+// U2X_th       0         0         0         0         0         0         0         0    
 // unused       0         0         0         0         0         0         0         0    
 //                     
 // END DO NOT EDIT     
@@ -87,8 +87,8 @@
 // RDYU         0         0         0         0         0         0         0         0    
 // WRU          0         1         1         1         1         1         1         0    
 // RDYU         0         0         0         1         1         1         1         0    
-// intern       0         0         0         0         0         0         0         0    
-// unused       0         0         0         0         0         0         0         0    
+// X2U_ex       0         0         0         0         0         0         0         0    
+// U2X_th       0         0         0         0         0         0         0         0    
 // unused       0         0         0         0         0         0         0         0    
 //                     
 // END DO NOT EDIT     
@@ -114,8 +114,8 @@
 // RDYU         0         0         0         0         0         0         0         0    
 // WRU          0         0         0         0         0         0         0         0    
 // RDYU         0         0         1         1         1         0         0         0    
-// intern       0         1         1         1         1         0         0         0    
-// unused       0         0         0         0         0         0         0         0    
+// X2U_ex       0         1         1         1         1         0         0         0    
+// U2X_th       0         0         0         0         0         0         0         0    
 // unused       0         0         0         0         0         0         0         0    
 //                     
 // END DO NOT EDIT     
@@ -128,21 +128,21 @@
 //                                                                                         
 // AddrMode Same Val  Same Val  Same Val  Same Val  Same Val  Same Val  Same Val           
 // DataMode NO Data   NO Data   NO Data   Activate  Activate  Activate  NO Data            
-// NextData SameData  SameData  SameData  SameData  SameData  NextData  SameData           
+// NextData SameData  SameData  SameData  SameData  NextData  NextData  SameData           
 // Int Trig No Int    No Int    No Int    No Int    No Int    Trig Int  No Int             
-// IF/Wait  IF        Wait 1    IF        IF        IF        IF        IF                 
-//   Term A WRX                 WRX       RDYX      FIFOFlag  RDYX      WRX                
-//   LFunc  AND                 AND       AND       AND       AND       AND                
-//   Term B WRX                 WRX       RDYX      FIFOFlag  RDYX      WRX                
-// Branch1  ThenIdle            Then 2    Then 4    Then 4    ThenIdle  ThenIdle           
-// Branch0  Else 1              Else 3    Else 3    Else 5    ElseIdle  ElseIdle           
-// Re-Exec  No                  No        No        Yes       No        No                 
+// IF/Wait  IF        Wait 1    IF        Wait 1    IF        IF        IF                 
+//   Term A WRX                 WRX                 FIFOFlag  RDYX      WRX                
+//   LFunc  AND                 AND                 AND       AND       AND                
+//   Term B WRX                 WRX                 FIFOFlag  RDYX      WRX                
+// Branch1  ThenIdle            Then 2              Then 5    Then 5    ThenIdle           
+// Branch0  Else 1              Else 3              Else 4    ElseIdle  ElseIdle           
+// Re-Exec  No                  No                  Yes       No        No                 
 // Sngl/CRC Default   Default   Default   Default   Default   Default   Default            
 // RDYU         0         0         0         0         0         0         0         0    
 // WRU          0         1         1         1         1         0         0         0    
 // RDYU         0         0         0         0         0         0         0         0    
-// intern       0         0         0         0         0         0         0         0    
-// unused       0         0         0         0         0         0         0         0    
+// X2U_ex       0         0         0         0         0         0         0         0    
+// U2X_th       0         0         0         0         0         0         0         0    
 // unused       0         0         0         0         0         0         0         0    
 //                     
 // END DO NOT EDIT     
@@ -174,10 +174,10 @@ const char xdata WaveData[128] =
 /* Output*/ 0x00,     0x08,     0x0C,     0x0C,     0x0C,     0x00,     0x00,     0x00,
 /* LFun  */ 0x00,     0x00,     0x00,     0x00,     0x00,     0x00,     0x00,     0x3F,
 // Wave 3 
-/* LenBr */ 0x39,     0x01,     0x13,     0x23,     0xA5,     0x3F,     0x3F,     0x07,
-/* Opcode*/ 0x01,     0x00,     0x01,     0x03,     0x03,     0x17,     0x01,     0x00,
+/* LenBr */ 0x39,     0x01,     0x13,     0x01,     0xAC,     0x2F,     0x3F,     0x07,
+/* Opcode*/ 0x01,     0x00,     0x01,     0x02,     0x07,     0x17,     0x01,     0x00,
 /* Output*/ 0x00,     0x02,     0x02,     0x02,     0x02,     0x00,     0x00,     0x00,
-/* LFun  */ 0x00,     0x00,     0x00,     0x09,     0x36,     0x09,     0x00,     0x3F,
+/* LFun  */ 0x00,     0x00,     0x00,     0x00,     0x36,     0x09,     0x00,     0x3F,
 };                     
 // END DO NOT EDIT     
                        
@@ -187,7 +187,7 @@ const char xdata FlowStates[36] =
 /* Wave 0 FlowStates */ 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 /* Wave 1 FlowStates */ 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 /* Wave 2 FlowStates */ 0x83,0x36,0x04,0x00,0x03,0x23,0x03,0x02,0x00,
-/* Wave 3 FlowStates */ 0x84,0x09,0x02,0x02,0x02,0x23,0x03,0x02,0x00,
+/* Wave 3 FlowStates */ 0x84,0x09,0x02,0x02,0x04,0x23,0x03,0x02,0x00,
 };                     
 // END DO NOT EDIT     
                        
