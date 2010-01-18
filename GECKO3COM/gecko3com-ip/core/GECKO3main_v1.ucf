@@ -43,7 +43,7 @@ net "i_SYSCLK"		loc = "AF14";
 net "i_SYSCLK" tnm_net = "SYSCLK";
 timespec "TS_SYSCLK" = period "SYSCLK" 20.0 ns HIGH 50%; # 50 MHz system clock
 
-net "i_IFCLK"  loc = "AA17";
+net "i_IFCLK"  loc = "AA7";
 net "i_IFCLK" CLOCK_DEDICATED_ROUTE = FALSE;
 net "i_IFCLK" tnm_net = "IFCLK";
 timespec "TS_IFCLK" = period "IFCLK" 20.83 ns HIGH 50%; # 48 MHz interface clock

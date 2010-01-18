@@ -41,6 +41,9 @@
 #define bmGPIF_READ_IN_PROGRESS 1
 #define bmGPIF_PENDING_DATA 2
 
+/** flag to signal, that the GPIF receives data from the FPGA */
+volatile static idata uint8_t flGPIF;
+
 /** \brief initialize GPIF system
  *
  *  initialize GPIF with waveform data.

@@ -265,6 +265,14 @@ begin
     end if;
   end process bus_access;
 
-  s_dbus_in <= b_gpif_bus;
+  -- buffer the gpif bus input signals to avoid that the last word in the
+  -- usb to xilinx transfer is read twice.
+  buf_input : process (i_IFCLK)
+  begin
+    if rising_edge(i_IFCLK) then
+      s_dbus_in <= b_gpif_bus;
+    end if;
+  end process buf_input;
+  
 
 end structure;

@@ -69,18 +69,17 @@ entity gpif_com_fsm is
     o_TX            : out std_logic     --
     );
 
-  -- XST specific synthesize attributes
-  attribute safe_implementation: string;
-  attribute safe_recovery_state: string;
-
-  attribute safe_implementation of gpif_com_fsm : entity is "yes";
-
 end gpif_com_fsm;
 
 
 
 architecture fsm of gpif_com_fsm is
 
+  -- XST specific synthesize attributes
+  attribute safe_implementation: string;
+  attribute safe_recovery_state: string;
+ 
+  
   -----------------------------------------------------------------------------
   -- FSM
   -----------------------------------------------------------------------------
@@ -90,8 +89,8 @@ architecture fsm of gpif_com_fsm is
   
 
   type t_fsmState is (rst, idle,        -- controll states
-                      inRQ, inACK, inTrans, inThrot,
-                      inThrotEnd, endInTrans,  -- in com states
+                      inRQ, inACK, inWait, inTrans, inThrot,
+                      inThrotBreak,inThrotBreak2, inThrotEnd, endInTrans,  -- in com states
                       outRQ, outTrans, outWait, endOutTrans);  -- out com states
 
   
@@ -99,7 +98,8 @@ architecture fsm of gpif_com_fsm is
   signal pr_state, nx_state : t_fsmState;
   -- XST specific synthesize attributes
   attribute safe_recovery_state of pr_state : signal is "idle";
-  attribute safe_recovery_state of nx_state : signal is "idle";
+  attribute safe_implementation of pr_state : signal is "yes";
+  
 
   
   -- interconection signals
@@ -112,6 +112,8 @@ architecture fsm of gpif_com_fsm is
   signal s_X2U_RD_EN : std_logic;
   
 begin
+
+  
 
   o_FIFOrst       <= s_FIFOrst;
   o_X2U_RD_EN     <= s_X2U_RD_EN;
@@ -128,7 +130,6 @@ begin
 
   -- state reg
   action : process(i_IFCLK, i_nReset)
-    variable v_setup : integer range 0 to 15;
   begin
 
     if i_nReset = '0' then
@@ -141,7 +142,8 @@ begin
 
 
   -- comb logic
-  transaction : process(pr_state, i_WRU, i_RDYU, i_U2X_AM_FULL, i_X2U_EMPTY)
+  transaction : process(pr_state, i_WRU, i_RDYU, i_U2X_FULL,
+                        i_U2X_AM_FULL, i_X2U_EMPTY)
   begin  -- process transaction
 
     -- default signal values to avoid latches:
@@ -204,6 +206,9 @@ begin
         -- output signal values:
         s_WRX  <= '0';
         s_RDYX <= '0';
+        s_U2X_WR_EN <= '0';
+        o_RX        <= '0';
+        
         -- state decisions
         if i_WRU = '1' and i_RDYU = '1' then
           nx_state <= rst;
@@ -217,18 +222,28 @@ begin
         -- output signal values:
         s_WRX       <= '0';
         s_RDYX      <= '1';
-        s_U2X_WR_EN <= '1';
+        s_U2X_WR_EN <= '0';
         o_RX        <= '1';
 
         -- state decisions
         if i_WRU = '1' and i_RDYU = '1' then
           nx_state <= rst;
         elsif i_WRU = '1' then
-          nx_state <= inTrans;
-          --nx_state <= inDummy;
+          --nx_state <= inTrans;
+          nx_state <= inWait;
         else
           nx_state <= endInTrans;
         end if;
+
+        when inWait =>
+        -- output signal values:
+        s_WRX       <= '0';
+        s_RDYX      <= '1';
+        s_U2X_WR_EN <= '0';
+        o_RX        <= '1';
+
+        -- state decisions
+        nx_state <= inTrans;
         
       when inTrans =>
         -- output signal values:
@@ -259,17 +274,30 @@ begin
         if i_WRU = '1' and i_RDYU = '1' then
           nx_state <= rst;
         elsif i_U2X_FULL = '0' then
-          --nx_state <= inThrotEnd;
-          nx_state <= inACK;
+          nx_state <= inThrotBreak;
+          --nx_state <= inACK;
         elsif i_WRU = '0' then
           nx_state <= endInTrans;
         else
           nx_state <= inThrot;
         end if;
 
-      --when inThrotEnd =>
+      when inThrotBreak =>
+        -- this is a one clock delay to help the fx2 to see the RDYX signal.
+       
+        -- output signal values:
+        s_WRX       <= '0';
+        s_RDYX      <= '1';
+        s_U2X_WR_EN <= '0';
+        o_RX        <= '1';
+
+        -- state decisions 
+        --nx_state <= inThrotBreak2;
+        nx_state <= inThrotEnd;
+
+      --when inThrotBreak2 =>
       --  -- this is a one clock delay to help the fx2 to see the RDYX signal.
-        
+       
       --  -- output signal values:
       --  s_WRX       <= '0';
       --  s_RDYX      <= '1';
@@ -277,13 +305,26 @@ begin
       --  o_RX        <= '1';
 
       --  -- state decisions 
-      --  nx_state <= inACK;
+      --  nx_state <= inThrotEnd;
+        
+      when inThrotEnd =>
+        -- this is a one clock delay to help the fx2 to see the RDYX signal.
+       
+        -- output signal values:
+        s_WRX       <= '0';
+        s_RDYX      <= '1';
+        s_U2X_WR_EN <= '0';
+        o_RX        <= '1';
+
+        -- state decisions 
+        nx_state <= inTrans;
         
       when endInTrans =>
         -- output signal values:
         s_WRX       <= '0';
         s_RDYX      <= '0';
-        s_U2X_WR_EN <= '1';
+        s_U2X_WR_EN <= '0';
+        o_RX        <= '0';
 
         -- state decisions
         nx_state <= idle;

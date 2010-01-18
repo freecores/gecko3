@@ -77,8 +77,8 @@ extern const char FlowStates[36];
 extern const char InitData[7];
 
 
-/** private flag to signal, that the GPIF receives data from the FPGA */
-volatile static uint8_t flGPIF;
+//** private flag to signal, that the GPIF receives data from the FPGA */
+//volatile static uint8_t flGPIF;
 
 
 
@@ -90,23 +90,22 @@ isr_gpif_done (void) interrupt
 {
   ISR_DEBUG_PORT |= bmGPIF_DONE;
 
-  clear_fifo_gpif_irq();
-
-  //EA = 0;		/* disable all interrupts */
-
   /* check if there is data available for an OUT transfer */  
-  if((flGPIF & bmGPIF_PENDING_DATA) == bmGPIF_PENDING_DATA) {
-  //if(!(EP2468STAT & bmEP2EMPTY)) {
+  /*if((flGPIF & bmGPIF_PENDING_DATA) == bmGPIF_PENDING_DATA) {
+    //if(!(EP2468STAT & bmEP2EMPTY)) {
     flGPIF &= ~bmGPIF_PENDING_DATA;
     GPIFABORT = 0xFF;
     SYNCDELAY;
     gpif_trigger_write();
   }
-  else {
-    INPKTEND = USB_TMC_EP_IN;
+  else*/ {
+    /* check if this is a end of a IN transfer */
+    //INPKTEND = USB_TMC_EP_IN;
+    while(!(GPIFTRIG & bmGPIF_IDLE));
     gpif_trigger_read(); 
   }
-  //EA = 1;		/* global interrupt enable */
+
+  clear_fifo_gpif_irq();
   
   ISR_DEBUG_PORT &= ~bmGPIF_DONE;
 }
@@ -120,20 +119,18 @@ isr_endpoint_out_data (void) interrupt
 {
   ISR_DEBUG_PORT |= bmFIFO_PF;
 
-  clear_fifo_gpif_irq();
-
   /* check if there is a active IN transfer */
-  if((GPIFIDLECTL & bmBIT3) == bmBIT3) {
+  /*if((GPIFIDLECTL & bmBIT3) == bmBIT3) {
     flGPIF |= bmGPIF_PENDING_DATA;
   }
-  else {
-    //EA = 0;		/* disable all interrupts */
+  else*/ {
     GPIFABORT = 0xFF;
     SYNCDELAY;
-    
+    while(!(GPIFTRIG & bmGPIF_IDLE));
     gpif_trigger_write(); 
-    //EA = 1;		/* global interrupt enable */
   }
+
+  clear_fifo_gpif_irq();
 
   ISR_DEBUG_PORT &= ~bmFIFO_PF;
 }
@@ -145,8 +142,9 @@ void init_gpif (void)
   uint8_t i;
 
 #ifdef GECKO3MAIN
-  /* IFCLK is generated internally and runs at 48 MHz; GPIF "master mode" */
-  IFCONFIG = bmIFCLKSRC | bm3048MHZ | bmIFCLKOE | bmGSTATE | bmIFGPIF;
+  /* IFCLK is generated internally and runs at 30 MHz; GPIF "master mode" */
+  //IFCONFIG = bmIFCLKSRC | bm3048MHZ | bmIFCLKOE | bmGSTATE | bmIFGPIF;
+  IFCONFIG = bmIFCLKSRC | bmIFCLKOE | bmGSTATE | bmIFGPIF;
   SYNCDELAY;
 
   /* we have to commit the currently processed packet BEFORE we switch to auto out mode */
@@ -168,11 +166,11 @@ void init_gpif (void)
    * flag has to change one cycle before the FIFO is completly empty, else we 
    * transfer one word too much */
   EP2FIFOPFH = bmDECIS;
-  EP2FIFOPFL = 1;
+  EP2FIFOPFL = 4;
   SYNCDELAY;
 
-  //EP2GPIFFLGSEL = bmFLAG_PROGRAMMABLE;
-  EP2GPIFFLGSEL = bmFLAG_EMPTY;
+  EP2GPIFFLGSEL = bmFLAG_PROGRAMMABLE;
+  //EP2GPIFFLGSEL = bmFLAG_EMPTY;
   SYNCDELAY;
   EP6GPIFFLGSEL = bmFLAG_FULL;
   SYNCDELAY;
@@ -286,7 +284,6 @@ void deactivate_gpif(void) {
 
 
 #ifdef GECKO3MAIN
-  //EP2FIFOCFG &= ~bmOEP;
   EP2FIFOCFG &= ~bmAUTOOUT;  /* disable AutoOUT feature */
   SYNCDELAY;
   //EP6FIFOCFG &= ~bmINFM;

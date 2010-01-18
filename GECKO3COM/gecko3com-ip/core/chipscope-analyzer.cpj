@@ -1,5 +1,5 @@
 #ChipScope Pro Analyzer Project File, Version 3.0
-#Wed Jan 13 21:31:08 CET 2010
+#Sat Jan 16 00:54:10 CET 2010
 deviceChain.deviceName0=XC3S1500
 deviceChain.iRLength0=6
 deviceChain.name0=MyDevice0
@@ -33,7 +33,7 @@ unit.0.0.1.HEIGHT1=0.6902655
 unit.0.0.1.WIDTH1=1.0574257
 unit.0.0.1.X1=0.0
 unit.0.0.1.Y1=0.3038348
-unit.0.0.MFBitsA0=1XXX
+unit.0.0.MFBitsA0=1XX0
 unit.0.0.MFBitsB0=0000
 unit.0.0.MFCompareA0=0
 unit.0.0.MFCompareB0=999

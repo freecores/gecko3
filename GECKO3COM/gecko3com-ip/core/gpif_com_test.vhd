@@ -81,7 +81,6 @@ architecture behaviour of gpif_com_test is
   signal s_RX_DATA : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
   signal s_RD_EN, s_WR_EN : std_logic;
   signal s_TX_DATA : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
-  signal s_RDYX : std_logic;
 
   signal s_ABORT, s_ABORT_TMP : std_logic;
   
@@ -160,13 +159,14 @@ begin  -- behaviour
   -- inputs : i_SYSCLK
   -- outputs: s_RX_DATA_TMP
   rx_throtling: process (i_SYSCLK, i_nReset)
-    variable v_rx_throtle_count : std_logic_vector(6 downto 0);  -- counter variable
+    -- counter variable
+    variable v_rx_throtle_count : std_logic_vector(6 downto 0);  
   begin
     if i_nReset = '0' then
       v_rx_throtle_count := (others => '0');
       s_RD_EN <= '0';
     elsif i_SYSCLK = '1' and i_SYSCLK'event then
-      if v_rx_throtle_count >= 63 then
+      if v_rx_throtle_count >= 2 then
         s_RD_EN <= '1';
         v_rx_throtle_count := (others => '0');
       else
@@ -193,7 +193,7 @@ begin  -- behaviour
 
   -- dummy logic to "use" these signals and avoid that they are removed by
   -- the optimizer
-  process(s_RX_DATA_TMP, s_EMPTY_TMP, s_FULL_TMP, s_ABORT_TMP, s_RDYX)
+  process(s_RX_DATA_TMP, s_EMPTY_TMP, s_FULL_TMP, s_ABORT_TMP)
     variable result : std_logic := '0';
   begin
     result := '0';
@@ -220,7 +220,7 @@ begin  -- behaviour
   begin
     if i_nReset = '0' then
       s_rom_adress <= (others => '0');
-      --DEBUG s_WR_EN <= '1';
+      --s_WR_EN <= '1';
       s_WR_EN <= '0';
     elsif i_SYSCLK = '1' and i_SYSCLK'event then
       if s_rom_adress = 24 then
@@ -228,7 +228,7 @@ begin  -- behaviour
         s_WR_EN <= '0';
       else
         s_rom_adress <= s_rom_adress + 1;
-        --DEBUG s_WR_EN <= '1';
+        --s_WR_EN <= '1';
         s_WR_EN <= '0';
       end if;
     end if;
