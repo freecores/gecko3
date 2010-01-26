@@ -15,9 +15,10 @@ architecture rtl of message_rom is
 	subtype ROM_WORD is std_logic_vector(15 downto 0);
 	type ROM_TABLE is array(0 to 31) of ROM_WORD;
 	signal ROM: ROM_TABLE := ROM_TABLE'(
+                "0000000000000000",	-- 0x0000
 		"0000001000000010",	-- 0x0000
 		"0000000011111101",	-- 0x0002
-		"0000000000100000",	-- 0x0004
+		"0000000000100001",	-- 0x0004
 		"0000000000000000",	-- 0x0006
 		"0000000000000001",	-- 0x0008
 		"0000000000000000",	-- 0x000A
@@ -45,8 +46,7 @@ architecture rtl of message_rom is
 		"----------------",	-- 0x0036
 		"----------------",	-- 0x0038
 		"----------------",	-- 0x003A
-		"----------------",	-- 0x003C
-		"----------------");	-- 0x003E
+		"----------------");	-- 0x003C
 begin
 	D <= ROM(to_integer(unsigned(A)));
 end;

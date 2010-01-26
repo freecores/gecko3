@@ -59,6 +59,7 @@ entity gpif_com is
     i_RD_EN   : in  std_logic;          -- read enable
     o_EMPTY   : out std_logic;          -- receive fifo empty
     o_RX_DATA : out std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);  -- receive data
+    i_EOM     : in  std_logic;
     i_WR_EN   : in  std_logic;          -- write enable
     o_FULL    : out std_logic;          -- send fifo full
     i_TX_DATA : in  std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);  -- send data
@@ -83,6 +84,8 @@ architecture structure of gpif_com is
   signal s_ABORT_FSM, s_ABORT_TMP  : std_logic;
   signal s_RX_FSM, s_RX_TMP  : std_logic;
   signal s_TX_FSM, s_TX_TMP  : std_logic;
+  signal s_EOM, s_EOM_TMP : std_logic;  -- End of message
+  signal s_X2U_FULL_IFCLK, s_X2U_FULL_TMP : std_logic;
   
   -- USB to Xilinx (U2X)
   signal s_U2X_WR_EN,
@@ -118,24 +121,25 @@ architecture structure of gpif_com is
   -- FSM GPIF
   component gpif_com_fsm
     port (
-      i_nReset,
-      i_IFCLK,									-- GPIF CLK (is Master)
-      i_WRU,                             -- write from GPIF
-      i_RDYU 	      : in    std_logic;       -- GPIF is ready
-      i_U2X_FULL,
-      i_U2X_AM_FULL,	 -- signals for IN FIFO
-      i_X2U_AM_EMPTY,
-      i_X2U_EMPTY	: in  std_logic;     -- signals for OUT FIFO
-      o_bus_trans_dir        : out    std_logic;
-      o_U2X_WR_EN, 						      -- signals for IN FIFO
-      o_X2U_RD_EN,								-- signals for OUT FIFO
-      o_FIFOrst,
-      o_WRX,                             -- To write to GPIF
-      o_RDYX    : out   std_logic;       -- Core is ready
-      o_ABORT   : out   std_logic;       -- abort condition detected. we have to flush the data
-      o_RX,
-      o_TX      : out   std_logic 		--
-      );
+      i_nReset         : in  std_logic;
+      i_IFCLK          : in  std_logic;
+      i_WRU            : in  std_logic;
+      i_RDYU           : in  std_logic;
+      i_EOM            : in  std_logic;
+      i_U2X_FULL       : in  std_logic;
+      i_U2X_AM_FULL    : in  std_logic;
+      i_X2U_FULL_IFCLK : in  std_logic;
+      i_X2U_AM_EMPTY   : in  std_logic;
+      i_X2U_EMPTY      : in  std_logic;
+      o_bus_trans_dir  : out std_logic;
+      o_U2X_WR_EN      : out std_logic;
+      o_X2U_RD_EN      : out std_logic;
+      o_FIFOrst        : out std_logic;
+      o_WRX            : out std_logic;
+      o_RDYX           : out std_logic;
+      o_ABORT          : out std_logic;
+      o_RX             : out std_logic;
+      o_TX             : out std_logic);
   end component;
 
   -- FIFO dualclock to cross the clock domain between the GPIF and the FPGA
@@ -195,23 +199,25 @@ begin
 
   FSM_GPIF : gpif_com_fsm
     port map (
-      i_nReset        => i_nReset,
-      i_IFCLK         => i_IFCLK,
-      i_WRU           => i_WRU,
-      i_RDYU          => i_RDYU,
-      i_U2X_FULL      => s_U2X_FULL,
-      i_U2X_AM_FULL   => s_U2X_AM_FULL,
-      i_X2U_AM_EMPTY  => s_X2U_AM_EMPTY,
-      i_X2U_EMPTY     => s_X2U_EMPTY,
-      o_U2X_WR_EN     => s_U2X_WR_EN,
-      o_X2U_RD_EN     => s_X2U_RD_EN,
-      o_FIFOrst       => s_FIFOrst,
-      o_bus_trans_dir => s_dbus_trans_dir,
-      o_WRX           => s_WRX,
-      o_RDYX          => s_RDYX,
-      o_ABORT         => s_ABORT_FSM,
-      o_RX            => s_RX_FSM,
-      o_TX            => s_TX_FSM
+      i_nReset         => i_nReset,
+      i_IFCLK          => i_IFCLK,
+      i_WRU            => i_WRU,
+      i_RDYU           => i_RDYU,
+      i_EOM            => s_EOM,
+      i_U2X_FULL       => s_U2X_FULL,
+      i_U2X_AM_FULL    => s_U2X_AM_FULL,
+      i_X2U_FULL_IFCLK => s_X2U_FULL_IFCLK,
+      i_X2U_AM_EMPTY   => s_X2U_AM_EMPTY,
+      i_X2U_EMPTY      => s_X2U_EMPTY,
+      o_U2X_WR_EN      => s_U2X_WR_EN,
+      o_X2U_RD_EN      => s_X2U_RD_EN,
+      o_FIFOrst        => s_FIFOrst,
+      o_bus_trans_dir  => s_dbus_trans_dir,
+      o_WRX            => s_WRX,
+      o_RDYX           => s_RDYX,
+      o_ABORT          => s_ABORT_FSM,
+      o_RX             => s_RX_FSM,
+      o_TX             => s_TX_FSM
       );
 
 
@@ -246,6 +252,20 @@ begin
       s_RX_TMP    <= s_RX_FSM;
     end if;
   end process double_buf_sig;
+
+  -- Double buffer the ABORT, RX and TX signal to avoid metastability
+  double_buf_ifclk : process (i_IFCLK, i_nReset)
+  begin
+    if i_nReset = '0' then
+      s_X2U_FULL_TMP <= '0';
+      s_X2U_FULL_IFCLK <= '0';
+    elsif rising_edge(i_IFCLK) then
+      s_EOM     <= s_EOM_TMP;
+      s_EOM_TMP <= i_EOM;
+      s_X2U_FULL_IFCLK <= s_X2U_FULL_TMP;
+      s_X2U_FULL_TMP <= s_X2U_FULL;
+    end if;
+  end process double_buf_ifclk;
 
 
 -----------------------------------------------------------------------------

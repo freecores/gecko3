@@ -114,6 +114,17 @@ sbit at 0x80+2 bitSPI_MISO;	       /**< \define In from FX2 point of view, Maste
 #define bmXILINX_BUSY	        bmBIT1 /**< bitmask to access busy */
 
 
+/* define pinning of the GPIF interface RDY signals 
+   accessible in the GPIFREADYSTAT register */
+#define bmWRX                   bmBIT0 /**< GPIFREADYSTAT bitmask to access Write Request Xilinx */
+#define bmRDYX                  bmBIT1 /**< GPIFREADYSTAT bitmask to access ReDY Xilinx
+
+/* define pinning of the GPIF interface CTL signals 
+   accessible while the GPIF is in the IDLE state through the
+   GPIFIDLECTL register */
+#define bmWRU                  bmBIT1 /**< GPIFREADYSTAT bitmask to access Write Request Xilinx */
+#define bmRDYU                 bmBIT2 /**< GPIFREADYSTAT bitmask to access ReDY Xilinx
+
 /*
  * Port A (bit addressable):
  */

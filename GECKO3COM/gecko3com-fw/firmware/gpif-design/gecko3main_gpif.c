@@ -103,13 +103,13 @@
 // DataMode NO Data   NO Data   NO Data   Activate  Activate  NO Data   NO Data            
 // NextData SameData  SameData  SameData  SameData  NextData  SameData  SameData           
 // Int Trig No Int    No Int    No Int    No Int    Trig Int  No Int    No Int             
-// IF/Wait  IF        IF        Wait 1    IF        Wait 1    IF        IF                 
-//   Term A WRX       WRX                 RDYX                WRX       WRX                
-//   LFunc  AND       AND                 !A AND B            AND       AND                
-//   Term B WRX       RDYX                WRX                 WRX       WRX                
-// Branch1  Then 1    Then 0              Then 3              ThenIdle  ThenIdle           
-// Branch0  Else 0    Else 2              Else 4              ElseIdle  ElseIdle           
-// Re-Exec  No        Yes                 Yes                 No        Yes                
+// IF/Wait  IF        IF        Wait 2    IF        Wait 1    IF        IF                 
+//   Term A RDYX      RDYX                WRX                 WRX       WRX                
+//   LFunc  !A AND B  !A AND B            AND                 AND       AND                
+//   Term B WRX       WRX                 WRX                 WRX       WRX                
+// Branch1  Then 1    Then 2              Then 3              ThenIdle  ThenIdle           
+// Branch0  Else 0    Else 0              Else 4              ElseIdle  ElseIdle           
+// Re-Exec  No        No                  Yes                 No        Yes                
 // Sngl/CRC Default   Default   Default   Default   Default   Default   Default            
 // RDYU         0         0         0         0         0         0         0         0    
 // WRU          0         0         0         0         0         0         0         0    
@@ -169,10 +169,10 @@ const char xdata WaveData[128] =
 /* Output*/ 0x00,     0x02,     0x02,     0x06,     0x06,     0x06,     0x06,     0x00,
 /* LFun  */ 0x40,     0x09,     0x0F,     0x09,     0x00,     0x00,     0x00,     0x3F,
 // Wave 2 
-/* LenBr */ 0x08,     0x82,     0x01,     0x9C,     0x01,     0x3F,     0xBF,     0x07,
+/* LenBr */ 0x08,     0x10,     0x02,     0x9C,     0x01,     0x3F,     0xBF,     0x07,
 /* Opcode*/ 0x01,     0x01,     0x00,     0x03,     0x16,     0x01,     0x01,     0x00,
 /* Output*/ 0x00,     0x00,     0x0C,     0x0C,     0x0C,     0x00,     0x00,     0x00,
-/* LFun  */ 0x00,     0x01,     0x00,     0xC8,     0x00,     0x00,     0x00,     0x3F,
+/* LFun  */ 0xC8,     0xC8,     0x00,     0x00,     0x00,     0x00,     0x00,     0x3F,
 // Wave 3 
 /* LenBr */ 0x39,     0x01,     0x13,     0x23,     0xA5,     0x2F,     0x3F,     0x07,
 /* Opcode*/ 0x01,     0x00,     0x01,     0x03,     0x07,     0x17,     0x01,     0x00,
@@ -186,7 +186,7 @@ const char xdata FlowStates[36] =
 {                                      
 /* Wave 0 FlowStates */ 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 /* Wave 1 FlowStates */ 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-/* Wave 2 FlowStates */ 0x83,0x36,0x04,0x00,0x03,0x23,0x03,0x02,0x00,
+/* Wave 2 FlowStates */ 0x83,0x4E,0x04,0x00,0x04,0x03,0x03,0x02,0x00,
 /* Wave 3 FlowStates */ 0x84,0x09,0x02,0x02,0x04,0x24,0x03,0x02,0x00,
 };                     
 // END DO NOT EDIT     

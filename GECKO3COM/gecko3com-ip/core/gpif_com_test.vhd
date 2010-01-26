@@ -79,7 +79,7 @@ architecture behaviour of gpif_com_test is
   -----------------------------------------------------------------------------
   signal s_EMPTY, s_FULL : std_logic;
   signal s_RX_DATA : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
-  signal s_RD_EN, s_WR_EN : std_logic;
+  signal s_RD_EN, s_WR_EN, s_EOM : std_logic;
   signal s_TX_DATA : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
 
   signal s_ABORT, s_ABORT_TMP : std_logic;
@@ -104,6 +104,7 @@ architecture behaviour of gpif_com_test is
       i_RD_EN    : in    std_logic;
       o_EMPTY    : out   std_logic;
       o_RX_DATA  : out   std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
+      i_EOM      : in    std_logic;
       i_WR_EN    : in    std_logic;
       o_FULL     : out   std_logic;
       i_TX_DATA  : in    std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
@@ -133,6 +134,7 @@ begin  -- behaviour
       i_RD_EN    => s_RD_EN,
       o_EMPTY    => s_EMPTY,
       o_RX_DATA  => s_RX_DATA,
+      i_EOM      => s_EOM,
       i_WR_EN    => s_WR_EN,
       o_FULL     => s_FULL,
       i_TX_DATA  => s_TX_DATA,
@@ -166,7 +168,7 @@ begin  -- behaviour
       v_rx_throtle_count := (others => '0');
       s_RD_EN <= '0';
     elsif i_SYSCLK = '1' and i_SYSCLK'event then
-      if v_rx_throtle_count >= 2 then
+      if v_rx_throtle_count >= 10 then
         s_RD_EN <= '1';
         v_rx_throtle_count := (others => '0');
       else
@@ -220,16 +222,19 @@ begin  -- behaviour
   begin
     if i_nReset = '0' then
       s_rom_adress <= (others => '0');
-      --s_WR_EN <= '1';
       s_WR_EN <= '0';
+      --s_WR_EN <= '0';
     elsif i_SYSCLK = '1' and i_SYSCLK'event then
-      if s_rom_adress = 24 then
+      if s_rom_adress >= 24 then
         s_rom_adress <= s_rom_adress;
         s_WR_EN <= '0';
+        s_EOM <= '1';
       else
-        s_rom_adress <= s_rom_adress + 1;
-        --s_WR_EN <= '1';
-        s_WR_EN <= '0';
+        if s_FULL ='0' then
+          s_rom_adress <= s_rom_adress + 1;
+          s_WR_EN <= '1'; 
+        end if;
+        s_EOM <= '0';
       end if;
     end if;
   end process rom_adress_counter;

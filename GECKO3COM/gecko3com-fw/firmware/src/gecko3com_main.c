@@ -744,8 +744,13 @@ static void main_loop (void)
 	   * After this command all endpoint 2 and 6 data goes directly to the 
 	   * FPGA, the FX2 doesn't parse commands anymore. Use endpoint 0 TMC 
 	   * commands to switch back */
-	  init_gpif();	  
-	  flLOCAL = GECKO3COM_REMOTE;
+	  if(fpga_done()) {
+	    init_gpif();	  
+	    flLOCAL = GECKO3COM_REMOTE;
+	  }
+	  else {
+	    ieee488_status.EventStatusRegister |= bmEXECUTION_ERROR;
+	  }
 	  usb_tmc_state = TMC_STATE_IDLE;
 	  break;
 
@@ -848,10 +853,21 @@ static void main_loop (void)
       }     
     } /* end of IN Transfer clause */
 
+    
+    /* if we operate in REMOTE mode (means we pass the data to the FPGA)
+     * continously check the DONE pin from the FPGA, to avoid that bad things
+     * happen when someone reconfigures the FPGA through JTAG */
+    if(flLOCAL == GECKO3COM_REMOTE && !fpga_done()) {
+      deactivate_gpif();
+      flLOCAL = GECKO3COM_LOCAL;
+    }
+
+
     /* if the LED flag is set to off, disable the external LED */
     if(flLED == LEDS_OFF) {
       set_led_ext(LEDS_OFF);
     }
+
 
     /* resets the watchdog timer back to the initial value */
     watchdog_count = WATCHDOG_TIME;

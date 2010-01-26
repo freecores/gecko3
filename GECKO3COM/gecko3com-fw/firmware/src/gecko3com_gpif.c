@@ -83,26 +83,31 @@ extern const char InitData[7];
 
 
 /** 
- * \brief exectuted when the gpif wafeform terminates 
+ * \brief exectuted when the gpif waveform terminates 
  */
 void
 isr_gpif_done (void) interrupt
 {
   ISR_DEBUG_PORT |= bmGPIF_DONE;
 
+  /* check if this is a end of a IN transfer */
+  if((flGPIF & bmGPIF_READ_IN_PROGRESS) == bmGPIF_READ_IN_PROGRESS){
+    INPKTEND = USB_TMC_EP_IN;
+  }
+
+  while(!(GPIFTRIG & bmGPIF_IDLE));
+
   /* check if there is data available for an OUT transfer */  
-  /*if((flGPIF & bmGPIF_PENDING_DATA) == bmGPIF_PENDING_DATA) {
+  if((flGPIF & bmGPIF_PENDING_DATA) == bmGPIF_PENDING_DATA) {
     //if(!(EP2468STAT & bmEP2EMPTY)) {
     flGPIF &= ~bmGPIF_PENDING_DATA;
-    GPIFABORT = 0xFF;
-    SYNCDELAY;
+        
     gpif_trigger_write();
+    flGPIF &= ~bmGPIF_READ_IN_PROGRESS;
   }
-  else*/ {
-    /* check if this is a end of a IN transfer */
-    //INPKTEND = USB_TMC_EP_IN;
-    while(!(GPIFTRIG & bmGPIF_IDLE));
-    gpif_trigger_read(); 
+  else {
+    gpif_trigger_read();
+    flGPIF |= bmGPIF_READ_IN_PROGRESS;
   }
 
   clear_fifo_gpif_irq();
@@ -120,14 +125,15 @@ isr_endpoint_out_data (void) interrupt
   ISR_DEBUG_PORT |= bmFIFO_PF;
 
   /* check if there is a active IN transfer */
-  /*if((GPIFIDLECTL & bmBIT3) == bmBIT3) {
+  if((GPIFREADYSTAT & bmWRX) == bmWRX) {
     flGPIF |= bmGPIF_PENDING_DATA;
   }
-  else*/ {
+  else {
     GPIFABORT = 0xFF;
     SYNCDELAY;
     while(!(GPIFTRIG & bmGPIF_IDLE));
     gpif_trigger_write(); 
+    flGPIF &= ~bmGPIF_READ_IN_PROGRESS;
   }
 
   clear_fifo_gpif_irq();
@@ -229,44 +235,35 @@ void init_gpif (void)
 /** \brief aborts any gpif running gpif transaction  */
 void abort_gpif(void) {
 
-#ifdef GECKO3MAIN
-  
-  /* signal an abort condition to the FPGA */
-  //if(!(GPIFTRIG & bmGPIF_IDLE)) {
-  //GPIFREADYCFG &= ~bmINTRDY;
-  //udelay(10);
-  //}
-#endif
   EA = 0;		/* disable all interrupts */
   
   flGPIF = 0;
 
+  /* abort the current GPIF waveform */
   GPIFABORT = 0xFF;
   SYNCDELAY;
   while(!(GPIFTRIG & bmGPIF_IDLE));
-  //print_info("gpif aborted\n");
 
   EA = 1;		/* global interrupt enable */
 
+  //print_info("gpif aborted\n");
+
+#ifdef GECKO3MAIN
+  /* signal an abort condition to the FPGA (both WRU and RDYU high) */
+  GPIFIDLECTL |= bmRDYU | bmWRU;
+  udelay(10);
+  GPIFIDLECTL = InitData[ 3 ]; /* restore original state */
+#endif
 
   gpif_trigger_read();
+  flGPIF |= bmGPIF_READ_IN_PROGRESS;
 }
 
 
 /** \brief disables gpif system */
 void deactivate_gpif(void) {
 
-#ifdef GECKO3MAIN
-  
-  /* signal an abort condition to the FPGA */
-  //if(!(GPIFTRIG & bmGPIF_IDLE)) {
-  //GPIFREADYCFG &= ~bmINTRDY;
-  //udelay(10);
-  //}
-#endif
-
-
-  EA = 0;		/* disable all interrupts */
+  EA = 0;	  /* disable all interrupts */
 
   EP2FIFOIE = 0;  /* disable FIFO interrupt */
   SYNCDELAY;
@@ -282,17 +279,21 @@ void deactivate_gpif(void) {
 
   flGPIF = 0;  /* unset all internal GPIF flags */
 
+  EA = 1;		/* global interrupt enable */
+
+  while(!(GPIFTRIG & bmGPIF_IDLE));
 
 #ifdef GECKO3MAIN
+  /* signal an abort condition to the FPGA (both WRU and RDYU high) */
+  GPIFIDLECTL |= bmRDYU | bmWRU;
+  udelay(10);
+  GPIFIDLECTL = InitData[ 3 ]; /* restore original state */
+
   EP2FIFOCFG &= ~bmAUTOOUT;  /* disable AutoOUT feature */
   SYNCDELAY;
   //EP6FIFOCFG &= ~bmINFM;
   EP6FIFOCFG &= ~bmAUTOIN;   /* disable AutoIN feature */
-
 #endif
-
-  EA = 1;		/* global interrupt enable */
-
 
   //print_info("gpif deactivated\n");
 }
