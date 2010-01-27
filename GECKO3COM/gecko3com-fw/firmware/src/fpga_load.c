@@ -244,7 +244,7 @@ fpga_load_end(void)
   
   if(!fpga_done()) {
     /* if not DONE, an error occoured during configuration */
-    print_err("fin.\n");
+    //print_err("fin.\n");
     return 0; 
   }
 

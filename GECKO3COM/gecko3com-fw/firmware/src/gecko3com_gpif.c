@@ -95,19 +95,25 @@ isr_gpif_done (void) interrupt
     INPKTEND = USB_TMC_EP_IN;
   }
 
+  //EA = 0;		/* disable all interrupts */
   while(!(GPIFTRIG & bmGPIF_IDLE));
+  //EA = 1;		/* global interrupt enable */
 
   /* check if there is data available for an OUT transfer */  
-  if((flGPIF & bmGPIF_PENDING_DATA) == bmGPIF_PENDING_DATA) {
+  //if((flGPIF & bmGPIF_PENDING_DATA) == bmGPIF_PENDING_DATA) {
     //if(!(EP2468STAT & bmEP2EMPTY)) {
-    flGPIF &= ~bmGPIF_PENDING_DATA;
-        
-    gpif_trigger_write();
-    flGPIF &= ~bmGPIF_READ_IN_PROGRESS;
-  }
-  else {
-    gpif_trigger_read();
+    //flGPIF &= ~bmGPIF_PENDING_DATA;
+    
+    //EA = 0;		/* disable all interrupts */
+    //flGPIF &= ~bmGPIF_READ_IN_PROGRESS;
+    //gpif_trigger_write();
+    //EA = 1;		/* global interrupt enable */
+  //}
+  /*else*/ {
+    EA = 0;		/* disable all interrupts */
     flGPIF |= bmGPIF_READ_IN_PROGRESS;
+    gpif_trigger_read();
+    EA = 1;		/* global interrupt enable */
   }
 
   clear_fifo_gpif_irq();
@@ -129,11 +135,20 @@ isr_endpoint_out_data (void) interrupt
     flGPIF |= bmGPIF_PENDING_DATA;
   }
   else {
-    GPIFABORT = 0xFF;
-    SYNCDELAY;
+    //EA = 0;		/* disable all interrupts */
+    if((flGPIF & bmGPIF_READ_IN_PROGRESS) == bmGPIF_READ_IN_PROGRESS) {
+      GPIFABORT = 0xFF;
+      SYNCDELAY;
+      flGPIF &= ~bmGPIF_READ_IN_PROGRESS;
+    }
+    //EA = 1;		/* global interrupt enable */
+    //EA = 0;		/* disable all interrupts */
     while(!(GPIFTRIG & bmGPIF_IDLE));
-    gpif_trigger_write(); 
+    //EA = 1;		/* global interrupt enable */
+    EA = 0;		/* disable all interrupts */
     flGPIF &= ~bmGPIF_READ_IN_PROGRESS;
+    gpif_trigger_write();
+    EA = 1;		/* global interrupt enable */
   }
 
   clear_fifo_gpif_irq();
@@ -227,6 +242,7 @@ void init_gpif (void)
 
 
   /* start gpif read, default state of the gpif to wait for fpga data */
+  flGPIF |= bmGPIF_READ_IN_PROGRESS;
   gpif_trigger_read();
 
 }

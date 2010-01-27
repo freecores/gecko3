@@ -149,6 +149,7 @@ begin
   -- comb logic
   transaction : process(pr_state, i_WRU, i_RDYU, i_U2X_FULL, i_U2X_AM_FULL,
                         i_X2U_EMPTY, i_X2U_FULL_IFCLK, i_EOM)
+    variable state_number : std_logic_vector(3 downto 0);  -- debug information
   begin  -- process transaction
 
     -- default signal values to avoid latches:
@@ -167,6 +168,7 @@ begin
       -- controll
 
       when rst =>
+        state_number := x"1";
         -- output signal values:
         s_FIFOrst   <= '1';
         s_WRX       <= '0';
@@ -186,6 +188,7 @@ begin
         end if;
         
       when idle =>
+        state_number := x"2";
         -- output signal values:
         s_FIFOrst       <= '0';
         s_WRX           <= '0';
@@ -209,6 +212,7 @@ begin
         -----------------------------------------------------------------------
         -- in trans
       when inRQ =>
+        state_number := x"3";      
         -- output signal values:
         s_WRX  <= '0';
         s_RDYX <= '0';
@@ -225,6 +229,7 @@ begin
         end if;
 
       when inACK =>
+        state_number := x"4";
         -- output signal values:
         s_WRX       <= '0';
         s_RDYX      <= '1';
@@ -242,6 +247,7 @@ begin
         end if;
 
         when inWait =>
+        state_number := x"5";
         -- output signal values:
         s_WRX       <= '0';
         s_RDYX      <= '1';
@@ -252,6 +258,7 @@ begin
         nx_state <= inTrans;
         
       when inTrans =>
+        state_number := x"6";
         -- output signal values:
         s_WRX       <= '0';
         s_RDYX      <= '1';
@@ -270,6 +277,7 @@ begin
         end if;
 
       when inThrot =>
+        state_number := x"7";
         -- output signal values:
         s_WRX       <= '0';
         s_RDYX      <= '0';
@@ -289,6 +297,7 @@ begin
         end if;
 
       when inThrotBreak =>
+        state_number := x"8";
         -- this is a one clock delay to help the fx2 to see the RDYX signal.
        
         -- output signal values:
@@ -314,6 +323,7 @@ begin
       --  nx_state <= inThrotEnd;
         
       when inThrotEnd =>
+        state_number := x"9";
         -- this is a one clock delay to help the fx2 to see the RDYX signal.
        
         -- output signal values:
@@ -326,6 +336,7 @@ begin
         nx_state <= inTrans;
         
       when endInTrans =>
+        state_number := x"A";
         -- output signal values:
         s_WRX       <= '0';
         s_RDYX      <= '0';
@@ -338,6 +349,7 @@ begin
         -----------------------------------------------------------------------
         -- out trans
       when outRQ =>
+        state_number := x"B";
         -- output signal values:
         s_WRX       <= '1';
         s_RDYX      <= '0';
@@ -353,6 +365,7 @@ begin
         end if;
 
      when outACK =>
+        state_number := x"C";
         -- output signal values:
         s_WRX       <= '1';
         s_RDYX      <= '0';
@@ -369,6 +382,7 @@ begin
         end if;
 
       when outTrans =>
+        state_number := x"D";
         -- output signal values:
         s_WRX           <= '1';
         s_RDYX          <= '0';
@@ -390,6 +404,7 @@ begin
         end if;
 
       when outUSBwait =>
+        state_number := x"E";
         -- output signal values:
         s_WRX       <= '1';
         s_RDYX      <= '0';
@@ -407,6 +422,7 @@ begin
         end if;
         
       when outFIFOwait =>
+        state_number := x"F";
         -- output signal values:
         s_WRX       <= '1';
         s_RDYX      <= '1';
@@ -426,6 +442,7 @@ begin
         end if;
         
       when endOutTrans =>
+        state_number := x"9";
         -- output signal values:
         s_RDYX          <= '0';
         s_WRX           <= '0'; 

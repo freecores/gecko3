@@ -1,5 +1,5 @@
 #ChipScope Pro Analyzer Project File, Version 3.0
-#Tue Jan 26 21:37:40 CET 2010
+#Wed Jan 27 19:37:15 CET 2010
 deviceChain.deviceName0=XC3S1500
 deviceChain.iRLength0=6
 deviceChain.name0=MyDevice0
@@ -33,7 +33,7 @@ unit.0.0.1.HEIGHT1=0.82300884
 unit.0.0.1.WIDTH1=0.9352014
 unit.0.0.1.X1=0.030647986
 unit.0.0.1.Y1=0.15781711
-unit.0.0.MFBitsA0=X1XXXXX
+unit.0.0.MFBitsA0=1XXXXXX
 unit.0.0.MFBitsB0=0000000
 unit.0.0.MFCompareA0=0
 unit.0.0.MFCompareB0=999
@@ -63,7 +63,7 @@ unit.0.0.port.-1.b.0.channellist=2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
 unit.0.0.port.-1.b.0.color=java.awt.Color[r\=0,g\=0,b\=124]
 unit.0.0.port.-1.b.0.name=/GPIF_INTERFACE/s_dbus_out
 unit.0.0.port.-1.b.0.orderindex=-1
-unit.0.0.port.-1.b.0.radix=Hex
+unit.0.0.port.-1.b.0.radix=Bin
 unit.0.0.port.-1.b.0.signedOffset=0.0
 unit.0.0.port.-1.b.0.signedPrecision=0
 unit.0.0.port.-1.b.0.signedScaleFactor=1.0
@@ -410,7 +410,7 @@ unit.0.0.waveform.posn.14.radix=1
 unit.0.0.waveform.posn.14.type=signal
 unit.0.0.waveform.posn.15.channel=2147483646
 unit.0.0.waveform.posn.15.name=/GPIF_INTERFACE/s_dbus_out
-unit.0.0.waveform.posn.15.radix=1
+unit.0.0.waveform.posn.15.radix=0
 unit.0.0.waveform.posn.15.type=bus
 unit.0.0.waveform.posn.16.channel=2147483646
 unit.0.0.waveform.posn.16.name=/s_RX_DATA

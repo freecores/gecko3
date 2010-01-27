@@ -854,14 +854,26 @@ static void main_loop (void)
     } /* end of IN Transfer clause */
 
     
-    /* if we operate in REMOTE mode (means we pass the data to the FPGA)
-     * continously check the DONE pin from the FPGA, to avoid that bad things
-     * happen when someone reconfigures the FPGA through JTAG */
-    if(flLOCAL == GECKO3COM_REMOTE && !fpga_done()) {
-      deactivate_gpif();
-      flLOCAL = GECKO3COM_LOCAL;
-    }
+    
+    if(flLOCAL == GECKO3COM_REMOTE) {
+      /* if we operate in REMOTE mode (means we pass the data to the FPGA)
+       * continously check the DONE pin from the FPGA, to avoid that bad things
+       * happen when someone reconfigures the FPGA through JTAG */
+      if(!fpga_done()) {
+	
+	mdelay(40);
+	if(!fpga_done()) {
+	  //set_led_ext(GREEN);
+	  deactivate_gpif();
+	  flLOCAL = GECKO3COM_LOCAL;
+	}
+      }
 
+      if(!(EP2468STAT & bmEP2EMPTY) && (GPIFTRIG & bmGPIF_IDLE)) {
+	flGPIF = 0;
+	gpif_trigger_write();
+      }
+    }
 
     /* if the LED flag is set to off, disable the external LED */
     if(flLED == LEDS_OFF) {
@@ -938,8 +950,8 @@ void main(void)
   USBCS |= bmDISCON;    
 
 #ifdef DEBUG_LEVEL_ERROR
-  ser_init();
-  printf_tiny("hi\n");
+  //ser_init();
+  //printf_tiny("hi\n");
 #endif
 
   /* set the context switch flag to local operation, not fpga */
