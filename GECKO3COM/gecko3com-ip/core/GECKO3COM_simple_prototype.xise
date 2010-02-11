@@ -22,10 +22,7 @@
       <association xil_pn:name="BehavioralSimulation"/>
       <association xil_pn:name="Implementation"/>
     </file>
-    <file xil_pn:name="coregenerator_fifo_dualclock.xco" xil_pn:type="FILE_COREGEN">
-      <association xil_pn:name="BehavioralSimulation"/>
-      <association xil_pn:name="Implementation"/>
-    </file>
+    <file xil_pn:name="coregenerator/coregenerator_fifo_dualclock.xco" xil_pn:type="FILE_COREGEN"/>
     <file xil_pn:name="fifo_dualclock.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation"/>
       <association xil_pn:name="Implementation"/>
@@ -58,7 +55,39 @@
     <file xil_pn:name="gecko3com_test_chipscope.cdc" xil_pn:type="FILE_CDC">
       <association xil_pn:name="Implementation"/>
     </file>
-    <file xil_pn:name="coregenerator_fifo_dualclock.ise" xil_pn:type="FILE_COREGENISE">
+    <file xil_pn:name="GECKO3COM_simple.vhd" xil_pn:type="FILE_VHDL">
+      <association xil_pn:name="BehavioralSimulation"/>
+      <association xil_pn:name="Implementation"/>
+    </file>
+    <file xil_pn:name="coregenerator/coregenerator_fifo_receive.xco" xil_pn:type="FILE_COREGEN">
+      <association xil_pn:name="BehavioralSimulation"/>
+      <association xil_pn:name="Implementation"/>
+    </file>
+    <file xil_pn:name="coregenerator/coregenerator_fifo_send.xco" xil_pn:type="FILE_COREGEN">
+      <association xil_pn:name="BehavioralSimulation"/>
+      <association xil_pn:name="Implementation"/>
+    </file>
+    <file xil_pn:name="fifo_receive.vhd" xil_pn:type="FILE_VHDL">
+      <association xil_pn:name="BehavioralSimulation"/>
+      <association xil_pn:name="Implementation"/>
+    </file>
+    <file xil_pn:name="fifo_send.vhd" xil_pn:type="FILE_VHDL">
+      <association xil_pn:name="BehavioralSimulation"/>
+      <association xil_pn:name="Implementation"/>
+    </file>
+    <file xil_pn:name="GECKO3COM_simple_datapath.vhd" xil_pn:type="FILE_VHDL">
+      <association xil_pn:name="BehavioralSimulation"/>
+      <association xil_pn:name="Implementation"/>
+    </file>
+    <file xil_pn:name="GECKO3COM_simple_fsm.vhd" xil_pn:type="FILE_VHDL">
+      <association xil_pn:name="BehavioralSimulation"/>
+      <association xil_pn:name="Implementation"/>
+    </file>
+    <file xil_pn:name="coregenerator/coregenerator_fifo_dualclock.ise" xil_pn:type="FILE_COREGENISE"/>
+    <file xil_pn:name="coregenerator/coregenerator_fifo_receive.ise" xil_pn:type="FILE_COREGENISE">
+      <association xil_pn:name="Implementation"/>
+    </file>
+    <file xil_pn:name="coregenerator/coregenerator_fifo_send.ise" xil_pn:type="FILE_COREGENISE">
       <association xil_pn:name="Implementation"/>
     </file>
   </files>
@@ -72,6 +101,7 @@
     <property xil_pn:name="Device Family" xil_pn:value="Spartan3"/>
     <property xil_pn:name="Editor" xil_pn:value="Custom"/>
     <property xil_pn:name="Fitter Report Format" xil_pn:value="HTML"/>
+    <property xil_pn:name="Functional Model Target Language Coregen" xil_pn:value="VHDL"/>
     <property xil_pn:name="Implementation Top" xil_pn:value="Architecture|gpif_com_test|loopback"/>
     <property xil_pn:name="Implementation Top Instance Path" xil_pn:value="/gpif_com_test"/>
     <property xil_pn:name="Keep Hierarchy" xil_pn:value="Soft"/>

@@ -84,7 +84,7 @@ architecture structure of gpif_com is
   signal s_ABORT_FSM, s_ABORT_TMP  : std_logic;
   signal s_RX_FSM, s_RX_TMP  : std_logic;
   signal s_TX_FSM, s_TX_TMP  : std_logic;
-  signal s_EOM, s_EOM_TMP : std_logic;  -- End of message
+  signal s_EOM, s_EOM_TMP, s_EOM_FF : std_logic;  -- End of message
   signal s_X2U_FULL_IFCLK, s_X2U_FULL_TMP : std_logic;
   
   -- USB to Xilinx (U2X)
@@ -203,7 +203,7 @@ begin
       i_IFCLK          => i_IFCLK,
       i_WRU            => i_WRU,
       i_RDYU           => i_RDYU,
-      i_EOM            => s_EOM,
+      i_EOM            => s_EOM_FF,
       i_U2X_FULL       => s_U2X_FULL,
       i_U2X_AM_FULL    => s_U2X_AM_FULL,
       i_X2U_FULL_IFCLK => s_X2U_FULL_IFCLK,
@@ -253,7 +253,7 @@ begin
     end if;
   end process double_buf_sig;
 
-  -- Double buffer the ABORT, RX and TX signal to avoid metastability
+  -- Double buffer the s_EOM and s_X2U_FULL_IFCLK signal to avoid metastability
   double_buf_ifclk : process (i_IFCLK, i_nReset)
   begin
     if i_nReset = '0' then
@@ -267,15 +267,32 @@ begin
     end if;
   end process double_buf_ifclk;
 
+  -- purpose: EOM bit flip-flop
+  -- type   : sequential
+  -- inputs : i_IFCLK, i_nReset, s_EOM, s_X2U_EMPTY
+  -- outputs: s_EOM_FF
+  EOM_FF: process (i_IFCLK, i_nReset)
+  begin  -- process EOM_FF
+    if i_nReset = '0' then                -- asynchronous reset (active low)
+      s_EOM_FF <= '0';
+    elsif i_IFCLK'event and i_IFCLK = '1' then  -- rising clock edge
+      if s_EOM = '1' then
+        s_EOM_FF <= '1';
+      end if;
+      if s_X2U_EMPTY = '1' then
+        s_EOM_FF <= '0';
+      end if;
+    end if;
+  end process EOM_FF;
+  
+  -----------------------------------------------------------------------------
+  -- Data bus access
+  -----------------------------------------------------------------------------
 
------------------------------------------------------------------------------
--- Data bus access
------------------------------------------------------------------------------
-
--- purpose: to handle the access on the bidirectional bus
--- type   : combinational
--- inputs : s_bus_trans_dir
--- outputs: 
+  -- purpose: to handle the access on the bidirectional bus
+  -- type   : combinational
+  -- inputs : s_bus_trans_dir
+  -- outputs: 
   bus_access : process (s_dbus_trans_dir, s_dbus_out)
   begin  -- process bus_access
     if s_dbus_trans_dir = '1' then
