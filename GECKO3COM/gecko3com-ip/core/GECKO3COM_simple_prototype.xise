@@ -15,9 +15,6 @@
   <version xil_pn:ise_version="11.1" xil_pn:schema_version="2"/>
 
   <files>
-    <file xil_pn:name="GECKO3COM_loopback.vhd" xil_pn:type="FILE_VHDL">
-      <association xil_pn:name="Implementation"/>
-    </file>
     <file xil_pn:name="GECKO3COM_defines.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation"/>
       <association xil_pn:name="Implementation"/>
@@ -83,6 +80,10 @@
       <association xil_pn:name="BehavioralSimulation"/>
       <association xil_pn:name="Implementation"/>
     </file>
+    <file xil_pn:name="GECKO3COM_simple_test.vhd" xil_pn:type="FILE_VHDL">
+      <association xil_pn:name="BehavioralSimulation"/>
+      <association xil_pn:name="Implementation"/>
+    </file>
     <file xil_pn:name="coregenerator/coregenerator_fifo_dualclock.ise" xil_pn:type="FILE_COREGENISE"/>
     <file xil_pn:name="coregenerator/coregenerator_fifo_receive.ise" xil_pn:type="FILE_COREGENISE">
       <association xil_pn:name="Implementation"/>
@@ -102,11 +103,11 @@
     <property xil_pn:name="Editor" xil_pn:value="Custom"/>
     <property xil_pn:name="Fitter Report Format" xil_pn:value="HTML"/>
     <property xil_pn:name="Functional Model Target Language Coregen" xil_pn:value="VHDL"/>
-    <property xil_pn:name="Implementation Top" xil_pn:value="Architecture|gpif_com_test|loopback"/>
-    <property xil_pn:name="Implementation Top Instance Path" xil_pn:value="/gpif_com_test"/>
+    <property xil_pn:name="Implementation Top" xil_pn:value="Architecture|GECKO3COM_simple_test|behavour"/>
+    <property xil_pn:name="Implementation Top Instance Path" xil_pn:value="/GECKO3COM_simple_test"/>
     <property xil_pn:name="Keep Hierarchy" xil_pn:value="Soft"/>
     <property xil_pn:name="Overwrite Compiled Libraries" xil_pn:value="true"/>
-    <property xil_pn:name="PROP_BehavioralSimTop" xil_pn:value="Architecture|gpif_com_test_tb|simulation"/>
+    <property xil_pn:name="PROP_BehavioralSimTop" xil_pn:value="Architecture|GECKO3COM_simple|Behavioral"/>
     <property xil_pn:name="PROP_DesignName" xil_pn:value="usb_tmc_com"/>
     <property xil_pn:name="PROP_mapSmartGuideFileName" xil_pn:value=""/>
     <property xil_pn:name="PROP_parSmartGuideFileName" xil_pn:value=""/>
@@ -118,7 +119,7 @@
     <property xil_pn:name="Report Type" xil_pn:value="Error Report"/>
     <property xil_pn:name="Report Type Post Trace" xil_pn:value="Error Report"/>
     <property xil_pn:name="Safe Implementation" xil_pn:value="Yes"/>
-    <property xil_pn:name="Selected Simulation Root Source Node Behavioral" xil_pn:value="Architecture|gpif_com_test_tb|simulation"/>
+    <property xil_pn:name="Selected Simulation Root Source Node Behavioral" xil_pn:value="Architecture|GECKO3COM_simple|Behavioral"/>
     <property xil_pn:name="Simulation Resolution" xil_pn:value="1 ns"/>
     <property xil_pn:name="Simulation Run Time Modelsim" xil_pn:value="2000ns"/>
     <property xil_pn:name="Simulator" xil_pn:value="ISim (VHDL/Verilog)"/>
@@ -138,7 +139,7 @@
   <libraries/>
 
   <partitions>
-    <partition xil_pn:name="/gpif_com_test"/>
+    <partition xil_pn:name="/GECKO3COM_simple_test"/>
   </partitions>
 
 </project>

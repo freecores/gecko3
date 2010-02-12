@@ -33,7 +33,7 @@
 --      This core provides a simple FIFO and register interface to the
 --      USB data transfer capabilities of the GECKO3COM/GECKO3main system.
 --
---      Look at GECKO3COM_loopback.vhd for an example how to use it.
+--      Look at GECKO3COM_simple.vhd for an example how to use it.
 --
 --  Target Devices:	Xilinx FPGA's Spartan3 and up or Virtex4 and up.
 --  Tool versions: 	11.1
@@ -68,6 +68,7 @@ entity GECKO3COM_simple is
     i_send_fifo_data       : in  std_logic_vector(BUSWIDTH-1 downto 0);
     i_send_transfersize    : in  std_logic_vector(31 downto 0);
     i_send_transfersize_en : in  std_logic;
+    i_send_have_more_data  : in  std_logic;
     o_send_data_request    : out std_logic;
     o_send_finished        : out std_logic;
 
@@ -146,6 +147,7 @@ architecture Behavioral of GECKO3COM_simple is
       i_send_fifo_reset            : in  std_logic;
       i_send_transfersize          : in  std_logic_vector(31 downto 0);
       i_send_transfersize_en       : in  std_logic;
+      i_send_have_more_data        : in  std_logic;
       i_send_counter_load          : in  std_logic;
       i_send_counter_en            : in  std_logic;
       o_send_counter_zero          : out std_logic;
@@ -301,6 +303,7 @@ begin  -- behaviour
       i_send_fifo_reset            => s_send_fifo_reset,
       i_send_transfersize          => i_send_transfersize,
       i_send_transfersize_en       => i_send_transfersize_en,
+      i_send_have_more_data        => i_send_have_more_data,
       i_send_counter_load          => s_send_counter_load,
       i_send_counter_en            => s_send_counter_en,
       o_send_counter_zero          => s_send_counter_zero,

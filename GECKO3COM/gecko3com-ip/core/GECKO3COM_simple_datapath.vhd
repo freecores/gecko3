@@ -33,7 +33,7 @@
 --      This core provides a simple FIFO and register interface to the
 --      USB data transfer capabilities of the GECKO3COM/GECKO3main system.
 --
---      Look at GECKO3COM_loopback.vhd for an example how to use it.
+--      Look at GECKO3COM_simple_test.vhd for an example how to use it.
 --
 --  Target Devices:     general
 --  Tool versions:      11.1
@@ -87,6 +87,7 @@ entity GECKO3COM_simple_datapath is
     i_send_fifo_reset      : in  std_logic;
     i_send_transfersize    : in  std_logic_vector(31 downto 0);
     i_send_transfersize_en : in  std_logic;
+    i_send_have_more_data  : in  std_logic;
     i_send_counter_load    : in  std_logic;
     i_send_counter_en      : in  std_logic;
     o_send_counter_zero    : out std_logic;
@@ -149,7 +150,7 @@ architecture behaviour of GECKO3COM_simple_datapath is
   signal s_receive_fifo_empty : std_logic;
 
   signal s_send_fifo_data : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
-  signal s_btag, s_nbtag : std_logic_vector(7 downto 0);
+  signal s_btag, s_nbtag, s_msg_id: std_logic_vector(7 downto 0);
 
 begin  -- behaviour
 
@@ -248,12 +249,12 @@ begin  -- behaviour
   --          i_send_transfersize_en
   -- outputs: s_send_transfersize_count
   send_counter : process (i_sysclk, i_nReset)
-  begin  -- process receive_counter
+  begin  -- process send_counter
     if i_nReset = '0' then              -- asynchronous reset (active low)
       s_send_transfersize_count <= (others => '0');
     elsif i_sysclk'event and i_sysclk = '1' then  -- rising clock edge
       if i_send_counter_load = '1' then
-        s_receive_transfersize_count <= s_send_transfersize_reg;
+        s_send_transfersize_count <= s_send_transfersize_reg;
       end if;
       if i_send_counter_en = '1' then
         s_send_transfersize_count <= s_send_transfersize_count - 1;
@@ -272,13 +273,15 @@ begin  -- behaviour
   --          i_rx_data
   -- outputs: s_btag, s_nbtag
   btag_register : process (i_sysclk, i_nReset)
-  begin  -- process receive_counter
+  begin  -- process btag_register
     if i_nReset = '0' then              -- asynchronous reset (active low)
       s_btag <= (others => '0');
+      s_msg_id <= (others => '0');
       s_nbtag <= (others => '0');
     elsif i_sysclk'event and i_sysclk = '1' then  -- rising clock edge
       if i_btag_reg_en = '1' then
         s_btag <= i_rx_data(15 downto 8);
+        s_msg_id <= i_rx_data(7 downto 0);
       end if;
       if   i_nbtag_reg_en = '1' then
         s_nbtag <= i_rx_data(7 downto 0);
@@ -292,11 +295,11 @@ begin  -- behaviour
 
   
   o_dev_dep_msg_out <=
-    '1' when i_rx_data(7 downto 0) = x"01" else
+    '1' when s_msg_id(7 downto 0) = x"01" else
     '0';
 
   o_request_dev_dep_msg_in <=
-    '1' when i_rx_data(7 downto 0) = x"02" else
+    '1' when s_msg_id(7 downto 0) = x"02" else
     '0';
 
   o_eom_bit_detected <=
@@ -317,49 +320,53 @@ begin  -- behaviour
       when "001" => o_tx_data <= s_nbtag & x"00"; -- inverted bTag and Reserved
       when "010" => o_tx_data <= s_send_transfersize_reg(15 downto 0);
       when "011" => o_tx_data <= s_send_transfersize_reg(31 downto 16);
-      when "100" => o_tx_data <= x"0001";  -- TransferAttributes: EOM = 1
+                    --TransferAttributes EOM bit:
+      when "100" => o_tx_data <= b"000000000000000" & i_send_have_more_data;
       when "101" => o_tx_data <= x"0000";  -- Header byte 10 and 11, Reserved
       when "110" => o_tx_data <= s_send_fifo_data;  -- message data
       when others => o_tx_data <= s_send_fifo_data;
     end case;
   end process tx_data_mux;
 
-  
--- purpose: set and reset behavour for the status flags
--- type   : sequential
--- inputs : i_sysclk, i_nReset, i_receive_newdata_set,
---          i_receive_end_of_message_set, s_send_data_request_set,
---          i_receive_fifo_rd_en, s_receive_fifo_empty, i_send_fifo_wr_en
--- outputs: o_receive_newdata, o_receive_end_of_message, o_send_data_request
-gecko3com_simple_flags: process (i_sysclk, i_nReset)
-begin  -- process gecko3com_simple_flags
-  if i_nReset = '0' then                -- asynchronous reset (active low)
-    o_receive_newdata <= '0';
-    o_receive_end_of_message <= '0';
-    o_send_data_request <= '0';
-  elsif i_sysclk'event and i_sysclk = '1' then  -- rising clock edge
-    if i_receive_newdata_set = '1' then
-      o_receive_newdata <= '1';
-    end if;
-    if i_receive_fifo_rd_en = '1' then
-      o_receive_newdata <= '0';
-    end if;
 
-    if i_receive_end_of_message_set = '1' then
-      o_receive_end_of_message <= '1';
-    end if;
-    if s_receive_fifo_empty = '1' then
+  -- purpose: set and reset behavour for the status flags
+  -- type   : sequential
+  -- inputs : i_sysclk, i_nReset, i_receive_newdata_set,
+  --          i_receive_end_of_message_set, s_send_data_request_set,
+  --          i_receive_fifo_rd_en, s_receive_fifo_empty, i_send_fifo_wr_en
+  -- outputs: o_receive_newdata, o_receive_end_of_message, o_send_data_request
+  gecko3com_simple_flags : process (i_sysclk, i_nReset)
+    variable v_receive_fifo_empty_old : std_logic;
+  begin  -- process gecko3com_simple_flags
+    if i_nReset = '0' then              -- asynchronous reset (active low)
+      o_receive_newdata        <= '0';
       o_receive_end_of_message <= '0';
-    end if;
+      o_send_data_request      <= '0';
+      v_receive_fifo_empty_old := '0';
+    elsif i_sysclk'event and i_sysclk = '1' then  -- rising clock edge
+      if i_receive_newdata_set = '1' then
+        o_receive_newdata <= '1';
+      end if;
+      if i_receive_fifo_rd_en = '1' then
+        o_receive_newdata <= '0';
+      end if;
 
-    if i_send_data_request_set = '1' then
-      o_send_data_request <= '1';
+      if i_receive_end_of_message_set = '1' then
+        o_receive_end_of_message <= '1';
+      end if;
+      if s_receive_fifo_empty = '1' and v_receive_fifo_empty_old = '0' then
+        o_receive_end_of_message <= '0';
+      end if;
+      v_receive_fifo_empty_old := s_receive_fifo_empty;
+
+      if i_send_data_request_set = '1' then
+        o_send_data_request <= '1';
+      end if;
+      if i_send_fifo_wr_en = '1' then
+        o_send_data_request <= '0';
+      end if;
     end if;
-    if i_send_fifo_wr_en = '1' then
-      o_send_data_request <= '0';
-    end if;
-  end if;
-end process gecko3com_simple_flags;
+  end process gecko3com_simple_flags;
 
       
 end behaviour;

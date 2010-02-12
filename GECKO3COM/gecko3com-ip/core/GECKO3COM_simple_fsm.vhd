@@ -32,7 +32,7 @@
 --      This core provides a simple FIFO and register interface to the
 --      USB data transfer capabilities of the GECKO3COM/GECKO3main system.
 --
---      Look at GECKO3COM_loopback.vhd for an example how to use it.
+--      Look at GECKO3COM_simple_test.vhd for an example how to use it.
 --
 --  Target Devices:     general
 --  Tool versions:      11.1
@@ -267,7 +267,7 @@ begin  -- fsm
       s_send_fifo_rd_en <= '1';
     end if;
 
-    if state = st2_abort then
+    if state = st2_abort or state = st24_wait_for_send_end then
       s_send_fifo_reset <= '1';
     end if;
 
