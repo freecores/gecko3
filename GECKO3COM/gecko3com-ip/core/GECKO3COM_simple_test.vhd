@@ -31,7 +31,8 @@
 --   	(Not the one for Xilinx EDK)
 --	This test module has two operation mode (selectable by external switch):
 --      - Send back a response message stored in rom
---      - Send back a stream of pseudo random data. Size is defined as a constant
+--      - Send back a stream of pseudo random data. Size is defined as a
+--        constant (currently 1 MiB)
 --
 --  Target Devices:	general
 --  Tool versions: 	11.1
