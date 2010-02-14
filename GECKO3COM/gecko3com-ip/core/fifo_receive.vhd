@@ -27,8 +27,9 @@
 --  Author:  Christoph Zimmermann
 --  Date of creation: 17. December 2009
 --  Description:
---      This is a wrapper for a FIFO that was generated with the Xilinx Coregenerator
---    to hide the vendor specific stuff and match our naming conventions.
+--      This is a wrapper for a FIFO that was generated with the Xilinx
+--      Coregenerator to hide the vendor specific stuff and match our naming
+--      conventions.
 --
 --  Target Devices:     Xilinx FPGA's due to use of Coregenerator IP cores
 --  Tool versions:      11.1
@@ -50,10 +51,10 @@ use work.GECKO3COM_defines.all;
 
 entity receive_fifo is
   generic (
-    BUSWIDTH : integer := 16);          -- vector size of the FIFO databusses
+    BUSWIDTH : integer := 32);          -- vector size of the FIFO databusses
   port (
     i_din    : in  std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
-    i_clk    : in  std_logic;
+    i_clk    : in  std_logic;    
     i_rd_en  : in  std_logic;
     i_rst    : in  std_logic;
     i_wr_en  : in  std_logic;
@@ -76,7 +77,7 @@ architecture wrapper of receive_fifo is
       rst    : in  std_logic;
       wr_clk : in  std_logic;
       wr_en  : in  std_logic;
-      dout   : out std_logic_vector(BUSWIDTH-1 downto 0);
+      dout   : out std_logic_vector(31 downto 0);
       empty  : out std_logic;
       full   : out std_logic);
   end component;

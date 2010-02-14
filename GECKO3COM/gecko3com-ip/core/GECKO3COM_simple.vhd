@@ -152,7 +152,6 @@ architecture Behavioral of GECKO3COM_simple is
       i_send_counter_en            : in  std_logic;
       o_send_counter_zero          : out std_logic;
       i_send_mux_sel               : in  std_logic_vector(2 downto 0);
-      o_send_finished              : out std_logic;
       i_receive_newdata_set        : in  std_logic;
       o_receive_newdata            : out std_logic;
       i_receive_end_of_message_set : in  std_logic;
@@ -186,6 +185,7 @@ architecture Behavioral of GECKO3COM_simple is
       o_send_counter_en            : out std_logic;
       i_send_counter_zero          : in  std_logic;
       o_send_mux_sel               : out std_logic_vector(2 downto 0);
+      o_send_finished              : out std_logic;
       o_receive_newdata_set        : out std_logic;
       o_receive_end_of_message_set : out std_logic;
       o_send_data_request_set      : out std_logic;
@@ -342,6 +342,7 @@ begin  -- behaviour
       o_send_counter_en            => s_send_counter_en,
       i_send_counter_zero          => s_send_counter_zero,
       o_send_mux_sel               => s_send_mux_sel,
+      o_send_finished              => o_send_finished,
       o_receive_newdata_set        => s_receive_newdata_set,
       o_receive_end_of_message_set => s_receive_end_of_message_set,
       o_send_data_request_set      => s_send_data_request_set,

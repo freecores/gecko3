@@ -161,7 +161,7 @@ begin  -- behaviour
       i_din   => i_rx_data,
       i_clk   => i_sysclk,
       i_rd_en => i_receive_fifo_rd_en,
-      i_rst   => i_nReset,
+      i_rst   => i_receive_fifo_reset,
       i_wr_en => i_receive_fifo_wr_en,
       o_dout  => o_receive_fifo_data,
       o_empty => s_receive_fifo_empty,
@@ -174,7 +174,7 @@ begin  -- behaviour
       i_din   => i_send_fifo_data,
       i_clk   => i_sysclk,
       i_rd_en => i_send_fifo_rd_en,
-      i_rst   => i_nReset,
+      i_rst   => i_send_fifo_reset,
       i_wr_en => i_send_fifo_wr_en,
       o_dout  => s_send_fifo_data,
       o_empty => o_send_fifo_empty,
@@ -309,11 +309,11 @@ begin  -- behaviour
 
   -- purpose: mulitiplexer to construct the tmc header structure
   -- type   : combinational
-  -- inputs : i_send_mux_sel, s_btag, s_nbtag, s_send_fifo_data,
-  --          s_send_transfersize_reg
+  -- inputs : i_send_mux_sel, i_send_have_more_data, s_btag, s_nbtag,
+  --          s_send_fifo_data, s_send_transfersize_reg
   -- outputs: o_tx_data
-  tx_data_mux: process (i_send_mux_sel, s_btag, s_nbtag, s_send_fifo_data,
-                        s_send_transfersize_reg)
+  tx_data_mux: process (i_send_mux_sel, i_send_have_more_data, s_btag,
+                        s_nbtag, s_send_fifo_data, s_send_transfersize_reg)
   begin  -- process tx_data_mux
     case i_send_mux_sel is
       when "000" => o_tx_data <= x"02" & s_btag;  -- MsgID and stored bTag

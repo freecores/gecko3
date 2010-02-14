@@ -50,10 +50,10 @@ use work.GECKO3COM_defines.all;
 
 entity send_fifo is
   generic (
-    BUSWIDTH : integer := 16);          -- vector size of the FIFO databusses
+    BUSWIDTH : integer := 32);          -- vector size of the FIFO databusses
   port (
     i_din    : in  std_logic_vector(BUSWIDTH-1 downto 0);
-    i_clk    : in  std_logic;
+    i_clk    : in  std_logic;   
     i_rd_en  : in  std_logic;
     i_rst    : in  std_logic;
     i_wr_en  : in  std_logic;
@@ -70,7 +70,7 @@ architecture wrapper of send_fifo is
 
   component coregenerator_fifo_send
     port (
-      din    : in  std_logic_vector(BUSWIDTH-1 downto 0);
+      din    : in  std_logic_vector(31 downto 0);
       rd_clk : in  std_logic;
       rd_en  : in  std_logic;
       rst    : in  std_logic;

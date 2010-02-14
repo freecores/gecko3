@@ -19,7 +19,6 @@
       <association xil_pn:name="BehavioralSimulation"/>
       <association xil_pn:name="Implementation"/>
     </file>
-    <file xil_pn:name="coregenerator/coregenerator_fifo_dualclock.xco" xil_pn:type="FILE_COREGEN"/>
     <file xil_pn:name="fifo_dualclock.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation"/>
       <association xil_pn:name="Implementation"/>
@@ -48,9 +47,6 @@
       <association xil_pn:name="PostRouteSimulation"/>
       <association xil_pn:name="PostMapSimulation"/>
       <association xil_pn:name="PostTranslateSimulation"/>
-    </file>
-    <file xil_pn:name="gecko3com_test_chipscope.cdc" xil_pn:type="FILE_CDC">
-      <association xil_pn:name="Implementation"/>
     </file>
     <file xil_pn:name="GECKO3COM_simple.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation"/>
@@ -84,16 +80,23 @@
       <association xil_pn:name="BehavioralSimulation"/>
       <association xil_pn:name="Implementation"/>
     </file>
-    <file xil_pn:name="coregenerator/coregenerator_fifo_dualclock.ise" xil_pn:type="FILE_COREGENISE"/>
+    <file xil_pn:name="coregenerator/coregenerator_fifo_dualclock.xco" xil_pn:type="FILE_COREGEN">
+      <association xil_pn:name="BehavioralSimulation"/>
+      <association xil_pn:name="Implementation"/>
+    </file>
     <file xil_pn:name="coregenerator/coregenerator_fifo_receive.ise" xil_pn:type="FILE_COREGENISE">
       <association xil_pn:name="Implementation"/>
     </file>
     <file xil_pn:name="coregenerator/coregenerator_fifo_send.ise" xil_pn:type="FILE_COREGENISE">
       <association xil_pn:name="Implementation"/>
     </file>
+    <file xil_pn:name="coregenerator/coregenerator_fifo_dualclock.ise" xil_pn:type="FILE_COREGENISE">
+      <association xil_pn:name="Implementation"/>
+    </file>
   </files>
 
   <properties>
+    <property xil_pn:name="Allow Unmatched LOC Constraints" xil_pn:value="true"/>
     <property xil_pn:name="Auto Implementation Top" xil_pn:value="false"/>
     <property xil_pn:name="Command line syntax" xil_pn:value="emacsclient +$2 $1"/>
     <property xil_pn:name="Compiled Library Directory" xil_pn:value="lib"/>
@@ -120,6 +123,8 @@
     <property xil_pn:name="Report Type Post Trace" xil_pn:value="Error Report"/>
     <property xil_pn:name="Safe Implementation" xil_pn:value="Yes"/>
     <property xil_pn:name="Selected Simulation Root Source Node Behavioral" xil_pn:value="Architecture|GECKO3COM_simple|Behavioral"/>
+    <property xil_pn:name="Selected Simulation Root Source Node Post-Route" xil_pn:value="Architecture|gpif_com_test_tb|simulation"/>
+    <property xil_pn:name="Selected Simulation Source Node" xil_pn:value="DUT"/>
     <property xil_pn:name="Simulation Resolution" xil_pn:value="1 ns"/>
     <property xil_pn:name="Simulation Run Time Modelsim" xil_pn:value="2000ns"/>
     <property xil_pn:name="Simulator" xil_pn:value="ISim (VHDL/Verilog)"/>
@@ -133,7 +138,6 @@
 
   <bindings>
     <binding xil_pn:location="/gpif_com_test" xil_pn:name="GECKO3main_prototype.ucf"/>
-    <binding xil_pn:location="/gpif_com_test" xil_pn:name="gecko3com_test_chipscope.cdc"/>
   </bindings>
 
   <libraries/>

@@ -203,6 +203,7 @@ begin
       i_IFCLK          => i_IFCLK,
       i_WRU            => i_WRU,
       i_RDYU           => i_RDYU,
+      --i_EOM            => s_EOM,
       i_EOM            => s_EOM_FF,
       i_U2X_FULL       => s_U2X_FULL,
       i_U2X_AM_FULL    => s_U2X_AM_FULL,
@@ -267,10 +268,10 @@ begin
     end if;
   end process double_buf_ifclk;
 
-  -- purpose: EOM bit flip-flop
-  -- type   : sequential
-  -- inputs : i_IFCLK, i_nReset, s_EOM, s_X2U_EMPTY
-  -- outputs: s_EOM_FF
+  --purpose: EOM bit flip-flop
+  --type   : sequential
+  --inputs : i_IFCLK, i_nReset, s_EOM, s_X2U_EMPTY
+  --outputs: s_EOM_FF
   EOM_FF: process (i_IFCLK, i_nReset)
   begin  -- process EOM_FF
     if i_nReset = '0' then                -- asynchronous reset (active low)

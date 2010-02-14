@@ -168,7 +168,7 @@ begin  -- behaviour
       v_rx_throtle_count := (others => '0');
       s_RD_EN <= '0';
     elsif i_SYSCLK = '1' and i_SYSCLK'event then
-      if v_rx_throtle_count >= 10 then
+      if v_rx_throtle_count >= 0 then
         s_RD_EN <= '1';
         v_rx_throtle_count := (others => '0');
       else
@@ -225,10 +225,14 @@ begin  -- behaviour
       s_WR_EN <= '0';
       --s_WR_EN <= '0';
     elsif i_SYSCLK = '1' and i_SYSCLK'event then
-      if s_rom_adress >= 24 then
-        s_rom_adress <= s_rom_adress;
+      if s_rom_adress = 24 then
+        s_rom_adress <= s_rom_adress + 1;
         s_WR_EN <= '0';
         s_EOM <= '1';
+      elsif s_rom_adress >= 24 then
+        s_rom_adress <= s_rom_adress;
+        s_WR_EN <= '0';
+        s_EOM <= '0';
       else
         if s_FULL ='0' then
           s_rom_adress <= s_rom_adress + 1;

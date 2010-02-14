@@ -41,9 +41,11 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.std_logic_unsigned.all;
 
 library work;
 use work.GECKO3COM_defines.all;
+
 
 entity GECKO3COM_simple_test is
   port (
@@ -56,7 +58,7 @@ entity GECKO3COM_simple_test is
     o_WRX         : out   std_logic;    -- To write to GPIF
     o_RDYX        : out   std_logic;    -- IP Core is ready
     -- bidirect data bus
-    b_gpif_bus    : inout std_logic_vector(SIZE_DBUS_GPIF-1 downto 0)
+    b_gpif_bus    : inout std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
     -- simple test "user interface" signals
     o_LEDrx       : out   std_logic;    -- controll LED receive data
     o_LEDtx       : out   std_logic;    -- controll LED send data
@@ -74,11 +76,11 @@ architecture behavour of GECKO3COM_simple_test is
   constant BUSWIDTH : integer := 32; -- you can choose here 32 or 16
 
   -- lenght of the message stored in the response message rom:
-  constant c_transfer_size_rom : std_logic_vector(31 downto 0) := x"0000000E";
+  signal c_transfer_size_rom : std_logic_vector(31 downto 0) := x"0000000E";
 
   -- we will transmitt 1 MiB data when the pseude random number generator
   -- is used:
-  constant c_transfer_size_prng : std_logic_vector(31 downto 0) := x"00100000";
+  signal c_transfer_size_prng : std_logic_vector(31 downto 0) := x"00100000";
 
   
   ----------------------------------------------------------------------------- 
@@ -143,7 +145,6 @@ architecture behavour of GECKO3COM_simple_test is
   signal s_mode                              : std_logic_vector(1 downto 0);
   signal s_transfer_size_reg_select          : std_logic;
   signal s_transfer_size_reg_en              : std_logic;
-  signal s_have_more_data                    : std_logic;
   signal s_send_counter_reset                : std_logic;
   signal s_send_counter_en                   : std_logic;
   signal s_send_counter_equals_transfer_size : std_logic;
@@ -154,11 +155,12 @@ architecture behavour of GECKO3COM_simple_test is
   signal s_receive_data_old        : std_logic_vector(31 downto 0);
   signal s_selected_transfer_size  : std_logic_vector(31 downto 0);
   signal s_remaining_transfer_size : std_logic_vector(31 downto 0);
+  signal s_subtract_value          : std_logic_vector(31 downto 0);
   signal s_send_counter_value      : std_logic_vector(31 downto 0);
   signal s_prng_data               : std_logic_vector(31 downto 0);
   signal s_message_rom_data        : std_logic_vector(31 downto 0);
 
-
+  
   -----------------------------------------------------------------------------
   -- finite state machine signals
   -----------------------------------------------------------------------------
@@ -174,8 +176,8 @@ architecture behavour of GECKO3COM_simple_test is
   signal state, next_state : t_fsmState;
   
   -- XST specific synthesize attributes
-  attribute safe_recovery_state of pr_state : signal is "idle";
-  attribute safe_implementation of pr_state : signal is "yes";
+  attribute safe_recovery_state of state : signal is "st1_idle";
+  attribute safe_implementation of state : signal is "yes";
 
   
 
@@ -226,11 +228,11 @@ begin --  behavour
   -- outputs: s_mode
   mode_switch_decoder: process (i_mode_switch)
   begin  -- process mode_switch_decoder
-    if i_mode_switch = "xx1" then
+    if i_mode_switch = "001" then
       s_mode <= "00";
-    elsif i_mode_switch = "x1x" then
+    elsif i_mode_switch = "010" then
       s_mode <= "01";
-    elsif i_mode_switch = "1xx" then
+    elsif i_mode_switch = "100" then
       s_mode <= "10";
     else
       s_mode <= "00";
@@ -248,10 +250,10 @@ begin --  behavour
   -- outputs: s_send_fifo_data
   send_data_mux: process (s_mode, s_prng_data, s_message_rom_data)
   begin  -- process send_data_mux
-    case i_send_mux_sel is
+    case s_mode is
       when "00" => s_send_fifo_data <= s_message_rom_data;
       when "01" => s_send_fifo_data <= s_prng_data;
-      when others => s_send_fifo_data <= (others => 'x')
+      when others => s_send_fifo_data <= (others => 'X');
     end case;
   end process send_data_mux;
 
@@ -265,7 +267,7 @@ begin --  behavour
     case s_mode is
       when "00" => s_selected_transfer_size <= c_transfer_size_rom;
       when "01" => s_selected_transfer_size <= c_transfer_size_prng;
-      when others => s_selected_transfer_size <= (others => 'x')
+      when others => s_selected_transfer_size <= (others => 'X');
     end case;
   end process send_transfersize_mode_mux;
 
@@ -288,25 +290,11 @@ begin --  behavour
         end if;
       end if;
     end if;
-  end process remaining_transfer_size_reg;
-
-  
-  -- purpose: mulitiplexer to select the final transfer size for the selected mode
-  -- type   : combinational
-  -- inputs : s_mode, c_transfer_size_rom, c_transfer_size_prng
-  -- outputs: s_selected_transfer_size
-  send_transfersize_mode_mux: process (s_mode, c_transfer_size_rom, c_transfer_size_prng)
-  begin  -- process send_transfersize_mode_mux
-    case s_mode is
-      when "00" => s_selected_transfer_size <= c_transfer_size_rom;
-      when "01" => s_selected_transfer_size <= c_transfer_size_prng;
-      when others => s_selected_transfer_size <= (others => 'x')
-    end case;
-  end process send_transfersize_mode_mux;  
+  end process remaining_transfer_size_reg; 
 
  
   -- maximum alowed transfer size comparator
-  s_have_more_data <=
+  s_send_have_more_data <=
     '1' when s_remaining_transfer_size > s_receive_transfersize else
     '0';
 
@@ -316,12 +304,14 @@ begin --  behavour
   -- inputs : s_have_more_data, s_remaining_transfer_size,
   --          s_receive_transfersize
   -- outputs: s_send_transfersize
-  send_transfersize_mux: process (s_have_more_data, s_current_transfer_size,
-                                  s_receive_transfersize)
+  send_transfersize_mux: process (s_send_have_more_data, s_receive_transfersize,
+                                  s_remaining_transfer_size)
+                                  
   begin  -- process send_transfersize_mux
-    case i_send_mux_sel is
+    case s_send_have_more_data is
       when '0' => s_send_transfersize <= s_remaining_transfer_size;
-      when '1' => s_send_transfersize <= s_receive_transfersize
+      when '1' => s_send_transfersize <= s_receive_transfersize;
+      when others => s_send_transfersize <= (others => 'X');
     end case;
   end process send_transfersize_mux;
 
@@ -336,10 +326,10 @@ begin --  behavour
     if i_nReset = '0' then              -- asynchronous reset (active low)
       s_send_counter_value <= (others => '0');
     elsif i_sysclk'event and i_sysclk = '1' then  -- rising clock edge
-      if i_send_counter_reset = '1' then
+      if s_send_counter_reset = '1' then
         s_send_counter_value <= (others => '0');
       end if;
-      if i_send_counter_en = '1' then
+      if s_send_counter_en = '1' then
         s_send_counter_value <= s_send_counter_value + 1;
       end if;
     end if;
@@ -373,10 +363,10 @@ begin --  behavour
   receive_fifo_data_reg: process (i_sysclk, i_nReset)
   begin  -- process receive_fifo_data_reg
     if i_nReset = '0' then              -- asynchronous reset (active low)
-      s_receive_fifo_data_old <= (others => '0');
+      s_receive_data_old <= (others => '0');
     elsif i_sysclk'event and i_sysclk = '1' then  -- rising clock edge
       if s_receive_fifo_rd_en = '1' then
-        s_receive_fifo_data_old <= s_receive_fifo_data;
+        s_receive_data_old <= s_receive_fifo_data;
       end if;
     end if;
   end process receive_fifo_data_reg;
@@ -385,7 +375,7 @@ begin --  behavour
   -- receive data comparator
   -- (use together with test data with incrementing values)
   s_receive_data_error <=
-    '0' when s_receive_fifo_data_old + 1 = s_receive_fifo_data else
+    '0' when s_receive_data_old + 1 = s_receive_fifo_data else
     '1';
 
 
@@ -397,10 +387,11 @@ begin --  behavour
   prng_shiftregister: process (i_sysclk, i_nReset)
   begin  -- process prng_shiftregister
     if i_nReset = '0' then              -- asynchronous reset (active low)
-      s_prng_data <= "01010101 01010101 01010101 01010101";
+      s_prng_data <= "01010101010101010101010101010101";
     elsif i_sysclk'event and i_sysclk = '1' then  -- rising clock edge
       if s_prng_en = '1' then
-        s_prng_data <= s_prng_data(30 downto 0) & s_prng_feedback;
+        s_prng_data(31 downto 1) <= s_prng_data(30 downto 0);
+        s_prng_data(0) <= s_prng_feedback;
       end if;
     end if;
   end process prng_shiftregister;
@@ -412,6 +403,7 @@ begin --  behavour
                      xor s_prng_data(10);
 
 
+  
   -----------------------------------------------------------------------------
   -- finite state machine (moore)
   -----------------------------------------------------------------------------
@@ -429,7 +421,8 @@ begin --  behavour
 
   -- comb logic
   next_state_decode: process(state, s_receive_fifo_empty, s_send_fifo_full,
-                             s_send_data_request)
+                             s_send_data_request, s_send_have_more_data, s_mode,
+                             s_send_counter_equals_transfer_size)
   begin  -- process next_state_decode
 
     --declare default state for next_state to avoid latches
@@ -482,9 +475,13 @@ begin --  behavour
           s_prng_en <= '1';
         end if;
 
-        if s_send_counter_equals_transfer_size = '1' and s_have_more_data = '0' then
+        if s_send_counter_equals_transfer_size = '1' and
+          s_send_have_more_data = '0'
+        then
           next_state <= st1_idle;
-        elsif s_send_counter_equals_transfer_size = '1' and s_have_more_data = '1' then
+        elsif s_send_counter_equals_transfer_size = '1' and
+          s_send_have_more_data = '1'
+        then
           next_state <= st7_subtract_transfered_data;
         elsif s_send_fifo_full = '1' then
           next_state <= st6_send_wait;
@@ -496,12 +493,12 @@ begin --  behavour
           next_state <= st5_send_data;
         end if;
 
-        when st7_subtract_transfered_data
+      when st7_subtract_transfered_data => 
           s_transfer_size_reg_select <= '0';
         s_transfer_size_reg_en <= '1';
 
         if s_send_data_request = '1' then
-          st8_reset_send_counter;
+          next_state <= st8_reset_send_counter;
         end if;
         
       when st8_reset_send_counter =>
@@ -522,6 +519,10 @@ end  behavour;
 --  RESPONSE MESSAGE ROM  
 -----------------------------------------------------------------------------
 -- This file was generated with hex2rom written by Daniel Wallner
+
+library ieee;
+use ieee.std_logic_1164.all;
+use IEEE.numeric_std.all;
 
 entity response_message_rom is
         port(

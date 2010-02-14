@@ -125,7 +125,6 @@ architecture fsm of GECKO3COM_simple_fsm is
   signal s_send_fifo_reset            : std_logic;
   signal s_send_counter_load          : std_logic;
   signal s_send_counter_en            : std_logic;
-  signal s_send_counter_zero          : std_logic;
   signal s_send_mux_sel               : std_logic_vector(2 downto 0);
   signal s_send_finished              : std_logic;
   signal s_receive_newdata_set        : std_logic;
@@ -212,6 +211,7 @@ begin  -- fsm
     s_send_counter_load          <= '0';
     s_send_counter_en            <= '0';
     s_send_mux_sel               <= (others => '0');
+    s_send_finished              <= '0';
     s_receive_newdata_set        <= '0';
     s_receive_end_of_message_set <= '0';
     s_send_data_request_set      <= '0';
@@ -299,7 +299,7 @@ begin  -- fsm
     end if;
 
     if state = st24_wait_for_send_end and i_gpif_tx = '0' then
-      s_send_finished <= '0';
+      s_send_finished <= '1';
     end if;
     
     if state = st10_signal_receive_new_data then
@@ -313,7 +313,7 @@ begin  -- fsm
     if state = st9_signal_data_request then
       s_send_data_request_set <= '1';
     end if;
-
+    
     if state = st22_send_data and i_send_counter_zero = '1' then
       s_gpif_eom <= '1';
     end if;
