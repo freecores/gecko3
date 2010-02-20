@@ -19,18 +19,18 @@
       <association xil_pn:name="Implementation"/>
     </file>
     <file xil_pn:name="coregenerator_fifo_receive.v" xil_pn:type="FILE_VERILOG">
-      <association xil_pn:name="Implementation"/>
       <association xil_pn:name="BehavioralSimulation"/>
-      <association xil_pn:name="PostTranslateSimulation"/>
-      <association xil_pn:name="PostMapSimulation"/>
+      <association xil_pn:name="Implementation"/>
       <association xil_pn:name="PostRouteSimulation"/>
+      <association xil_pn:name="PostMapSimulation"/>
+      <association xil_pn:name="PostTranslateSimulation"/>
     </file>
     <file xil_pn:name="coregenerator_fifo_receive.vhd" xil_pn:type="FILE_VHDL">
-      <association xil_pn:name="Implementation"/>
       <association xil_pn:name="BehavioralSimulation"/>
-      <association xil_pn:name="PostTranslateSimulation"/>
-      <association xil_pn:name="PostMapSimulation"/>
+      <association xil_pn:name="Implementation"/>
       <association xil_pn:name="PostRouteSimulation"/>
+      <association xil_pn:name="PostMapSimulation"/>
+      <association xil_pn:name="PostTranslateSimulation"/>
     </file>
     <file xil_pn:name="coregenerator_fifo_receive_padded.ngc" xil_pn:type="FILE_NGC">
       <association xil_pn:name="Implementation"/>
@@ -39,9 +39,9 @@
 
   <properties>
     <property xil_pn:name="Auto Implementation Top" xil_pn:value="false"/>
-    <property xil_pn:name="Device" xil_pn:value="xc3s4000"/>
+    <property xil_pn:name="Device" xil_pn:value="xc3s1500"/>
     <property xil_pn:name="Device Family" xil_pn:value="Spartan3"/>
-    <property xil_pn:name="Implementation Stop View" xil_pn:value="Structural"/>
+    <property xil_pn:name="Implementation Stop View" xil_pn:value="PreSynthesis"/>
     <property xil_pn:name="Implementation Top" xil_pn:value="Module|coregenerator_fifo_receive"/>
     <property xil_pn:name="Implementation Top Instance Path" xil_pn:value="/coregenerator_fifo_receive"/>
     <property xil_pn:name="PROP_DesignName" xil_pn:value="coregenerator_fifo_receive"/>

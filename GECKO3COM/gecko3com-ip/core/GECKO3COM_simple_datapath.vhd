@@ -61,23 +61,24 @@ entity GECKO3COM_simple_datapath is
     i_rx_data : in  std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
     o_tx_data : out std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
 
-    i_receive_fifo_rd_en      : in  std_logic;
-    i_receive_fifo_wr_en      : in  std_logic;
-    o_receive_fifo_empty      : out std_logic;
-    o_receive_fifo_full       : out std_logic;
-    o_receive_fifo_data       : out std_logic_vector(BUSWIDTH-1 downto 0);
-    i_receive_fifo_reset      : in  std_logic;
-    o_receive_transfersize    : out std_logic_vector(31 downto 0);
-    i_receive_transfersize_en : in  std_logic_vector((32/SIZE_DBUS_GPIF)-1 downto 0);
-    i_receive_counter_load    : in  std_logic;
-    i_receive_counter_en      : in  std_logic;
-    o_receive_counter_zero    : out std_logic;
-    o_dev_dep_msg_out         : out std_logic;
-    o_request_dev_dep_msg_in  : out std_logic;
-    i_btag_reg_en             : in  std_logic;
-    i_nbtag_reg_en            : in  std_logic;
-    o_btag_correct            : out std_logic;
-    o_eom_bit_detected        : out std_logic;
+    i_receive_fifo_rd_en       : in  std_logic;
+    i_receive_fifo_wr_en       : in  std_logic;
+    o_receive_fifo_empty       : out std_logic;
+    o_receive_fifo_full        : out std_logic;
+    o_receive_fifo_data        : out std_logic_vector(BUSWIDTH-1 downto 0);
+    i_receive_fifo_reset       : in  std_logic;
+    o_receive_transfersize     : out std_logic_vector(31 downto 0);
+    i_receive_transfersize_en  : in  std_logic_vector((32/SIZE_DBUS_GPIF)-1 downto 0);
+    o_receive_transfersize_lsb : out std_logic;
+    i_receive_counter_load     : in  std_logic;
+    i_receive_counter_en       : in  std_logic;
+    o_receive_counter_zero     : out std_logic;
+    o_dev_dep_msg_out          : out std_logic;
+    o_request_dev_dep_msg_in   : out std_logic;
+    i_btag_reg_en              : in  std_logic;
+    i_nbtag_reg_en             : in  std_logic;
+    o_btag_correct             : out std_logic;
+    o_eom_bit_detected         : out std_logic;
 
     i_send_fifo_rd_en      : in  std_logic;
     i_send_fifo_wr_en      : in  std_logic;
@@ -112,28 +113,28 @@ architecture behaviour of GECKO3COM_simple_datapath is
     generic (
       BUSWIDTH : integer);
     port (
-      i_din    : in  std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
-      i_clk    : in  std_logic;
-      i_rd_en  : in  std_logic;
-      i_rst    : in  std_logic;
-      i_wr_en  : in  std_logic;
-      o_dout   : out std_logic_vector(BUSWIDTH-1 downto 0);
-      o_empty  : out std_logic;
-      o_full   : out std_logic);
+      i_din   : in  std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
+      i_clk   : in  std_logic;
+      i_rd_en : in  std_logic;
+      i_rst   : in  std_logic;
+      i_wr_en : in  std_logic;
+      o_dout  : out std_logic_vector(BUSWIDTH-1 downto 0);
+      o_empty : out std_logic;
+      o_full  : out std_logic);
   end component;
 
   component send_fifo
     generic (
       BUSWIDTH : integer);
     port (
-      i_din    : in  std_logic_vector(BUSWIDTH-1 downto 0);
-      i_clk    : in  std_logic;
-      i_rd_en  : in  std_logic;
-      i_rst    : in  std_logic;
-      i_wr_en  : in  std_logic;
-      o_dout   : out std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
-      o_empty  : out std_logic;
-      o_full   : out std_logic);
+      i_din   : in  std_logic_vector(BUSWIDTH-1 downto 0);
+      i_clk   : in  std_logic;
+      i_rd_en : in  std_logic;
+      i_rst   : in  std_logic;
+      i_wr_en : in  std_logic;
+      o_dout  : out std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
+      o_empty : out std_logic;
+      o_full  : out std_logic);
   end component;
 
 
@@ -141,16 +142,16 @@ architecture behaviour of GECKO3COM_simple_datapath is
   -- interconection signals
   -----------------------------------------------------------------------------
 
-  signal s_receive_transfersize : std_logic_vector(31 downto 0);
-  signal s_send_transfersize_reg: std_logic_vector(31 downto 0);
+  signal s_receive_transfersize  : std_logic_vector(31 downto 0);
+  signal s_send_transfersize_reg : std_logic_vector(31 downto 0);
 
-  signal s_receive_transfersize_count: std_logic_vector(31 downto 0);
-  signal s_send_transfersize_count: std_logic_vector(31 downto 0);
+  signal s_receive_transfersize_count : std_logic_vector(30 downto 0);
+  signal s_send_transfersize_count    : std_logic_vector(30 downto 0);
 
   signal s_receive_fifo_empty : std_logic;
 
-  signal s_send_fifo_data : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
-  signal s_btag, s_nbtag, s_msg_id: std_logic_vector(7 downto 0);
+  signal s_send_fifo_data     : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
+  signal s_btag, s_nbtag, s_msg_id : std_logic_vector(7 downto 0);
 
 begin  -- behaviour
 
@@ -187,7 +188,7 @@ begin  -- behaviour
   --          or 16 bit wide input data.
   -- type   : sequential
   -- inputs : i_sysclk, i_nReset, i_rx_data, i_receive_transfersize_en
-  receive_transfersize: process (i_sysclk, i_nReset)
+  receive_transfersize : process (i_sysclk, i_nReset)
   begin  -- process registers
     if i_nReset = '0' then              -- asynchronous reset (active low)
       s_receive_transfersize <= (others => '0');
@@ -202,12 +203,13 @@ begin  -- behaviour
   end process receive_transfersize;
 
   o_receive_transfersize <= s_receive_transfersize;
+  o_receive_transfersize_lsb <= s_receive_transfersize(0);
 
 
   -- purpose: 32 bit send_transfersize register
   -- type   : sequential
   -- inputs : i_sysclk, i_nReset, i_send_transfersize, i_receive_transfersize_en
-  send_transfersize: process (i_sysclk, i_nReset)
+  send_transfersize : process (i_sysclk, i_nReset)
   begin  -- process registers
     if i_nReset = '0' then              -- asynchronous reset (active low)
       s_send_transfersize_reg <= (others => '0');
@@ -218,7 +220,7 @@ begin  -- behaviour
     end if;
   end process send_transfersize;
 
-  
+
   -- purpose: down counter for the receive transfer size
   -- type   : sequential
   -- inputs : i_sysclk, i_nReset, s_reveive_transfersize,
@@ -230,17 +232,18 @@ begin  -- behaviour
       s_receive_transfersize_count <= (others => '0');
     elsif i_sysclk'event and i_sysclk = '1' then  -- rising clock edge
       if i_receive_counter_load = '1' then
-        s_receive_transfersize_count <= s_receive_transfersize;
-      end if;
-      if i_receive_counter_en = '1' then
+        s_receive_transfersize_count <= s_receive_transfersize(31 downto 1);
+      elsif i_receive_counter_en = '1' then
         s_receive_transfersize_count <= s_receive_transfersize_count - 1;
+      else
+        s_receive_transfersize_count <= s_receive_transfersize_count;
       end if;
     end if;
   end process receive_counter;
 
   o_receive_counter_zero <=
-    '1' when s_receive_transfersize_count = x"0000" else
-    '0';
+    '1' when s_receive_transfersize_count = "000000000000000000000000000000"
+    else '0';
 
 
   -- purpose: down counter for the send transfer size
@@ -254,17 +257,18 @@ begin  -- behaviour
       s_send_transfersize_count <= (others => '0');
     elsif i_sysclk'event and i_sysclk = '1' then  -- rising clock edge
       if i_send_counter_load = '1' then
-        s_send_transfersize_count <= s_send_transfersize_reg;
-      end if;
-      if i_send_counter_en = '1' then
+        s_send_transfersize_count <= s_send_transfersize_reg(31 downto 1);
+      elsif i_send_counter_en = '1' then
         s_send_transfersize_count <= s_send_transfersize_count - 1;
+      else
+        s_send_transfersize_count <= s_send_transfersize_count;
       end if;
     end if;
   end process send_counter;
 
   o_send_counter_zero <=
-    '1' when s_send_transfersize_count = x"0000" else
-    '0';
+    '1' when s_send_transfersize_count = "000000000000000000000000000000"
+    else '0';
 
 
   -- purpose: registers to store the btag and inverse btag
@@ -275,20 +279,20 @@ begin  -- behaviour
   btag_register : process (i_sysclk, i_nReset)
   begin  -- process btag_register
     if i_nReset = '0' then              -- asynchronous reset (active low)
-      s_btag <= (others => '0');
+      s_btag   <= (others => '0');
       s_msg_id <= (others => '0');
-      s_nbtag <= (others => '0');
+      s_nbtag  <= (others => '0');
     elsif i_sysclk'event and i_sysclk = '1' then  -- rising clock edge
       if i_btag_reg_en = '1' then
-        s_btag <= i_rx_data(15 downto 8);
+        s_btag   <= i_rx_data(15 downto 8);
         s_msg_id <= i_rx_data(7 downto 0);
       end if;
-      if   i_nbtag_reg_en = '1' then
+      if i_nbtag_reg_en = '1' then
         s_nbtag <= i_rx_data(7 downto 0);
       end if;
     end if;
   end process btag_register;
-  
+
   o_btag_correct <=
     '1' when s_btag = not s_nbtag else
     '0';
@@ -303,7 +307,7 @@ begin  -- behaviour
     '0';
 
   o_eom_bit_detected <=
-    '1' when i_rx_data(15 downto 8) = b"00000001" else
+    '1' when i_rx_data(7 downto 0) = b"00000001" else
     '0';
 
 
@@ -312,19 +316,19 @@ begin  -- behaviour
   -- inputs : i_send_mux_sel, i_send_have_more_data, s_btag, s_nbtag,
   --          s_send_fifo_data, s_send_transfersize_reg
   -- outputs: o_tx_data
-  tx_data_mux: process (i_send_mux_sel, i_send_have_more_data, s_btag,
+  tx_data_mux : process (i_send_mux_sel, i_send_have_more_data, s_btag,
                         s_nbtag, s_send_fifo_data, s_send_transfersize_reg)
   begin  -- process tx_data_mux
     case i_send_mux_sel is
-      when "000" => o_tx_data <= x"02" & s_btag;  -- MsgID and stored bTag
-      when "001" => o_tx_data <= s_nbtag & x"00"; -- inverted bTag and Reserved
-      when "010" => o_tx_data <= s_send_transfersize_reg(15 downto 0);
-      when "011" => o_tx_data <= s_send_transfersize_reg(31 downto 16);
+      when "000"  => o_tx_data <= s_btag & s_msg_id; -- MsgID and stored bTag
+      when "001"  => o_tx_data <= x"00" & s_nbtag; -- inverted bTag and Reserved
+      when "010"  => o_tx_data <= s_send_transfersize_reg(15 downto 0);
+      when "011"  => o_tx_data <= s_send_transfersize_reg(31 downto 16);
                     --TransferAttributes EOM bit:
-      when "100" => o_tx_data <= b"000000000000000" & i_send_have_more_data;
-      when "101" => o_tx_data <= x"0000";  -- Header byte 10 and 11, Reserved
-      when "110" => o_tx_data <= s_send_fifo_data;  -- message data
-      when others => o_tx_data <= s_send_fifo_data;
+      when "100"  => o_tx_data <= b"000000000000000" & not i_send_have_more_data;
+      when "101"  => o_tx_data <= x"0000";  -- Header byte 10 and 11, Reserved
+      when "110"  => o_tx_data <= s_send_fifo_data;  -- message data
+      when others => o_tx_data <= s_btag & s_msg_id; -- MsgID and stored bTag
     end case;
   end process tx_data_mux;
 
@@ -368,5 +372,5 @@ begin  -- behaviour
     end if;
   end process gecko3com_simple_flags;
 
-      
+  
 end behaviour;

@@ -64,6 +64,7 @@ entity GECKO3COM_simple_test is
     o_LEDrx       : out   std_logic;    -- controll LED receive data
     o_LEDtx       : out   std_logic;    -- controll LED send data
     o_LEDrun      : out   std_logic;    -- power LED
+    o_dummy       : out   std_logic;    -- dummy output for otherwise unused signals
     i_mode_switch : in    std_logic_vector(2 downto 0));
 end GECKO3COM_simple_test;
 
@@ -81,7 +82,8 @@ architecture behavour of GECKO3COM_simple_test is
 
   -- we will transmitt 1 MiB data when the pseude random number generator
   -- is used:
-  signal c_transfer_size_prng : std_logic_vector(31 downto 0) := x"00100000";
+  --signal c_transfer_size_prng : std_logic_vector(31 downto 0) := x"00100000";
+  signal c_transfer_size_prng : std_logic_vector(31 downto 0) := x"00000FA0";
 
   
   ----------------------------------------------------------------------------- 
@@ -216,11 +218,14 @@ begin --  behavour
 
   response_message_rom_1: response_message_rom
     port map (
-      A => s_send_counter_value(3 downto 0),
+      A => s_send_counter_value(5 downto 2),
       D => s_message_rom_data);
 
   
   o_LEDrun <= '1';
+
+  o_dummy <= s_send_finished or s_receive_end_of_message or s_receive_newdata
+             or s_receive_data_error;
 
 
   -- purpose: converts the mode_switch input to a binary coded value
@@ -331,14 +336,17 @@ begin --  behavour
         s_send_counter_value <= (others => '0');
       end if;
       if s_send_counter_en = '1' then
-        s_send_counter_value <= s_send_counter_value + 1;
+        s_send_counter_value(31 downto 2) <=
+          s_send_counter_value(31 downto 2) + 1;
+        s_send_counter_value(1 downto 0) <= "00";  -- every fifo write (32bit)
+                                                   -- transfers 4 bytes.
       end if;
     end if;
   end process send_counter;
   
   -- transfer size counter comparator
   s_send_counter_equals_transfer_size <=
-    '1' when s_send_counter_value = s_send_transfersize else
+    '1' when s_send_counter_value >= s_send_transfersize else
     '0';
 
 

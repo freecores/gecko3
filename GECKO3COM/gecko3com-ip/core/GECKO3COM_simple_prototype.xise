@@ -84,6 +84,9 @@
       <association xil_pn:name="BehavioralSimulation"/>
       <association xil_pn:name="Implementation"/>
     </file>
+    <file xil_pn:name="GECKO3COM_simple_test.cdc" xil_pn:type="FILE_CDC">
+      <association xil_pn:name="Implementation"/>
+    </file>
     <file xil_pn:name="coregenerator/coregenerator_fifo_receive.ise" xil_pn:type="FILE_COREGENISE">
       <association xil_pn:name="Implementation"/>
     </file>
@@ -97,7 +100,6 @@
 
   <properties>
     <property xil_pn:name="Allow Unmatched LOC Constraints" xil_pn:value="true"/>
-    <property xil_pn:name="Auto Implementation Top" xil_pn:value="false"/>
     <property xil_pn:name="Command line syntax" xil_pn:value="emacsclient +$2 $1"/>
     <property xil_pn:name="Compiled Library Directory" xil_pn:value="lib"/>
     <property xil_pn:name="Constraints Entry" xil_pn:value="Constraints Editor"/>
@@ -138,6 +140,7 @@
 
   <bindings>
     <binding xil_pn:location="/gpif_com_test" xil_pn:name="GECKO3main_prototype.ucf"/>
+    <binding xil_pn:location="/GECKO3COM_simple_test" xil_pn:name="GECKO3COM_simple_test.cdc"/>
   </bindings>
 
   <libraries/>

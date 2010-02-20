@@ -130,6 +130,7 @@ architecture Behavioral of GECKO3COM_simple is
       i_receive_fifo_reset         : in  std_logic;
       o_receive_transfersize       : out std_logic_vector(31 downto 0);
       i_receive_transfersize_en    : in  std_logic_vector((32/SIZE_DBUS_GPIF)-1 downto 0);
+      o_receive_transfersize_lsb   : out std_logic;
       i_receive_counter_load       : in  std_logic;
       i_receive_counter_en         : in  std_logic;
       o_receive_counter_zero       : out std_logic;
@@ -168,6 +169,7 @@ architecture Behavioral of GECKO3COM_simple is
       i_receive_fifo_full          : in  std_logic;
       o_receive_fifo_reset         : out std_logic;
       o_receive_transfersize_en    : out std_logic_vector((32/SIZE_DBUS_GPIF)-1 downto 0);
+      i_receive_transfersize_lsb   : in  std_logic;
       o_receive_counter_load       : out std_logic;
       o_receive_counter_en         : out std_logic;
       i_receive_counter_zero       : in  std_logic;
@@ -221,6 +223,7 @@ architecture Behavioral of GECKO3COM_simple is
   signal s_receive_fifo_full       : std_logic;
   signal s_receive_fifo_reset      : std_logic;
   signal s_receive_transfersize_en : std_logic_vector((32/SIZE_DBUS_GPIF)-1 downto 0);
+  signal s_receive_transfersize_lsb: std_logic;
   signal s_receive_counter_load    : std_logic;
   signal s_receive_counter_en      : std_logic;
   signal s_receive_counter_zero    : std_logic;
@@ -286,6 +289,7 @@ begin  -- behaviour
       i_receive_fifo_reset         => s_receive_fifo_reset,
       o_receive_transfersize       => o_receive_transfersize,
       i_receive_transfersize_en    => s_receive_transfersize_en,
+      o_receive_transfersize_lsb   => s_receive_transfersize_lsb,
       i_receive_counter_load       => s_receive_counter_load,
       i_receive_counter_en         => s_receive_counter_en,
       o_receive_counter_zero       => s_receive_counter_zero,
@@ -325,6 +329,7 @@ begin  -- behaviour
       i_receive_fifo_full          => s_receive_fifo_full,
       o_receive_fifo_reset         => s_receive_fifo_reset,
       o_receive_transfersize_en    => s_receive_transfersize_en,
+      i_receive_transfersize_lsb   => s_receive_transfersize_lsb,
       o_receive_counter_load       => s_receive_counter_load,
       o_receive_counter_en         => s_receive_counter_en,
       i_receive_counter_zero       => s_receive_counter_zero,

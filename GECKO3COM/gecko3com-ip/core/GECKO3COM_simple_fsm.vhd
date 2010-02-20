@@ -57,6 +57,7 @@ entity GECKO3COM_simple_fsm is
     i_receive_fifo_full          : in  std_logic;
     o_receive_fifo_reset         : out std_logic;
     o_receive_transfersize_en    : out std_logic_vector((32/SIZE_DBUS_GPIF)-1 downto 0);
+    i_receive_transfersize_lsb   : in  std_logic;
     o_receive_counter_load       : out std_logic;
     o_receive_counter_en         : out std_logic;
     i_receive_counter_zero       : in  std_logic;
@@ -96,8 +97,8 @@ architecture fsm of GECKO3COM_simple_fsm is
   attribute safe_implementation : string;
   attribute safe_recovery_state : string;
 
-  type   state_type is (st1_idle, st2_abort, st3_read_msg_id, st4_read_nbtag,
-                        st5_check_btag, st6_read_transfer_size_low,
+  type   state_type is (st1_idle, st2_abort, st3_read_msg_id, st4_check_msg_id,
+                        st5_read_nbtag, st6_read_transfer_size_low,
                         st7_read_transfer_size_high, st8_check_attributes,
                         st9_signal_data_request, st10_signal_receive_new_data,
                         st11_receive_data, st12_receive_wait,
@@ -105,7 +106,7 @@ architecture fsm of GECKO3COM_simple_fsm is
                         st15_start_response, st16_send_msg_id,
                         st17_send_nbtag, st18_send_transfer_size_low,
                         st19_send_transfer_size_high, st20_send_attributes,
-                        st21_load_counter, st22_send_data, st23_send_wait,
+                        st21_send_reserved, st22_send_data, st23_send_wait,
                         st24_wait_for_send_end);
   signal state, next_state : state_type;
 
@@ -136,55 +137,35 @@ architecture fsm of GECKO3COM_simple_fsm is
   
 
 begin  -- fsm
+
+  o_receive_fifo_wr_en         <= s_receive_fifo_wr_en;
+  o_receive_fifo_reset         <= s_receive_fifo_reset;
+  o_receive_transfersize_en    <= s_receive_transfersize_en;
+  o_receive_counter_load       <= s_receive_counter_load;
+  o_receive_counter_en         <= s_receive_counter_en;
+  o_btag_reg_en                <= s_btag_reg_en;
+  o_nbtag_reg_en               <= s_nbtag_reg_en;
+  o_send_fifo_rd_en            <= s_send_fifo_rd_en;
+  o_send_fifo_reset            <= s_send_fifo_reset;
+  o_send_counter_load          <= s_send_counter_load;
+  o_send_counter_en            <= s_send_counter_en;
+  o_send_mux_sel               <= s_send_mux_sel;
+  o_send_finished              <= s_send_finished;
+  o_receive_newdata_set        <= s_receive_newdata_set;
+  o_receive_end_of_message_set <= s_receive_end_of_message_set;
+  o_send_data_request_set      <= s_send_data_request_set;
+  o_gpif_eom                   <= s_gpif_eom;
+  o_gpif_rx_rd_en              <= s_gpif_rx_rd_en;
+  o_gpif_tx_wr_en              <= s_gpif_tx_wr_en;
+
   
   SYNC_PROC : process (i_sysclk)
   begin
     if (i_sysclk'event and i_sysclk = '1') then
       if (i_nReset = '0') then
         state <= st1_idle;
-
-        o_receive_fifo_wr_en         <= '0';
-        o_receive_fifo_reset         <= '1';
-        o_receive_transfersize_en    <= (others => '0');
-        o_receive_counter_load       <= '0';
-        o_receive_counter_en         <= '0';
-        o_btag_reg_en                <= '0';
-        o_nbtag_reg_en               <= '0';
-        o_send_fifo_rd_en            <= '0';
-        o_send_fifo_reset            <= '1';
-        o_send_counter_load          <= '0';
-        o_send_counter_en            <= '0';
-        o_send_mux_sel               <= (others => '0');
-        o_send_finished              <= '0';
-        o_receive_newdata_set        <= '0';
-        o_receive_end_of_message_set <= '0';
-        o_send_data_request_set      <= '0';
-        o_gpif_eom                   <= '0';
-        o_gpif_rx_rd_en              <= '0';
-        o_gpif_tx_wr_en              <= '0';
-        
       else
         state <= next_state;
-
-        o_receive_fifo_wr_en         <= s_receive_fifo_wr_en;
-        o_receive_fifo_reset         <= s_receive_fifo_reset;
-        o_receive_transfersize_en    <= s_receive_transfersize_en;
-        o_receive_counter_load       <= s_receive_counter_load;
-        o_receive_counter_en         <= s_receive_counter_en;
-        o_btag_reg_en                <= s_btag_reg_en;
-        o_nbtag_reg_en               <= s_nbtag_reg_en;
-        o_send_fifo_rd_en            <= s_send_fifo_rd_en;
-        o_send_fifo_reset            <= s_send_fifo_reset;
-        o_send_counter_load          <= s_send_counter_load;
-        o_send_counter_en            <= s_send_counter_en;
-        o_send_mux_sel               <= s_send_mux_sel;
-        o_send_finished              <= s_send_finished;
-        o_receive_newdata_set        <= s_receive_newdata_set;
-        o_receive_end_of_message_set <= s_receive_end_of_message_set;
-        o_send_data_request_set      <= s_send_data_request_set;
-        o_gpif_eom                   <= s_gpif_eom;
-        o_gpif_rx_rd_en              <= s_gpif_rx_rd_en;
-        o_gpif_tx_wr_en              <= s_gpif_tx_wr_en;
       end if;
     end if;
   end process;
@@ -192,11 +173,12 @@ begin  -- fsm
   --MEALY State-Machine - Outputs based on state and inputs
   OUTPUT_DECODE : process (state, i_receive_fifo_full,
                            i_receive_counter_zero, i_dev_dep_msg_out,
-                           i_request_dev_dep_msg_in, i_btag_correct,
+                           i_request_dev_dep_msg_in, --i_btag_correct,
                            i_eom_bit_detected, i_send_transfersize_en,
                            i_send_fifo_empty, i_send_counter_zero,
                            i_gpif_rx, i_gpif_rx_empty, i_gpif_tx,
-                           i_gpif_tx_full, i_gpif_abort)
+                           i_gpif_tx_full, i_gpif_abort,
+                           i_receive_transfersize_lsb)
   begin
 
     s_receive_fifo_wr_en         <= '0';
@@ -233,17 +215,26 @@ begin  -- fsm
       s_receive_transfersize_en <= "10";
     end if;
 
-    if state = st10_signal_receive_new_data then
+    if state = st8_check_attributes and
+      i_dev_dep_msg_out = '1' and
+      i_gpif_rx_empty = '0'
+    then
       s_receive_counter_load <= '1';
     end if;
 
     if (state = st10_signal_receive_new_data and
         i_gpif_rx_empty = '0' and
-        i_receive_fifo_full = '0')
-      or (state = st11_receive_data)
+        i_receive_fifo_full = '0' and
+        i_receive_transfersize_lsb = '0')  -- if it is '1' then we have to read
+                                           -- one time more from the fifo (which
+                                           -- is 16bit wide)
+      or (state = st11_receive_data and
+          i_receive_counter_zero = '0' and
+          i_gpif_rx_empty = '0' and
+          i_receive_fifo_full = '0')
       or (state = st12_receive_wait and
           i_gpif_rx_empty = '0' and
-          i_receive_fifo_full = '1')
+          i_receive_fifo_full = '0')
     then
       s_receive_counter_en <= '1';
     end if;
@@ -252,14 +243,17 @@ begin  -- fsm
       s_btag_reg_en <= '1';
     end if;
     
-    if state = st4_read_nbtag then
+    if state = st5_read_nbtag then
       s_nbtag_reg_en <= '1';
     end if;
 
-    if (state = st21_load_counter and
+    if (state = st21_send_reserved and
         i_gpif_tx_full = '0' and
         i_send_fifo_empty = '0')
-      or state = st22_send_data
+      or (state = st22_send_data and
+          i_gpif_tx_full = '0' and
+          i_send_fifo_empty = '0' and
+          i_send_counter_zero = '0')
       or (state = st23_send_wait and
           i_gpif_tx_full = '0' and
           i_send_fifo_empty = '0')
@@ -271,15 +265,19 @@ begin  -- fsm
       s_send_fifo_reset <= '1';
     end if;
 
-    if state = st21_load_counter then
+    if state = st20_send_attributes then
       s_send_counter_load <= '1';
     end if;
 
-    if (state = st21_load_counter and i_gpif_tx_full = '0' and
-        i_send_fifo_empty = '0') or
-      state = st22_send_data or
-      (state = st23_send_wait and i_gpif_tx_full = '0' and
-       i_send_fifo_empty = '0')
+    if (state = st21_send_reserved and i_gpif_tx_full = '0' and
+        i_send_fifo_empty = '0')
+      or (state = st22_send_data and
+          i_gpif_tx_full = '0' and
+          i_send_fifo_empty = '0' and
+          i_send_counter_zero = '0')
+      or (state = st23_send_wait and
+          i_gpif_tx_full = '0' and
+          i_send_fifo_empty = '0')
     then
       s_send_counter_en <= '1';
     end if;
@@ -294,8 +292,10 @@ begin  -- fsm
       s_send_mux_sel <= "011";
     elsif state = st20_send_attributes then
       s_send_mux_sel <= "100";
-    elsif state = st21_load_counter then
+    elsif state = st21_send_reserved then
       s_send_mux_sel <= "101";
+    elsif state = st22_send_data or state = st23_send_wait then
+      s_send_mux_sel <= "110";
     end if;
 
     if state = st24_wait_for_send_end and i_gpif_tx = '0' then
@@ -314,21 +314,30 @@ begin  -- fsm
       s_send_data_request_set <= '1';
     end if;
     
-    if state = st22_send_data and i_send_counter_zero = '1' then
+    if (state = st22_send_data and i_send_counter_zero = '1')
+      or state = st24_wait_for_send_end
+    then
       s_gpif_eom <= '1';
     end if;
     
     if (i_gpif_rx_empty = '0' and
         (state = st1_idle or
-         state = st3_read_msg_id or
-         state = st4_read_nbtag or
-         state = st5_check_btag or
+         state = st5_read_nbtag or
          state = st6_read_transfer_size_low or
          state = st7_read_transfer_size_high or
          state = st8_check_attributes))
+      or (state = st4_check_msg_id and
+          i_gpif_rx_empty = '0' and
+          (i_dev_dep_msg_out = '1' or i_request_dev_dep_msg_in = '1'))
       or ((state = st10_signal_receive_new_data or state = st12_receive_wait)
           and i_gpif_rx_empty = '0' and i_receive_fifo_full = '0')
-      or state = st11_receive_data
+      or (state = st11_receive_data and
+          i_receive_counter_zero = '0' and
+          i_gpif_rx_empty = '0' and
+          i_receive_fifo_full = '0')
+      or (state = st12_receive_wait and
+          i_gpif_rx_empty = '0' and
+          i_receive_fifo_full = '0')
       or (state = st14_read_align_bytes and i_gpif_rx_empty = '0')
     then
       s_gpif_rx_rd_en <= '1';
@@ -340,7 +349,7 @@ begin  -- fsm
          state = st18_send_transfer_size_low or
          state = st19_send_transfer_size_high or
          state = st20_send_attributes or
-         state = st21_load_counter))
+         state = st21_send_reserved))
       or state = st22_send_data
     then
       s_gpif_tx_wr_en <= '1';
@@ -370,24 +379,22 @@ begin  -- fsm
         next_state <= st1_idle;
         
       when st3_read_msg_id =>
+        next_state <= st4_check_msg_id;
+
+      when st4_check_msg_id =>
         if i_gpif_abort = '1' then
           next_state <= st2_abort;
-        elsif i_gpif_rx_empty = '0' then
-          next_state <= st4_read_nbtag;
+        elsif i_dev_dep_msg_out = '0' and i_request_dev_dep_msg_in = '0' then
+          next_state <= st1_idle;
+        elsif i_gpif_rx_empty = '0' and
+          (i_dev_dep_msg_out = '1' or i_request_dev_dep_msg_in = '1')
+        then
+          next_state <= st5_read_nbtag;
         end if;
         
-      when st4_read_nbtag =>
+      when st5_read_nbtag =>
         if i_gpif_abort = '1' then
           next_state <= st2_abort;
-        elsif i_gpif_rx_empty = '0' then
-          next_state <= st5_check_btag;
-        end if;
-
-      when st5_check_btag =>
-        if i_gpif_abort = '1' then
-          next_state <= st2_abort;
-        elsif i_btag_correct = '0' then
-          next_state <= st1_idle;
         elsif i_gpif_rx_empty = '0' then
           next_state <= st6_read_transfer_size_low;
         end if;
@@ -395,7 +402,9 @@ begin  -- fsm
       when st6_read_transfer_size_low =>
         if i_gpif_abort = '1' then
           next_state <= st2_abort;
-        elsif i_gpif_rx_empty = '0' then
+        elsif i_btag_correct = '0' then
+          next_state <= st1_idle;
+        elsif i_gpif_rx_empty = '0' and i_btag_correct = '1' then
           next_state <= st7_read_transfer_size_high;
         end if;
 
@@ -409,6 +418,8 @@ begin  -- fsm
       when st8_check_attributes =>
         if i_gpif_abort = '1' then
           next_state <= st2_abort;
+        elsif i_dev_dep_msg_out = '0' and i_request_dev_dep_msg_in = '0' then
+          next_state <= st1_idle;
         elsif i_gpif_rx_empty = '0' and i_request_dev_dep_msg_in = '1' then
           next_state <= st9_signal_data_request;
         elsif i_gpif_rx_empty = '0' and i_dev_dep_msg_out = '1' then
@@ -433,7 +444,8 @@ begin  -- fsm
         if i_gpif_abort = '1' then
           next_state <= st2_abort;
         elsif i_receive_counter_zero = '1' then
-          next_state <= st13_wait_for_receive_end;
+          --next_state <= st13_wait_for_receive_end;
+          next_state <= st1_idle;
         elsif  i_gpif_rx_empty = '1' or i_receive_fifo_full = '1' then
           next_state <= st12_receive_wait;
         end if;
@@ -498,10 +510,10 @@ begin  -- fsm
         if i_gpif_abort = '1' then
           next_state <= st2_abort;
         elsif i_gpif_tx_full = '0' then
-          next_state <= st21_load_counter;
+          next_state <= st21_send_reserved;
         end if;
 
-      when st21_load_counter =>
+      when st21_send_reserved =>
         if i_gpif_abort = '1' then
           next_state <= st2_abort;
         elsif i_gpif_tx_full = '0' and i_send_fifo_empty = '0' then
