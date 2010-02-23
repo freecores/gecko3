@@ -80,7 +80,7 @@ architecture fsm of gpif_com_fsm is
   -- XST specific synthesize attributes
   attribute safe_implementation: string;
   attribute safe_recovery_state: string;
- 
+
   
   -----------------------------------------------------------------------------
   -- FSM
@@ -94,8 +94,8 @@ architecture fsm of gpif_com_fsm is
                       inRQ, inACK, inWait, inTrans, inThrot,
                       inThrotBreak,inThrotBreak2, inThrotEnd,
                       endInTrans,  -- in com states
-                      outRQ, outTrans, outACK, outUSBwait, outFIFOwait,
-                      endOutTrans);  -- out com states
+                      outRQ, outRQdelay, outTrans, outACK, outUSBwait,
+                      outFIFOwait, endOutTrans);  -- out com states
 
   
   
@@ -103,9 +103,7 @@ architecture fsm of gpif_com_fsm is
   -- XST specific synthesize attributes
   attribute safe_recovery_state of pr_state : signal is "idle";
   attribute safe_implementation of pr_state : signal is "yes";
-
   
-
   
   -- interconection signals
   signal s_FIFOrst, s_RDYX, s_WRX, s_ABORT : std_logic;
@@ -361,8 +359,23 @@ begin
         elsif i_WRU = '1' and i_RDYU = '0' then
           nx_state <= inRQ;
         else
-          nx_state <= outACK;
+          nx_state <= outRQdelay;
         end if;
+
+      when outRQdelay =>
+        -- output signal values:
+        s_WRX       <= '1';
+        s_RDYX      <= '0';
+        s_X2U_RD_EN <= '0';
+
+        -- state decisions
+        if i_WRU = '1' and i_RDYU = '1' then
+          nx_state <= rst;
+        elsif i_WRU = '1' and i_RDYU = '0' then
+          nx_state <= inRQ;
+        else
+          nx_state <= outACK;
+        end if;   
 
      when outACK =>
         state_number := x"C";
@@ -415,6 +428,8 @@ begin
         -- state decisions
         if i_WRU = '1' and i_RDYU = '1' then
           nx_state <= rst;
+        elsif i_X2U_EMPTY = '1' and i_EOM = '1' then
+          nx_state <= endOutTrans;
         elsif i_WRU = '0' and i_RDYU = '1' then
           nx_state <= outTrans;
         else
@@ -435,7 +450,7 @@ begin
           nx_state <= rst;
         elsif i_X2U_EMPTY = '1' and i_EOM = '1' then
           nx_state <= endOutTrans;
-        elsif i_X2U_EMPTY = '0' and i_EOM = '0' then
+        elsif i_X2U_EMPTY = '0' then
           nx_state <= outTrans;
         else
           nx_state <= outFIFOwait;

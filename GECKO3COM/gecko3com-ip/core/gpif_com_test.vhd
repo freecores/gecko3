@@ -168,7 +168,7 @@ begin  -- behaviour
       v_rx_throtle_count := (others => '0');
       s_RD_EN <= '0';
     elsif i_SYSCLK = '1' and i_SYSCLK'event then
-      if v_rx_throtle_count >= 0 then
+      if v_rx_throtle_count >= 0 and s_EMPTY = '0' then
         s_RD_EN <= '1';
         v_rx_throtle_count := (others => '0');
       else

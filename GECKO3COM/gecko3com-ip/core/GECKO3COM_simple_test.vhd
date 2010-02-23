@@ -257,8 +257,12 @@ begin --  behavour
   send_data_mux: process (s_mode, s_prng_data, s_message_rom_data)
   begin  -- process send_data_mux
     case s_mode is
-      when "00" => s_send_fifo_data <= s_message_rom_data;
-      when "01" => s_send_fifo_data <= s_prng_data;
+      -- we have to change here the "16bit word order" else the data is
+      -- transmitted in the wrong order
+      when "00" => s_send_fifo_data <= s_message_rom_data(15 downto 0) &
+                                       s_message_rom_data(31 downto 16);
+      when "01" => s_send_fifo_data <= s_prng_data(15 downto 0) &
+                                       s_prng_data(31 downto 16);
       when others => s_send_fifo_data <= (others => 'X');
     end case;
   end process send_data_mux;
@@ -459,7 +463,9 @@ begin --  behavour
         end if;
         
       when st2_get_data =>
-        s_receive_fifo_rd_en <= '1';
+        if s_receive_fifo_empty = '0' then
+          s_receive_fifo_rd_en <= '1';          
+        end if;
 
         if s_receive_fifo_empty = '1' then
           next_state <= st1_idle;
@@ -478,10 +484,12 @@ begin --  behavour
         next_state <= st5_send_data;
         
       when st5_send_data =>
-        s_send_fifo_wr_en <= '1';
-        s_send_counter_en <= '1';
-        if s_mode = "01" then
-          s_prng_en <= '1';
+        if s_send_fifo_full = '0' then
+          s_send_fifo_wr_en <= '1';
+          s_send_counter_en <= '1';
+          if s_mode = "01" then
+            s_prng_en <= '1';
+          end if;
         end if;
 
         if s_send_counter_equals_transfer_size = '1' and

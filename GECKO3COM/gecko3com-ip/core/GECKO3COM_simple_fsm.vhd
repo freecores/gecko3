@@ -96,6 +96,7 @@ architecture fsm of GECKO3COM_simple_fsm is
   -- XST specific synthesize attributes
   attribute safe_implementation : string;
   attribute safe_recovery_state : string;
+  attribute fsm_encoding       : string;
 
   type   state_type is (st1_idle, st2_abort, st3_read_msg_id, st4_check_msg_id,
                         st5_read_nbtag, st6_read_transfer_size_low,
@@ -113,7 +114,9 @@ architecture fsm of GECKO3COM_simple_fsm is
   -- XST specific synthesize attributes
   attribute safe_recovery_state of state : signal is "st1_idle";
   attribute safe_implementation of state : signal is "yes";
+  attribute fsm_encoding of state        : signal is "johnson";
 
+  
   --Declare internal signals for all outputs of the state-machine
   signal s_receive_fifo_wr_en         : std_logic;
   signal s_receive_fifo_reset         : std_logic;
@@ -350,7 +353,12 @@ begin  -- fsm
          state = st19_send_transfer_size_high or
          state = st20_send_attributes or
          state = st21_send_reserved))
-      or state = st22_send_data
+      or (state = st22_send_data and
+          i_gpif_tx_full = '0' and
+          i_send_fifo_empty = '0')
+      or (state = st23_send_wait and
+          i_gpif_tx_full = '0' and
+          i_send_fifo_empty = '0')
     then
       s_gpif_tx_wr_en <= '1';
     end if;
@@ -376,7 +384,9 @@ begin  -- fsm
         end if;
         
       when st2_abort =>
-        next_state <= st1_idle;
+        if i_gpif_abort = '0' then
+          next_state <= st1_idle;          
+        end if;
         
       when st3_read_msg_id =>
         next_state <= st4_check_msg_id;

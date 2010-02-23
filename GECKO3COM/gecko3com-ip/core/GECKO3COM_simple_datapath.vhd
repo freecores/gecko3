@@ -317,7 +317,8 @@ begin  -- behaviour
   --          s_send_fifo_data, s_send_transfersize_reg
   -- outputs: o_tx_data
   tx_data_mux : process (i_send_mux_sel, i_send_have_more_data, s_btag,
-                        s_nbtag, s_send_fifo_data, s_send_transfersize_reg)
+                         s_msg_id, s_nbtag, s_send_fifo_data,
+                         s_send_transfersize_reg)
   begin  -- process tx_data_mux
     case i_send_mux_sel is
       when "000"  => o_tx_data <= s_btag & s_msg_id; -- MsgID and stored bTag
