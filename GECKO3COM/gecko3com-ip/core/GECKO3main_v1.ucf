@@ -74,10 +74,10 @@ net "b_gpif_bus<15>" loc = "W13";
 
 
 # switches
-net "i_mode_switch<0>" loc = "C5";
-net "i_mode_switch<1>" loc = "D5";
-net "i_mode_switch<2>" loc = "E5";
-#net "i_mode_switch<3>" loc = "C4";
+net "i_mode_switch<0>" loc = "D7";
+net "i_mode_switch<1>" loc = "F7";
+net "i_mode_switch<2>" loc = "C6";
+#net "i_mode_switch<3>" loc = "D6";
 
 # LEDs
 

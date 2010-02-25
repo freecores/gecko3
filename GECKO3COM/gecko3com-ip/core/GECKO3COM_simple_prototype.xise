@@ -140,8 +140,6 @@
     <property xil_pn:name="Report Fastest Path(s) in Each Constraint" xil_pn:value="false"/>
     <property xil_pn:name="Report Fastest Path(s) in Each Constraint Post Trace" xil_pn:value="false"/>
     <property xil_pn:name="Report Type" xil_pn:value="Error Report"/>
-    <property xil_pn:name="Report Type Post Trace" xil_pn:value="Error Report"/>
-    <property xil_pn:name="Report Unconstrained Paths Post Trace" xil_pn:value="yes"/>
     <property xil_pn:name="Router Effort Level (Overrides Overall Level)" xil_pn:value="High" xil_pn:x_locked="true"/>
     <property xil_pn:name="Safe Implementation" xil_pn:value="Yes"/>
     <property xil_pn:name="Selected Simulation Root Source Node Behavioral" xil_pn:value="Architecture|GECKO3COM_simple|Behavioral"/>

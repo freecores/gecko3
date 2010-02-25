@@ -42,12 +42,12 @@ net "i_SYSCLK"		loc = "AF14";
 #net "i_SYSCLK"		loc = "AA11"; # IFCLK, to test as a synchronus system
 #net "i_SYSCLK" CLOCK_DEDICATED_ROUTE = FALSE; # also needed when IFCLK used as SYSCLK
 net "i_SYSCLK" tnm_net = "SYSCLK";
-timespec "TS_SYSCLK" = period "SYSCLK" 20.0 ns HIGH 50%; # 50 MHz system clock
+timespec "TS_SYSCLK" = period "SYSCLK" 15.0 ns HIGH 50%; # 50 MHz system clock
 
 net "i_IFCLK"  loc = "AA11";
 net "i_IFCLK" CLOCK_DEDICATED_ROUTE = FALSE;
 net "i_IFCLK" tnm_net = "IFCLK";
-timespec "TS_IFCLK" = period "IFCLK" 20.83 ns HIGH 50%; # 48 MHz interface clock
+timespec "TS_IFCLK" = period "IFCLK" 15.0 ns HIGH 50%; # 48 MHz interface clock
 
 # connection of controll bus signals
 net "i_WRU"    loc = "AC5";

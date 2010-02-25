@@ -142,14 +142,12 @@ architecture fsm of GECKO3COM_simple_fsm is
 begin  -- fsm
 
   o_receive_fifo_wr_en         <= s_receive_fifo_wr_en;
-  o_receive_fifo_reset         <= s_receive_fifo_reset;
   o_receive_transfersize_en    <= s_receive_transfersize_en;
   o_receive_counter_load       <= s_receive_counter_load;
   o_receive_counter_en         <= s_receive_counter_en;
   o_btag_reg_en                <= s_btag_reg_en;
   o_nbtag_reg_en               <= s_nbtag_reg_en;
   o_send_fifo_rd_en            <= s_send_fifo_rd_en;
-  o_send_fifo_reset            <= s_send_fifo_reset;
   o_send_counter_load          <= s_send_counter_load;
   o_send_counter_en            <= s_send_counter_en;
   o_send_mux_sel               <= s_send_mux_sel;
@@ -167,8 +165,14 @@ begin  -- fsm
     if (i_sysclk'event and i_sysclk = '1') then
       if (i_nReset = '0') then
         state <= st1_idle;
+
+        o_receive_fifo_reset         <= '0';
+        o_send_fifo_reset            <= '0';
       else
         state <= next_state;
+
+        o_receive_fifo_reset         <= s_receive_fifo_reset;
+        o_send_fifo_reset            <= s_send_fifo_reset;
       end if;
     end if;
   end process;
@@ -272,9 +276,9 @@ begin  -- fsm
       s_send_counter_load <= '1';
     end if;
 
-    if (state = st21_send_reserved and i_gpif_tx_full = '0' and
-        i_send_fifo_empty = '0')
-      or (state = st22_send_data and
+    if --(state = st21_send_reserved and i_gpif_tx_full = '0' and
+        --i_send_fifo_empty = '0')
+      (state = st22_send_data and
           i_gpif_tx_full = '0' and
           i_send_fifo_empty = '0' and
           i_send_counter_zero = '0')

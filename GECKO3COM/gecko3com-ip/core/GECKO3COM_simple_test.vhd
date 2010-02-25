@@ -83,7 +83,7 @@ architecture behavour of GECKO3COM_simple_test is
   -- we will transmitt 1 MiB data when the pseude random number generator
   -- is used:
   --signal c_transfer_size_prng : std_logic_vector(31 downto 0) := x"00100000";
-  signal c_transfer_size_prng : std_logic_vector(31 downto 0) := x"00000FA0";
+  signal c_transfer_size_prng : std_logic_vector(31 downto 0) := x"00000001";
 
   
   ----------------------------------------------------------------------------- 
@@ -336,10 +336,10 @@ begin --  behavour
     if i_nReset = '0' then              -- asynchronous reset (active low)
       s_send_counter_value <= (others => '0');
     elsif i_sysclk'event and i_sysclk = '1' then  -- rising clock edge
-      if s_send_counter_reset = '1' then
+      if s_send_counter_reset = '1' and  s_send_counter_en = '0' then
         s_send_counter_value <= (others => '0');
       end if;
-      if s_send_counter_en = '1' then
+      if s_send_counter_reset = '0' and s_send_counter_en = '1' then
         s_send_counter_value(31 downto 2) <=
           s_send_counter_value(31 downto 2) + 1;
         s_send_counter_value(1 downto 0) <= "00";  -- every fifo write (32bit)
@@ -350,7 +350,7 @@ begin --  behavour
   
   -- transfer size counter comparator
   s_send_counter_equals_transfer_size <=
-    '1' when s_send_counter_value >= s_send_transfersize else
+    '1' when s_send_counter_value > s_send_transfersize else
     '0';
 
 
@@ -505,13 +505,13 @@ begin --  behavour
         end if;
 
       when st6_send_wait =>
-
+        
         if s_send_fifo_full = '0' then
           next_state <= st5_send_data;
         end if;
 
       when st7_subtract_transfered_data => 
-          s_transfer_size_reg_select <= '0';
+        s_transfer_size_reg_select <= '0';
         s_transfer_size_reg_en <= '1';
 
         if s_send_data_request = '1' then

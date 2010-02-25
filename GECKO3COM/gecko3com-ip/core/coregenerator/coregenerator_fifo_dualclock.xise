@@ -41,7 +41,7 @@
     <property xil_pn:name="Auto Implementation Top" xil_pn:value="false"/>
     <property xil_pn:name="Command line syntax" xil_pn:value="emacsclient +$2 $1"/>
     <property xil_pn:name="Constraints Entry" xil_pn:value="Constraints Editor"/>
-    <property xil_pn:name="Device" xil_pn:value="xc3s1500"/>
+    <property xil_pn:name="Device" xil_pn:value="xc3s4000"/>
     <property xil_pn:name="Device Family" xil_pn:value="Spartan3"/>
     <property xil_pn:name="Editor" xil_pn:value="Custom"/>
     <property xil_pn:name="Fitter Report Format" xil_pn:value="HTML"/>

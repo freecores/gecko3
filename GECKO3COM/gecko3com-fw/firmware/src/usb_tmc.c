@@ -187,6 +187,9 @@ uint8_t usb_handle_tmc_packet (void){
 	FIFORESET = bmNAKALL | USB_TMC_EP_IN;   SYNCDELAY;
 
 	INPKTEND = bmSKIP | USB_TMC_EP_IN;      SYNCDELAY; 
+	INPKTEND = bmSKIP | USB_TMC_EP_IN;      SYNCDELAY; 
+	INPKTEND = bmSKIP | USB_TMC_EP_IN;      SYNCDELAY; 
+	INPKTEND = bmSKIP | USB_TMC_EP_IN;      SYNCDELAY; 
 
 	FIFORESET = 0;		    SYNCDELAY;
 
@@ -253,8 +256,16 @@ uint8_t usb_handle_tmc_packet (void){
       OUTPKTEND = bmSKIP | USB_TMC_EP_OUT;       SYNCDELAY;
       OUTPKTEND = bmSKIP | USB_TMC_EP_OUT;       SYNCDELAY;
 
+      INPKTEND = bmSKIP | USB_TMC_EP_IN;      SYNCDELAY; 
+      INPKTEND = bmSKIP | USB_TMC_EP_IN;      SYNCDELAY; 
+      INPKTEND = bmSKIP | USB_TMC_EP_IN;      SYNCDELAY; 
+      INPKTEND = bmSKIP | USB_TMC_EP_IN;      SYNCDELAY; 
+
       FIFORESET = 0;		    SYNCDELAY;
 
+      EP2CS &= ~bmEPSTALL;
+      EP6CS &= ~bmEPSTALL;
+      
       EP0BUF[0] = usb_tmc_status;
       EP0BCH = 0;
       EP0BCL = 1;

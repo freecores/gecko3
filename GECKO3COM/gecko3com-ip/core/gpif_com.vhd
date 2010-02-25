@@ -280,7 +280,7 @@ begin
       if s_EOM = '1' then
         s_EOM_FF <= '1';
       end if;
-      if s_X2U_EMPTY = '1' then
+      if s_X2U_EMPTY = '1' and s_TX_FSM = '0' then
         s_EOM_FF <= '0';
       end if;
     end if;

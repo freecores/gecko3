@@ -100,7 +100,7 @@
 //          _________ _________ _________ _________ _________ _________ _________ _________
 //                                                                                         
 // AddrMode Same Val  Same Val  Same Val  Same Val  Same Val  Same Val  Same Val           
-// DataMode NO Data   NO Data   NO Data   Activate  Activate  NO Data   NO Data            
+// DataMode NO Data   NO Data   NO Data   Activate  NO Data   NO Data   NO Data            
 // NextData SameData  SameData  SameData  SameData  NextData  SameData  SameData           
 // Int Trig No Int    No Int    No Int    No Int    Trig Int  No Int    No Int             
 // IF/Wait  IF        IF        Wait 2    IF        Wait 1    IF        IF                 
@@ -170,7 +170,7 @@ const char xdata WaveData[128] =
 /* LFun  */ 0x40,     0x09,     0x0F,     0x09,     0x00,     0x00,     0x00,     0x3F,
 // Wave 2 
 /* LenBr */ 0x08,     0x10,     0x02,     0x9C,     0x01,     0x3F,     0xBF,     0x07,
-/* Opcode*/ 0x01,     0x01,     0x00,     0x03,     0x16,     0x01,     0x01,     0x00,
+/* Opcode*/ 0x01,     0x01,     0x00,     0x03,     0x14,     0x01,     0x01,     0x00,
 /* Output*/ 0x00,     0x00,     0x0C,     0x0C,     0x0C,     0x00,     0x00,     0x00,
 /* LFun  */ 0xC8,     0xC8,     0x00,     0x00,     0x00,     0x00,     0x00,     0x3F,
 // Wave 3 

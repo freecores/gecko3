@@ -111,12 +111,13 @@ isr_gpif_done (void) interrupt
   //}
   /*else*/ {
     EA = 0;		/* disable all interrupts */
+    clear_fifo_gpif_irq();
     flGPIF |= bmGPIF_READ_IN_PROGRESS;
     gpif_trigger_read();
     EA = 1;		/* global interrupt enable */
   }
 
-  clear_fifo_gpif_irq();
+  
   
   ISR_DEBUG_PORT &= ~bmGPIF_DONE;
 }

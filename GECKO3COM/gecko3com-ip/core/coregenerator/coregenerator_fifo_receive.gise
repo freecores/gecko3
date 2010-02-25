@@ -38,6 +38,7 @@
     <transform xil_pn:end_ts="1266873170" xil_pn:name="TRAN_regenerateCores" xil_pn:prop_ck="4335293426568460978" xil_pn:start_ts="1266873170">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForProperties"/>
     </transform>
     <transform xil_pn:end_ts="1266873170" xil_pn:name="TRAN_SubProjectAbstractToPreProxy" xil_pn:start_ts="1266873170">
       <status xil_pn:value="SuccessfullyRun"/>

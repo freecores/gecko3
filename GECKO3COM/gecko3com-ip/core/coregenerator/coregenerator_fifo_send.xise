@@ -39,7 +39,7 @@
 
   <properties>
     <property xil_pn:name="Auto Implementation Top" xil_pn:value="false"/>
-    <property xil_pn:name="Device" xil_pn:value="xc3s1500"/>
+    <property xil_pn:name="Device" xil_pn:value="xc3s4000"/>
     <property xil_pn:name="Device Family" xil_pn:value="Spartan3"/>
     <property xil_pn:name="Implementation Stop View" xil_pn:value="PreSynthesis"/>
     <property xil_pn:name="Implementation Top" xil_pn:value="Module|coregenerator_fifo_send"/>

@@ -861,18 +861,28 @@ static void main_loop (void)
        * happen when someone reconfigures the FPGA through JTAG */
       if(!fpga_done()) {
 	
-	mdelay(40);
+	mdelay(50);
 	if(!fpga_done()) {
-	  //set_led_ext(GREEN);
+	  set_led_ext(ORANGE);
 	  deactivate_gpif();
 	  flLOCAL = GECKO3COM_LOCAL;
 	}
       }
 
-      if(!(EP2468STAT & bmEP2EMPTY) && (GPIFTRIG & bmGPIF_IDLE)) {
-	flGPIF = 0;
-	gpif_trigger_write();
-      }
+      //if(!(EP2468STAT & bmEP2EMPTY) && (GPIFTRIG & bmGPIF_IDLE)) {
+	/* check if there is a active IN transfer */
+	/*if((GPIFREADYSTAT & bmWRX) != bmWRX) {
+	  flGPIF = 0;
+	  gpif_trigger_write();
+	}
+	}*/
+
+      /* check if this is a end of a IN transfer */
+      /*if(!(EP2468STAT & bmEP6EMPTY) && (GPIFTRIG & bmGPIF_IDLE)) {
+	INPKTEND = USB_TMC_EP_IN;
+	flGPIF |= bmGPIF_PENDING_DATA;
+	gpif_trigger_read();
+	}*/
     }
 
     /* if the LED flag is set to off, disable the external LED */
