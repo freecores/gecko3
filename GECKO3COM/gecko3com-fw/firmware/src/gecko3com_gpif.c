@@ -169,12 +169,15 @@ void init_gpif (void)
   IFCONFIG = bmIFCLKSRC | bmIFCLKOE | bmGSTATE | bmIFGPIF;
   SYNCDELAY;
 
-  /* we have to commit the currently processed packet BEFORE we switch to auto out mode */
+  /* we have to commit the currently processed packet BEFORE we switch
+   *to auto out mode */
   OUTPKTEND = bmSKIP | USB_TMC_EP_OUT;
 
-  /*FIXME  only here for testing */
-  //EP6AUTOINLENH = (20) >> 8;	   SYNCDELAY;  /* this is the length for high speed */
-  //EP6AUTOINLENL = (20) & 0xff;  SYNCDELAY;
+    /* reset FIFOs */
+
+  FIFORESET = bmNAKALL;					SYNCDELAY;
+  FIFORESET = 6;					SYNCDELAY;
+  FIFORESET = 0;					SYNCDELAY;
 
   /* enable autoout and autoin feature of the endpoints */
   EP2FIFOCFG |= bmAUTOOUT;
@@ -194,6 +197,12 @@ void init_gpif (void)
   EP2GPIFFLGSEL = bmFLAG_PROGRAMMABLE;
   //EP2GPIFFLGSEL = bmFLAG_EMPTY;
   SYNCDELAY;
+
+  //EP6FIFOPFH = bmDECIS | 0x19;
+  //EP6FIFOPFL = 0xFB;
+  //SYNCDELAY;
+
+  //EP6GPIFFLGSEL = bmFLAG_PROGRAMMABLE;
   EP6GPIFFLGSEL = bmFLAG_FULL;
   SYNCDELAY;
 
@@ -211,7 +220,8 @@ void init_gpif (void)
   GPIFIDLECTL = InitData[ 3 ];
   /* Hmmm, what's InitData[ 4 ] ... */
   GPIFWFSELECT = InitData[ 5 ];
-  /* GPIFREADYSTAT = InitData[ 6 ]; */	/* I think this register is read only... */
+  /* I think this register is read only... */
+  /* GPIFREADYSTAT = InitData[ 6 ]; */ 
   
   for (i = 0; i < 128; i++){
     GPIF_WAVE_DATA[i] = WaveData[i];

@@ -82,8 +82,8 @@ architecture behavour of GECKO3COM_simple_test is
 
   -- we will transmitt 1 MiB data when the pseude random number generator
   -- is used:
-  --signal c_transfer_size_prng : std_logic_vector(31 downto 0) := x"00100000";
-  signal c_transfer_size_prng : std_logic_vector(31 downto 0) := x"00000001";
+  signal c_transfer_size_prng : std_logic_vector(31 downto 0) := x"00100000";
+  --signal c_transfer_size_prng : std_logic_vector(31 downto 0) := x"00000001";
 
   
   ----------------------------------------------------------------------------- 

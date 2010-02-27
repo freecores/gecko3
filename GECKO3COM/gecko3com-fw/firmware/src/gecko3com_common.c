@@ -117,8 +117,8 @@ init_gecko3com (void)
 
   /* set autoout length for EP2 and autoin length for EP6 */
   if(USBCS & bmHSM){
-    EP6AUTOINLENH = (512) >> 8;	   SYNCDELAY;  /* this is the length for high speed */
-    EP6AUTOINLENL = (512) & 0xff;  SYNCDELAY;
+    EP6AUTOINLENH = (512) >> 8;	   SYNCDELAY;  /* this is the length for */
+    EP6AUTOINLENL = (512) & 0xff;  SYNCDELAY;  /* high speed */
   }
   else {
     EP6AUTOINLENH = 0;	  SYNCDELAY;  /* this is the length for full speed */
@@ -182,17 +182,17 @@ void
 init_io_ext (void)
 {
   xdata uint8_t cmd[2];
-  cmd[0] = 0x03;			/* write to configuration register */
-  cmd[1] = 0x01;		      	/* set Bit 0 (LSB) as input and Bit 1,2 as output, others be irrelevant */
-  i2c_write(I2C_DEV_IO, cmd, 2);
+  cmd[0] = 0x03;		       /* write to configuration register */
+  cmd[1] = 0x01;		       /* set Bit 0 (LSB) as input and Bit */
+  i2c_write(I2C_DEV_IO, cmd, 2);       /* 1,2 as output, others be irrelevant */
 }
 
 void
 set_led_ext (const uint8_t color)
 {
   xdata uint8_t cmd[2];
-  cmd[0] = 0x01;	       		/* write to output port register */
-  cmd[1] = color;			/* set LED */
+  cmd[0] = 0x01;	       	       /* write to output port register */
+  cmd[1] = color;		       /* set LED */
   i2c_write(I2C_DEV_IO, cmd, 2);
   flLED = ~LEDS_OFF;
 }
@@ -202,13 +202,13 @@ get_switch (void)
 {
   xdata uint8_t cmd[1];
   
-  cmd[0] = 0x00;			/* set command byte to input port register */
+  cmd[0] = 0x00;		/* set command byte to input port register */
 
   i2c_write(I2C_DEV_IO, cmd, 1);
   
   i2c_read(I2C_DEV_IO, cmd, 1);
   
-  if((cmd[0] & 0x01) == 1){	        /* only bit 0 in the input register is used */
+  if((cmd[0] & 0x01) == 1){	/* only bit 0 in the input register is used */
     return 1;
   }
   

@@ -78,7 +78,7 @@ void deactivate_gpif(void);
     GPIFTCB2 = 0x00; 						        \
     GPIFTCB1 = 0x00; 					                \
     GPIFTCB0 = 0x01;							\
-    GPIFTRIG = bmGPIF_EP6_START | bmGPIF_READ; /* trigger FIFO out transfer */ \
+    GPIFTRIG = bmGPIF_EP6_START | bmGPIF_READ; /* trigger FIFO IN transfer */ \
     /*SYNCDELAY;*/							\
   } while (0)
 
@@ -94,7 +94,7 @@ void deactivate_gpif(void);
     GPIFTCB2 = 0x00;							\
     GPIFTCB1 = 0x00;							\
     GPIFTCB0 = 0x01;							\
-    GPIFTRIG = bmGPIF_EP2_START | bmGPIF_WRITE; /* trigger FIFO out transfer */ \
+    GPIFTRIG = bmGPIF_EP2_START | bmGPIF_WRITE; /* trigger FIFO OUT transfer*/ \
     /*SYNCDELAY;*/							\
   } while(0)
 

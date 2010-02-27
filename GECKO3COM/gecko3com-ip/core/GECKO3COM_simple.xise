@@ -46,35 +46,27 @@
       <association xil_pn:name="PostTranslateSimulation"/>
     </file>
     <file xil_pn:name="GECKO3COM_simple.vhd" xil_pn:type="FILE_VHDL">
-      <association xil_pn:name="BehavioralSimulation"/>
       <association xil_pn:name="Implementation"/>
     </file>
     <file xil_pn:name="coregenerator/coregenerator_fifo_receive.xco" xil_pn:type="FILE_COREGEN">
-      <association xil_pn:name="BehavioralSimulation"/>
       <association xil_pn:name="Implementation"/>
     </file>
     <file xil_pn:name="coregenerator/coregenerator_fifo_send.xco" xil_pn:type="FILE_COREGEN">
-      <association xil_pn:name="BehavioralSimulation"/>
       <association xil_pn:name="Implementation"/>
     </file>
     <file xil_pn:name="fifo_receive.vhd" xil_pn:type="FILE_VHDL">
-      <association xil_pn:name="BehavioralSimulation"/>
       <association xil_pn:name="Implementation"/>
     </file>
     <file xil_pn:name="fifo_send.vhd" xil_pn:type="FILE_VHDL">
-      <association xil_pn:name="BehavioralSimulation"/>
       <association xil_pn:name="Implementation"/>
     </file>
     <file xil_pn:name="GECKO3COM_simple_datapath.vhd" xil_pn:type="FILE_VHDL">
-      <association xil_pn:name="BehavioralSimulation"/>
       <association xil_pn:name="Implementation"/>
     </file>
     <file xil_pn:name="GECKO3COM_simple_fsm.vhd" xil_pn:type="FILE_VHDL">
-      <association xil_pn:name="BehavioralSimulation"/>
       <association xil_pn:name="Implementation"/>
     </file>
     <file xil_pn:name="GECKO3COM_simple_test.vhd" xil_pn:type="FILE_VHDL">
-      <association xil_pn:name="BehavioralSimulation"/>
       <association xil_pn:name="Implementation"/>
     </file>
     <file xil_pn:name="coregenerator/coregenerator_fifo_dualclock.xco" xil_pn:type="FILE_COREGEN">
@@ -84,10 +76,16 @@
     <file xil_pn:name="GECKO3COM_simple_test.ucf" xil_pn:type="FILE_UCF">
       <association xil_pn:name="Implementation"/>
     </file>
-    <file xil_pn:name="GECKO3COM_simple_test.cdc" xil_pn:type="FILE_CDC">
+    <file xil_pn:name="GECKO3main_v1.ucf" xil_pn:type="FILE_UCF">
       <association xil_pn:name="Implementation"/>
     </file>
-    <file xil_pn:name="GECKO3main_v1.ucf" xil_pn:type="FILE_UCF">
+    <file xil_pn:name="GECKO3COM_simple_prng_tb.vhd" xil_pn:type="FILE_VHDL">
+      <association xil_pn:name="BehavioralSimulation"/>
+      <association xil_pn:name="PostRouteSimulation"/>
+      <association xil_pn:name="PostMapSimulation"/>
+      <association xil_pn:name="PostTranslateSimulation"/>
+    </file>
+    <file xil_pn:name="GECKO3COM_simple_test.cdc" xil_pn:type="FILE_CDC">
       <association xil_pn:name="Implementation"/>
     </file>
     <file xil_pn:name="coregenerator/coregenerator_fifo_receive.ise" xil_pn:type="FILE_COREGENISE">
@@ -107,6 +105,7 @@
     <property xil_pn:name="Command line syntax" xil_pn:value="emacsclient +$2 $1"/>
     <property xil_pn:name="Compiled Library Directory" xil_pn:value="lib"/>
     <property xil_pn:name="Constraints Entry" xil_pn:value="Constraints Editor"/>
+    <property xil_pn:name="Custom Project Filename Behavioral" xil_pn:value="GECKO3COM_simple_prng_tb_beh.prj"/>
     <property xil_pn:name="Device" xil_pn:value="xc3s4000"/>
     <property xil_pn:name="Device Family" xil_pn:value="Spartan3"/>
     <property xil_pn:name="Editor" xil_pn:value="Custom"/>
@@ -124,7 +123,7 @@
     <property xil_pn:name="Optimization Goal" xil_pn:value="Speed" xil_pn:x_locked="true"/>
     <property xil_pn:name="Optimization Strategy (Cover Mode)" xil_pn:value="Speed"/>
     <property xil_pn:name="Overwrite Compiled Libraries" xil_pn:value="true"/>
-    <property xil_pn:name="PROP_BehavioralSimTop" xil_pn:value="Architecture|GECKO3COM_simple|Behavioral"/>
+    <property xil_pn:name="PROP_BehavioralSimTop" xil_pn:value="Architecture|GECKO3COM_simple_prng_tb|simulation"/>
     <property xil_pn:name="PROP_DesignName" xil_pn:value="usb_tmc_com"/>
     <property xil_pn:name="PROP_mapSmartGuideFileName" xil_pn:value=""/>
     <property xil_pn:name="PROP_parSmartGuideFileName" xil_pn:value=""/>
@@ -144,7 +143,7 @@
     <property xil_pn:name="Report Unconstrained Paths Post Trace" xil_pn:value="yes"/>
     <property xil_pn:name="Router Effort Level (Overrides Overall Level)" xil_pn:value="High" xil_pn:x_locked="true"/>
     <property xil_pn:name="Safe Implementation" xil_pn:value="Yes"/>
-    <property xil_pn:name="Selected Simulation Root Source Node Behavioral" xil_pn:value="Architecture|GECKO3COM_simple|Behavioral"/>
+    <property xil_pn:name="Selected Simulation Root Source Node Behavioral" xil_pn:value="Architecture|GECKO3COM_simple_prng_tb|simulation"/>
     <property xil_pn:name="Selected Simulation Root Source Node Post-Route" xil_pn:value="Architecture|gpif_com_test_tb|simulation"/>
     <property xil_pn:name="Selected Simulation Source Node" xil_pn:value="DUT"/>
     <property xil_pn:name="Simulation Resolution" xil_pn:value="1 ns"/>
@@ -161,8 +160,8 @@
 
   <bindings>
     <binding xil_pn:location="/gpif_com_test" xil_pn:name="GECKO3COM_simple_test.ucf"/>
-    <binding xil_pn:location="/GECKO3COM_simple_test" xil_pn:name="GECKO3COM_simple_test.cdc"/>
     <binding xil_pn:location="/GECKO3COM_simple_test" xil_pn:name="GECKO3main_v1.ucf"/>
+    <binding xil_pn:location="/GECKO3COM_simple_test" xil_pn:name="GECKO3COM_simple_test.cdc"/>
   </bindings>
 
   <libraries/>

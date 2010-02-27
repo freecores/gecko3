@@ -200,7 +200,8 @@ begin
         elsif i_WRU = '1' and i_RDYU = '0' then
           nx_state <= inRQ;
         elsif i_WRU = '0' and
-          (i_X2U_FULL_IFCLK = '1' or i_EOM = '1') and i_X2U_EMPTY = '0' then
+          --(i_X2U_FULL_IFCLK = '1' or i_EOM = '1') and i_X2U_EMPTY = '0' then
+          i_X2U_EMPTY = '0' then
           nx_state <= outRQ;
         else
           nx_state <= idle;
@@ -381,6 +382,7 @@ begin
           nx_state <= rst;
         elsif i_WRU = '0' and i_RDYU = '1' then
           nx_state <= outTrans;
+          s_X2U_RD_EN <= '1';
         else
           nx_state <= outACKwait;
         end if;
@@ -404,6 +406,7 @@ begin
           nx_state <= outTrans;
         else
           nx_state <= outUSBwait;
+          s_X2U_RD_EN <= '0';
         end if;
 
       when outUSBwait =>
@@ -424,12 +427,12 @@ begin
         else
           nx_state <= outUSBwait;
         end if;
-
+        
       when outUSBwaitEnd =>
         -- output signal values:
         s_WRX       <= '1';
-        s_RDYX      <= '1';
-        s_X2U_RD_EN <= '0';
+        s_RDYX      <= '0';
+        s_X2U_RD_EN <= '1';
         o_TX        <= '1';
         s_bus_trans_dir <= writeToGPIF;
 
@@ -451,6 +454,7 @@ begin
           nx_state <= endOutTrans;
         elsif i_X2U_EMPTY = '0' then
           nx_state <= outTrans;
+          s_X2U_RD_EN <= '1';
         else
           nx_state <= outFIFOwait;
         end if;

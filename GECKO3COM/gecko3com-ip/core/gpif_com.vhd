@@ -78,13 +78,12 @@ end gpif_com;
 architecture structure of gpif_com is
   
   -- interconection signals
+  signal s_FIFOrst, s_WRX, s_RDYX         : std_logic;
 
-  signal s_FIFOrst, s_WRX, s_RDYX      : std_logic;
-  
-  signal s_ABORT_FSM, s_ABORT_TMP  : std_logic;
-  signal s_RX_FSM, s_RX_TMP  : std_logic;
-  signal s_TX_FSM, s_TX_TMP  : std_logic;
-  signal s_EOM, s_EOM_TMP, s_EOM_FF : std_logic;  -- End of message
+  signal s_ABORT_FSM, s_ABORT_TMP         : std_logic;
+  signal s_RX_FSM, s_RX_TMP               : std_logic;
+  signal s_TX_FSM, s_TX_TMP               : std_logic;
+  signal s_EOM, s_EOM_TMP, s_EOM_FF       : std_logic;  -- End of message
   signal s_X2U_FULL_IFCLK, s_X2U_FULL_TMP : std_logic;
   
   -- USB to Xilinx (U2X)
@@ -93,8 +92,8 @@ architecture structure of gpif_com is
     s_U2X_FULL,
     s_U2X_AM_FULL,
     s_U2X_EMPTY,
-    s_U2X_AM_EMPTY : std_logic;
-  signal s_U2X_DATA	: std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
+    s_U2X_AM_EMPTY  : std_logic;
+  signal s_U2X_DATA : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
   
   -- Xilinx to USB (X2U)
   signal s_X2U_WR_EN,
@@ -102,17 +101,18 @@ architecture structure of gpif_com is
     s_X2U_FULL,
     s_X2U_AM_FULL,
     s_X2U_EMPTY,
-    s_X2U_AM_EMPTY : std_logic;
-  signal s_X2U_DATA	: std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
+    s_X2U_AM_EMPTY  : std_logic;
+  signal s_X2U_DATA : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
   
   -----------------------------------------------------------------------------
   -- data bus
   -----------------------------------------------------------------------------
 
   -- data signals
-  signal s_dbus_trans_dir     : std_logic;
-  signal s_dbus_in  : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
-  signal s_dbus_out : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
+  signal s_dbus_trans_dir : std_logic;
+  signal s_dbus_in        : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
+  signal s_dbus_out       : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
+  signal s_dbus_out_fifo  : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
   
   -----------------------------------------------------------------------------
   -- COMPONENTS
@@ -191,7 +191,7 @@ begin
       i_wr_en        => s_X2U_WR_EN,
       o_almost_empty => s_X2U_AM_EMPTY,
       o_almost_full  => s_X2U_AM_FULL,
-      o_dout         => s_dbus_out,
+      o_dout         => s_dbus_out_fifo,
       o_empty        => s_X2U_EMPTY,
       o_full         => s_X2U_FULL
       );
@@ -309,6 +309,10 @@ begin
   begin
     if rising_edge(i_IFCLK) then
       s_dbus_in <= b_gpif_bus;
+
+      if s_X2U_RD_EN = '1' then
+        s_dbus_out <= s_dbus_out_fifo;
+      end if;
     end if;
   end process buf_input;
   

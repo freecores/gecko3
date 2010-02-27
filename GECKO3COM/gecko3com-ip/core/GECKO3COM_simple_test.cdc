@@ -1,5 +1,5 @@
 #ChipScope Core Inserter Project File Version 3.0
-#Wed Feb 24 16:47:27 CET 2010
+#Sat Feb 27 18:00:38 CET 2010
 Project.device.designInputFile=/home/chrigi/bfh-work/GECKO3COM/gecko3com-ip/core/GECKO3COM_simple_test_cs.ngc
 Project.device.designOutputFile=/home/chrigi/bfh-work/GECKO3COM/gecko3com-ip/core/GECKO3COM_simple_test_cs.ngc
 Project.device.deviceFamily=6
@@ -106,24 +106,24 @@ Project.unit<0>.dataChannel<45>=GECKO3COM_simple_1 GECKO3COM_simple_fsm_1 state_
 Project.unit<0>.dataChannel<46>=GECKO3COM_simple_1 GECKO3COM_simple_fsm_1 state_FSM_FFd5
 Project.unit<0>.dataChannel<47>=s_transfer_size_reg_en
 Project.unit<0>.dataChannel<48>=s_send_transfersize_en
-Project.unit<0>.dataChannel<49>=GECKO3COM_simple_1 GECKO3COM_simple_datapath_1 s_send_fifo_data<0>
+Project.unit<0>.dataChannel<49>=GECKO3COM_simple_1 GPIF_INTERFACE s_dbus_out<0>
 Project.unit<0>.dataChannel<4>=GECKO3COM_simple_1 o_receive_end_of_message
-Project.unit<0>.dataChannel<50>=GECKO3COM_simple_1 GECKO3COM_simple_datapath_1 s_send_fifo_data<1>
-Project.unit<0>.dataChannel<51>=GECKO3COM_simple_1 GECKO3COM_simple_datapath_1 s_send_fifo_data<2>
-Project.unit<0>.dataChannel<52>=GECKO3COM_simple_1 GECKO3COM_simple_datapath_1 s_send_fifo_data<3>
-Project.unit<0>.dataChannel<53>=GECKO3COM_simple_1 GECKO3COM_simple_datapath_1 s_send_fifo_data<4>
-Project.unit<0>.dataChannel<54>=GECKO3COM_simple_1 GECKO3COM_simple_datapath_1 s_send_fifo_data<5>
-Project.unit<0>.dataChannel<55>=GECKO3COM_simple_1 GECKO3COM_simple_datapath_1 s_send_fifo_data<6>
-Project.unit<0>.dataChannel<56>=GECKO3COM_simple_1 GECKO3COM_simple_datapath_1 s_send_fifo_data<7>
-Project.unit<0>.dataChannel<57>=GECKO3COM_simple_1 GECKO3COM_simple_datapath_1 s_send_fifo_data<8>
-Project.unit<0>.dataChannel<58>=GECKO3COM_simple_1 GECKO3COM_simple_datapath_1 s_send_fifo_data<9>
-Project.unit<0>.dataChannel<59>=GECKO3COM_simple_1 GECKO3COM_simple_datapath_1 s_send_fifo_data<10>
+Project.unit<0>.dataChannel<50>=GECKO3COM_simple_1 GPIF_INTERFACE s_dbus_out<1>
+Project.unit<0>.dataChannel<51>=GECKO3COM_simple_1 GPIF_INTERFACE s_dbus_out<2>
+Project.unit<0>.dataChannel<52>=GECKO3COM_simple_1 GPIF_INTERFACE s_dbus_out<3>
+Project.unit<0>.dataChannel<53>=GECKO3COM_simple_1 GPIF_INTERFACE s_dbus_out<4>
+Project.unit<0>.dataChannel<54>=GECKO3COM_simple_1 GPIF_INTERFACE s_dbus_out<5>
+Project.unit<0>.dataChannel<55>=GECKO3COM_simple_1 GPIF_INTERFACE s_dbus_out<6>
+Project.unit<0>.dataChannel<56>=GECKO3COM_simple_1 GPIF_INTERFACE s_dbus_out<7>
+Project.unit<0>.dataChannel<57>=GECKO3COM_simple_1 GPIF_INTERFACE s_dbus_out<8>
+Project.unit<0>.dataChannel<58>=GECKO3COM_simple_1 GPIF_INTERFACE s_dbus_out<9>
+Project.unit<0>.dataChannel<59>=GECKO3COM_simple_1 GPIF_INTERFACE s_dbus_out<10>
 Project.unit<0>.dataChannel<5>=GECKO3COM_simple_1 o_receive_fifo_empty
-Project.unit<0>.dataChannel<60>=GECKO3COM_simple_1 GECKO3COM_simple_datapath_1 s_send_fifo_data<11>
-Project.unit<0>.dataChannel<61>=GECKO3COM_simple_1 GECKO3COM_simple_datapath_1 s_send_fifo_data<12>
-Project.unit<0>.dataChannel<62>=GECKO3COM_simple_1 GECKO3COM_simple_datapath_1 s_send_fifo_data<13>
-Project.unit<0>.dataChannel<63>=GECKO3COM_simple_1 GECKO3COM_simple_datapath_1 s_send_fifo_data<14>
-Project.unit<0>.dataChannel<64>=GECKO3COM_simple_1 GECKO3COM_simple_datapath_1 s_send_fifo_data<15>
+Project.unit<0>.dataChannel<60>=GECKO3COM_simple_1 GPIF_INTERFACE s_dbus_out<11>
+Project.unit<0>.dataChannel<61>=GECKO3COM_simple_1 GPIF_INTERFACE s_dbus_out<12>
+Project.unit<0>.dataChannel<62>=GECKO3COM_simple_1 GPIF_INTERFACE s_dbus_out<13>
+Project.unit<0>.dataChannel<63>=GECKO3COM_simple_1 GPIF_INTERFACE s_dbus_out<14>
+Project.unit<0>.dataChannel<64>=GECKO3COM_simple_1 GPIF_INTERFACE s_dbus_out<15>
 Project.unit<0>.dataChannel<65>=GECKO3COM_simple_1 GECKO3COM_simple_datapath_1 i_rx_data<0>
 Project.unit<0>.dataChannel<66>=GECKO3COM_simple_1 GECKO3COM_simple_datapath_1 i_rx_data<1>
 Project.unit<0>.dataChannel<67>=GECKO3COM_simple_1 GECKO3COM_simple_datapath_1 i_rx_data<2>
