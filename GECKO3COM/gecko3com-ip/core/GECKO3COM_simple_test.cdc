@@ -1,5 +1,5 @@
 #ChipScope Core Inserter Project File Version 3.0
-#Sat Feb 27 18:00:38 CET 2010
+#Sun Feb 28 00:15:45 CET 2010
 Project.device.designInputFile=/home/chrigi/bfh-work/GECKO3COM/gecko3com-ip/core/GECKO3COM_simple_test_cs.ngc
 Project.device.designOutputFile=/home/chrigi/bfh-work/GECKO3COM/gecko3com-ip/core/GECKO3COM_simple_test_cs.ngc
 Project.device.deviceFamily=6

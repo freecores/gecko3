@@ -1,5 +1,5 @@
 #ChipScope Pro Analyzer Project File, Version 3.0
-#Thu Feb 25 21:47:08 CET 2010
+#Sun Feb 28 02:06:22 CET 2010
 deviceChain.deviceName0=XC3S4000
 deviceChain.iRLength0=6
 deviceChain.name0=MyDevice0
@@ -34,7 +34,7 @@ unit.0.0.1.HEIGHT1=0.9084423
 unit.0.0.1.WIDTH1=1.0563822
 unit.0.0.1.X1=-0.0031323414
 unit.0.0.1.Y1=0.10463734
-unit.0.0.MFBitsA0=XXXXX1XXXXXX
+unit.0.0.MFBitsA0=XXXXXX1XXXXX
 unit.0.0.MFBitsA1=XXXXX0XXXXXX
 unit.0.0.MFBitsB0=000000000000
 unit.0.0.MFBitsB1=000000000000
@@ -53,7 +53,7 @@ unit.0.0.SequencerOn=0
 unit.0.0.TCActive=0
 unit.0.0.TCAdvanced0=0
 unit.0.0.TCCondition0_0=M0
-unit.0.0.TCCondition0_1=M0
+unit.0.0.TCCondition0_1=M0 --> M1 --> M0
 unit.0.0.TCConditionType0=1
 unit.0.0.TCCount=1
 unit.0.0.TCEventCount0=1
@@ -119,10 +119,10 @@ unit.0.0.port.-1.b.10.unsignedOffset=0.0
 unit.0.0.port.-1.b.10.unsignedPrecision=0
 unit.0.0.port.-1.b.10.unsignedScaleFactor=1.0
 unit.0.0.port.-1.b.10.visible=1
-unit.0.0.port.-1.b.2.alias=/s_send_fifo_data
-unit.0.0.port.-1.b.2.channellist=49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64
+unit.0.0.port.-1.b.2.alias=GECKO3COM_simple_fsm_1/state_FSM_FFd1
+unit.0.0.port.-1.b.2.channellist=42 43 44 45 46
 unit.0.0.port.-1.b.2.color=java.awt.Color[r\=0,g\=0,b\=124]
-unit.0.0.port.-1.b.2.name=/s_send_fifo_data
+unit.0.0.port.-1.b.2.name=/GECKO3COM_simple_1/o_receive_transfersize
 unit.0.0.port.-1.b.2.orderindex=-1
 unit.0.0.port.-1.b.2.radix=Hex
 unit.0.0.port.-1.b.2.signedOffset=0.0
@@ -133,10 +133,10 @@ unit.0.0.port.-1.b.2.unsignedOffset=0.0
 unit.0.0.port.-1.b.2.unsignedPrecision=0
 unit.0.0.port.-1.b.2.unsignedScaleFactor=1.0
 unit.0.0.port.-1.b.2.visible=1
-unit.0.0.port.-1.b.3.alias=GECKO3COM_simple_fsm_1/state_FSM_FFd1
-unit.0.0.port.-1.b.3.channellist=42 43 44 45 46
+unit.0.0.port.-1.b.3.alias=GPIF_INTERFACE/s_dbus_out
+unit.0.0.port.-1.b.3.channellist=49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64
 unit.0.0.port.-1.b.3.color=java.awt.Color[r\=0,g\=0,b\=124]
-unit.0.0.port.-1.b.3.name=/GECKO3COM_simple_1/o_receive_transfersize
+unit.0.0.port.-1.b.3.name=/s_send_fifo_data
 unit.0.0.port.-1.b.3.orderindex=-1
 unit.0.0.port.-1.b.3.radix=Hex
 unit.0.0.port.-1.b.3.signedOffset=0.0
@@ -685,7 +685,7 @@ unit.0.0.port.-1.s.48.orderindex=-1
 unit.0.0.port.-1.s.48.visible=1
 unit.0.0.port.-1.s.49.alias=
 unit.0.0.port.-1.s.49.color=java.awt.Color[r\=0,g\=0,b\=124]
-unit.0.0.port.-1.s.49.name=/GECKO3COM_simple_1/GECKO3COM_simple_datapath_1/s_send_fifo_data<0>
+unit.0.0.port.-1.s.49.name=/GECKO3COM_simple_1/GPIF_INTERFACE/s_dbus_out<0>
 unit.0.0.port.-1.s.49.orderindex=-1
 unit.0.0.port.-1.s.49.visible=0
 unit.0.0.port.-1.s.5.alias=
@@ -695,52 +695,52 @@ unit.0.0.port.-1.s.5.orderindex=-1
 unit.0.0.port.-1.s.5.visible=1
 unit.0.0.port.-1.s.50.alias=
 unit.0.0.port.-1.s.50.color=java.awt.Color[r\=0,g\=0,b\=124]
-unit.0.0.port.-1.s.50.name=/GECKO3COM_simple_1/GECKO3COM_simple_datapath_1/s_send_fifo_data<1>
+unit.0.0.port.-1.s.50.name=/GECKO3COM_simple_1/GPIF_INTERFACE/s_dbus_out<1>
 unit.0.0.port.-1.s.50.orderindex=-1
 unit.0.0.port.-1.s.50.visible=0
 unit.0.0.port.-1.s.51.alias=
 unit.0.0.port.-1.s.51.color=java.awt.Color[r\=0,g\=0,b\=124]
-unit.0.0.port.-1.s.51.name=/GECKO3COM_simple_1/GECKO3COM_simple_datapath_1/s_send_fifo_data<2>
+unit.0.0.port.-1.s.51.name=/GECKO3COM_simple_1/GPIF_INTERFACE/s_dbus_out<2>
 unit.0.0.port.-1.s.51.orderindex=-1
 unit.0.0.port.-1.s.51.visible=0
 unit.0.0.port.-1.s.52.alias=
 unit.0.0.port.-1.s.52.color=java.awt.Color[r\=0,g\=0,b\=124]
-unit.0.0.port.-1.s.52.name=/GECKO3COM_simple_1/GECKO3COM_simple_datapath_1/s_send_fifo_data<3>
+unit.0.0.port.-1.s.52.name=/GECKO3COM_simple_1/GPIF_INTERFACE/s_dbus_out<3>
 unit.0.0.port.-1.s.52.orderindex=-1
 unit.0.0.port.-1.s.52.visible=0
 unit.0.0.port.-1.s.53.alias=
 unit.0.0.port.-1.s.53.color=java.awt.Color[r\=0,g\=0,b\=124]
-unit.0.0.port.-1.s.53.name=/GECKO3COM_simple_1/GECKO3COM_simple_datapath_1/s_send_fifo_data<4>
+unit.0.0.port.-1.s.53.name=/GECKO3COM_simple_1/GPIF_INTERFACE/s_dbus_out<4>
 unit.0.0.port.-1.s.53.orderindex=-1
 unit.0.0.port.-1.s.53.visible=0
 unit.0.0.port.-1.s.54.alias=
 unit.0.0.port.-1.s.54.color=java.awt.Color[r\=0,g\=0,b\=124]
-unit.0.0.port.-1.s.54.name=/GECKO3COM_simple_1/GECKO3COM_simple_datapath_1/s_send_fifo_data<5>
+unit.0.0.port.-1.s.54.name=/GECKO3COM_simple_1/GPIF_INTERFACE/s_dbus_out<5>
 unit.0.0.port.-1.s.54.orderindex=-1
 unit.0.0.port.-1.s.54.visible=0
 unit.0.0.port.-1.s.55.alias=
 unit.0.0.port.-1.s.55.color=java.awt.Color[r\=0,g\=0,b\=124]
-unit.0.0.port.-1.s.55.name=/GECKO3COM_simple_1/GECKO3COM_simple_datapath_1/s_send_fifo_data<6>
+unit.0.0.port.-1.s.55.name=/GECKO3COM_simple_1/GPIF_INTERFACE/s_dbus_out<6>
 unit.0.0.port.-1.s.55.orderindex=-1
 unit.0.0.port.-1.s.55.visible=0
 unit.0.0.port.-1.s.56.alias=
 unit.0.0.port.-1.s.56.color=java.awt.Color[r\=0,g\=0,b\=124]
-unit.0.0.port.-1.s.56.name=/GECKO3COM_simple_1/GECKO3COM_simple_datapath_1/s_send_fifo_data<7>
+unit.0.0.port.-1.s.56.name=/GECKO3COM_simple_1/GPIF_INTERFACE/s_dbus_out<7>
 unit.0.0.port.-1.s.56.orderindex=-1
 unit.0.0.port.-1.s.56.visible=0
 unit.0.0.port.-1.s.57.alias=
 unit.0.0.port.-1.s.57.color=java.awt.Color[r\=0,g\=0,b\=124]
-unit.0.0.port.-1.s.57.name=/GECKO3COM_simple_1/GECKO3COM_simple_datapath_1/s_send_fifo_data<8>
+unit.0.0.port.-1.s.57.name=/GECKO3COM_simple_1/GPIF_INTERFACE/s_dbus_out<8>
 unit.0.0.port.-1.s.57.orderindex=-1
 unit.0.0.port.-1.s.57.visible=0
 unit.0.0.port.-1.s.58.alias=
 unit.0.0.port.-1.s.58.color=java.awt.Color[r\=0,g\=0,b\=124]
-unit.0.0.port.-1.s.58.name=/GECKO3COM_simple_1/GECKO3COM_simple_datapath_1/s_send_fifo_data<9>
+unit.0.0.port.-1.s.58.name=/GECKO3COM_simple_1/GPIF_INTERFACE/s_dbus_out<9>
 unit.0.0.port.-1.s.58.orderindex=-1
 unit.0.0.port.-1.s.58.visible=0
 unit.0.0.port.-1.s.59.alias=
 unit.0.0.port.-1.s.59.color=java.awt.Color[r\=0,g\=0,b\=124]
-unit.0.0.port.-1.s.59.name=/GECKO3COM_simple_1/GECKO3COM_simple_datapath_1/s_send_fifo_data<10>
+unit.0.0.port.-1.s.59.name=/GECKO3COM_simple_1/GPIF_INTERFACE/s_dbus_out<10>
 unit.0.0.port.-1.s.59.orderindex=-1
 unit.0.0.port.-1.s.59.visible=0
 unit.0.0.port.-1.s.6.alias=
@@ -750,27 +750,27 @@ unit.0.0.port.-1.s.6.orderindex=-1
 unit.0.0.port.-1.s.6.visible=1
 unit.0.0.port.-1.s.60.alias=
 unit.0.0.port.-1.s.60.color=java.awt.Color[r\=0,g\=0,b\=124]
-unit.0.0.port.-1.s.60.name=/GECKO3COM_simple_1/GECKO3COM_simple_datapath_1/s_send_fifo_data<11>
+unit.0.0.port.-1.s.60.name=/GECKO3COM_simple_1/GPIF_INTERFACE/s_dbus_out<11>
 unit.0.0.port.-1.s.60.orderindex=-1
 unit.0.0.port.-1.s.60.visible=0
 unit.0.0.port.-1.s.61.alias=
 unit.0.0.port.-1.s.61.color=java.awt.Color[r\=0,g\=0,b\=124]
-unit.0.0.port.-1.s.61.name=/GECKO3COM_simple_1/GECKO3COM_simple_datapath_1/s_send_fifo_data<12>
+unit.0.0.port.-1.s.61.name=/GECKO3COM_simple_1/GPIF_INTERFACE/s_dbus_out<12>
 unit.0.0.port.-1.s.61.orderindex=-1
 unit.0.0.port.-1.s.61.visible=0
 unit.0.0.port.-1.s.62.alias=
 unit.0.0.port.-1.s.62.color=java.awt.Color[r\=0,g\=0,b\=124]
-unit.0.0.port.-1.s.62.name=/GECKO3COM_simple_1/GECKO3COM_simple_datapath_1/s_send_fifo_data<13>
+unit.0.0.port.-1.s.62.name=/GECKO3COM_simple_1/GPIF_INTERFACE/s_dbus_out<13>
 unit.0.0.port.-1.s.62.orderindex=-1
 unit.0.0.port.-1.s.62.visible=0
 unit.0.0.port.-1.s.63.alias=
 unit.0.0.port.-1.s.63.color=java.awt.Color[r\=0,g\=0,b\=124]
-unit.0.0.port.-1.s.63.name=/GECKO3COM_simple_1/GECKO3COM_simple_datapath_1/s_send_fifo_data<14>
+unit.0.0.port.-1.s.63.name=/GECKO3COM_simple_1/GPIF_INTERFACE/s_dbus_out<14>
 unit.0.0.port.-1.s.63.orderindex=-1
 unit.0.0.port.-1.s.63.visible=0
 unit.0.0.port.-1.s.64.alias=
 unit.0.0.port.-1.s.64.color=java.awt.Color[r\=0,g\=0,b\=124]
-unit.0.0.port.-1.s.64.name=/GECKO3COM_simple_1/GECKO3COM_simple_datapath_1/s_send_fifo_data<15>
+unit.0.0.port.-1.s.64.name=/GECKO3COM_simple_1/GPIF_INTERFACE/s_dbus_out<15>
 unit.0.0.port.-1.s.64.orderindex=-1
 unit.0.0.port.-1.s.64.visible=0
 unit.0.0.port.-1.s.65.alias=
@@ -1340,7 +1340,7 @@ unit.0.0.waveform.posn.4.channel=4
 unit.0.0.waveform.posn.4.name=/GECKO3COM_simple_1/o_receive_end_of_message
 unit.0.0.waveform.posn.4.type=signal
 unit.0.0.waveform.posn.40.channel=2147483646
-unit.0.0.waveform.posn.40.name=/s_send_fifo_data
+unit.0.0.waveform.posn.40.name=GPIF_INTERFACE/s_dbus_out
 unit.0.0.waveform.posn.40.radix=1
 unit.0.0.waveform.posn.40.type=bus
 unit.0.0.waveform.posn.41.channel=2147483646

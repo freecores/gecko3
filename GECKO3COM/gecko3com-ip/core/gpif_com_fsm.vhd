@@ -50,25 +50,27 @@ use work.GECKO3COM_defines.all;
 
 entity gpif_com_fsm is
   port (
-    i_nReset         : in  std_logic;
-    i_IFCLK          : in  std_logic;  -- GPIF CLK (GPIF is Master and provides the clock)
-    i_WRU            : in  std_logic;   -- write from GPIF
-    i_RDYU           : in  std_logic;   -- GPIF is ready
-    i_EOM            : in  std_logic;   -- all data for X2U transfer is in FIFO
-    i_U2X_FULL       : in  std_logic;
-    i_U2X_AM_FULL    : in  std_logic;   -- signals for IN FIFO
-    i_X2U_FULL_IFCLK : in  std_logic;
-    i_X2U_AM_EMPTY   : in  std_logic;
-    i_X2U_EMPTY      : in  std_logic;   -- signals for OUT FIFO
-    o_bus_trans_dir  : out std_logic;
-    o_U2X_WR_EN      : out std_logic;   -- signals for IN FIFO
-    o_X2U_RD_EN      : out std_logic;   -- signals for OUT FIFO
-    o_FIFOrst        : out std_logic;
-    o_WRX            : out std_logic;   -- To write to GPIF
-    o_RDYX           : out std_logic;   -- Core is ready
-    o_ABORT          : out std_logic;  -- abort condition detected. we have to flush the data
-    o_RX             : out std_logic;
-    o_TX             : out std_logic    --
+    i_nReset           : in  std_logic;
+    i_IFCLK            : in  std_logic;  -- GPIF CLK (GPIF is Master and
+                                         -- provides the clock)
+    i_WRU              : in  std_logic;  -- write from GPIF
+    i_RDYU             : in  std_logic;  -- GPIF is ready
+    i_EOM              : in  std_logic;  -- all data for X2U transfer is in FIFO
+    i_U2X_FULL         : in  std_logic;
+    i_U2X_AM_FULL      : in  std_logic;  -- signals for IN FIFO
+    i_X2U_AM_EMPTY     : in  std_logic;
+    i_X2U_EMPTY        : in  std_logic;  -- signals for OUT FIFO
+    o_dbus_out_mux_sel : out std_logic;
+    o_bus_trans_dir    : out std_logic;
+    o_U2X_WR_EN        : out std_logic;  -- signals for IN FIFO
+    o_X2U_RD_EN        : out std_logic;  -- signals for OUT FIFO
+    o_FIFOrst          : out std_logic;
+    o_WRX              : out std_logic;  -- To write to GPIF
+    o_RDYX             : out std_logic;  -- Core is ready
+    o_ABORT            : out std_logic;  -- abort condition detected.
+                                         -- we have to flush the data
+    o_RX               : out std_logic;
+    o_TX               : out std_logic  --
     );
 
 end gpif_com_fsm;
@@ -97,7 +99,7 @@ architecture fsm of gpif_com_fsm is
                       endInTrans,
                       -- out com states
                       outRQ, outRQdelay, outTrans, outACK, outACKwait,
-                      outUSBwait, outUSBwaitEnd, outFIFOwait, endOutTrans);  
+                      outUSBwait, outFIFOwait, endOutTrans);  
 
   
   
@@ -111,22 +113,24 @@ architecture fsm of gpif_com_fsm is
   signal s_FIFOrst, s_RDYX, s_WRX, s_ABORT : std_logic;
 
   -- USB to Xilinx (U2X)
-  signal s_U2X_WR_EN : std_logic;
+  signal s_U2X_WR_EN   : std_logic;
 
   -- Xilinx to USB (X2U)
-  signal s_X2U_RD_EN : std_logic;
+  signal s_X2U_RD_EN        : std_logic;
+  signal s_dbus_out_mux_sel : std_logic;
   
 begin
 
   
 
-  o_FIFOrst       <= s_FIFOrst;
-  o_X2U_RD_EN     <= s_X2U_RD_EN;
-  o_WRX           <= s_WRX;
-  o_RDYX          <= s_RDYX;
-  o_U2X_WR_EN     <= s_U2X_WR_EN;
-  o_bus_trans_dir <= '1' when s_bus_trans_dir = writeToGPIF else '0';
-  o_ABORT         <= s_ABORT;
+  o_FIFOrst          <= s_FIFOrst;
+  o_X2U_RD_EN        <= s_X2U_RD_EN;
+  o_WRX              <= s_WRX;
+  o_RDYX             <= s_RDYX;
+  o_U2X_WR_EN        <= s_U2X_WR_EN;
+  o_bus_trans_dir    <= '1' when s_bus_trans_dir = writeToGPIF else '0';
+  o_ABORT            <= s_ABORT;
+  o_dbus_out_mux_sel <= s_dbus_out_mux_sel;
 
 
   -----------------------------------------------------------------------------
@@ -148,35 +152,37 @@ begin
 
   -- comb logic
   transaction : process(pr_state, i_WRU, i_RDYU, i_U2X_FULL, i_U2X_AM_FULL,
-                        i_X2U_EMPTY, i_X2U_FULL_IFCLK, i_EOM)
+                        i_X2U_EMPTY, i_EOM)
   begin  -- process transaction
 
     -- default signal values to avoid latches:
-    s_FIFOrst       <= '0';
-    s_bus_trans_dir <= readFromGPIF;
-    s_U2X_WR_EN     <= '0';
-    s_X2U_RD_EN     <= '0';
-    nx_state        <= idle;
-    s_WRX           <= '0';
-    s_RDYX          <= '0';
-    s_ABORT         <= '0';
-    o_RX            <= '0';
-    o_TX            <= '0';
+    s_FIFOrst          <= '0';
+    s_bus_trans_dir    <= readFromGPIF;
+    s_U2X_WR_EN        <= '0';
+    s_X2U_RD_EN        <= '0';
+    s_dbus_out_mux_sel <= '0';
+    nx_state           <= idle;
+    s_WRX              <= '0';
+    s_RDYX             <= '0';
+    s_ABORT            <= '0';
+    o_RX               <= '0';
+    o_TX               <= '0';
 
     case pr_state is
       -- controll
 
       when rst =>
         -- output signal values:
-        s_FIFOrst   <= '1';
-        s_WRX       <= '0';
-        s_RDYX      <= '0';
-        s_U2X_WR_EN <= '0';
-        s_X2U_RD_EN <= '0';
-        s_ABORT     <= '1';
-        o_RX        <= '0';
-        o_TX        <= '0';
-        s_bus_trans_dir <= readFromGPIF;
+        s_FIFOrst          <= '1';
+        s_WRX              <= '0';
+        s_RDYX             <= '0';
+        s_U2X_WR_EN        <= '0';
+        s_X2U_RD_EN        <= '0';
+        s_ABORT            <= '1';
+        s_dbus_out_mux_sel <= '0';
+        o_RX               <= '0';
+        o_TX               <= '0';
+        s_bus_trans_dir    <= readFromGPIF;
 
         -- state decisions
         if i_WRU = '1' and i_RDYU = '1' then
@@ -200,7 +206,6 @@ begin
         elsif i_WRU = '1' and i_RDYU = '0' then
           nx_state <= inRQ;
         elsif i_WRU = '0' and
-          --(i_X2U_FULL_IFCLK = '1' or i_EOM = '1') and i_X2U_EMPTY = '0' then
           i_X2U_EMPTY = '0' then
           nx_state <= outRQ;
         else
@@ -353,7 +358,7 @@ begin
         else
           nx_state <= outACK;
         end if;   
-
+        
       when outACK =>
         -- output signal values:
         s_WRX       <= '1';
@@ -382,7 +387,6 @@ begin
           nx_state <= rst;
         elsif i_WRU = '0' and i_RDYU = '1' then
           nx_state <= outTrans;
-          s_X2U_RD_EN <= '1';
         else
           nx_state <= outACKwait;
         end if;
@@ -394,6 +398,7 @@ begin
         s_X2U_RD_EN     <= '1';
         o_TX            <= '1';
         s_bus_trans_dir <= writeToGPIF;
+        s_dbus_out_mux_sel <= '0';
         
         -- state decisions
         if i_WRU = '1' and i_RDYU = '1' then
@@ -406,7 +411,7 @@ begin
           nx_state <= outTrans;
         else
           nx_state <= outUSBwait;
-          s_X2U_RD_EN <= '0';
+          s_X2U_RD_EN   <= '0';
         end if;
 
       when outUSBwait =>
@@ -416,6 +421,7 @@ begin
         s_X2U_RD_EN <= '0';
         o_TX        <= '1';
         s_bus_trans_dir <= writeToGPIF;
+        s_dbus_out_mux_sel <= '1';
 
         -- state decisions
         if i_WRU = '1' and i_RDYU = '1' then
@@ -423,21 +429,10 @@ begin
         elsif i_X2U_EMPTY = '1' and i_EOM = '1' then
           nx_state <= endOutTrans;
         elsif i_WRU = '0' and i_RDYU = '1' then
-          nx_state <= outUSBwaitEnd;
+          nx_state <= outTrans;
         else
           nx_state <= outUSBwait;
-        end if;
-        
-      when outUSBwaitEnd =>
-        -- output signal values:
-        s_WRX       <= '1';
-        s_RDYX      <= '0';
-        s_X2U_RD_EN <= '1';
-        o_TX        <= '1';
-        s_bus_trans_dir <= writeToGPIF;
-
-        -- state decisions
-        nx_state <= outTrans;  
+        end if; 
         
       when outFIFOwait =>
         -- output signal values:
@@ -454,7 +449,6 @@ begin
           nx_state <= endOutTrans;
         elsif i_X2U_EMPTY = '0' then
           nx_state <= outTrans;
-          s_X2U_RD_EN <= '1';
         else
           nx_state <= outFIFOwait;
         end if;

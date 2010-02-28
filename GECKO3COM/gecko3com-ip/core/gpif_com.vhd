@@ -103,6 +103,8 @@ architecture structure of gpif_com is
     s_X2U_EMPTY,
     s_X2U_AM_EMPTY  : std_logic;
   signal s_X2U_DATA : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
+
+  signal s_dbus_out_mux_sel : std_logic;
   
   -----------------------------------------------------------------------------
   -- data bus
@@ -112,7 +114,9 @@ architecture structure of gpif_com is
   signal s_dbus_trans_dir : std_logic;
   signal s_dbus_in        : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
   signal s_dbus_out       : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
-  signal s_dbus_out_fifo  : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
+
+  signal s_fifo_out       : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
+  signal s_fifo_old       : std_logic_vector(SIZE_DBUS_GPIF-1 downto 0);
   
   -----------------------------------------------------------------------------
   -- COMPONENTS
@@ -121,25 +125,25 @@ architecture structure of gpif_com is
   -- FSM GPIF
   component gpif_com_fsm
     port (
-      i_nReset         : in  std_logic;
-      i_IFCLK          : in  std_logic;
-      i_WRU            : in  std_logic;
-      i_RDYU           : in  std_logic;
-      i_EOM            : in  std_logic;
-      i_U2X_FULL       : in  std_logic;
-      i_U2X_AM_FULL    : in  std_logic;
-      i_X2U_FULL_IFCLK : in  std_logic;
-      i_X2U_AM_EMPTY   : in  std_logic;
-      i_X2U_EMPTY      : in  std_logic;
-      o_bus_trans_dir  : out std_logic;
-      o_U2X_WR_EN      : out std_logic;
-      o_X2U_RD_EN      : out std_logic;
-      o_FIFOrst        : out std_logic;
-      o_WRX            : out std_logic;
-      o_RDYX           : out std_logic;
-      o_ABORT          : out std_logic;
-      o_RX             : out std_logic;
-      o_TX             : out std_logic);
+      i_nReset           : in  std_logic;
+      i_IFCLK            : in  std_logic;
+      i_WRU              : in  std_logic;
+      i_RDYU             : in  std_logic;
+      i_EOM              : in  std_logic;
+      i_U2X_FULL         : in  std_logic;
+      i_U2X_AM_FULL      : in  std_logic;
+      i_X2U_AM_EMPTY     : in  std_logic;
+      i_X2U_EMPTY        : in  std_logic;
+      o_dbus_out_mux_sel : out std_logic;
+      o_bus_trans_dir    : out std_logic;
+      o_U2X_WR_EN        : out std_logic;
+      o_X2U_RD_EN        : out std_logic;
+      o_FIFOrst          : out std_logic;
+      o_WRX              : out std_logic;
+      o_RDYX             : out std_logic;
+      o_ABORT            : out std_logic;
+      o_RX               : out std_logic;
+      o_TX               : out std_logic);
   end component;
 
   -- FIFO dualclock to cross the clock domain between the GPIF and the FPGA
@@ -191,7 +195,7 @@ begin
       i_wr_en        => s_X2U_WR_EN,
       o_almost_empty => s_X2U_AM_EMPTY,
       o_almost_full  => s_X2U_AM_FULL,
-      o_dout         => s_dbus_out_fifo,
+      o_dout         => s_fifo_out,
       o_empty        => s_X2U_EMPTY,
       o_full         => s_X2U_FULL
       );
@@ -199,26 +203,26 @@ begin
 
   FSM_GPIF : gpif_com_fsm
     port map (
-      i_nReset         => i_nReset,
-      i_IFCLK          => i_IFCLK,
-      i_WRU            => i_WRU,
-      i_RDYU           => i_RDYU,
+      i_nReset           => i_nReset,
+      i_IFCLK            => i_IFCLK,
+      i_WRU              => i_WRU,
+      i_RDYU             => i_RDYU,
       --i_EOM            => s_EOM,
-      i_EOM            => s_EOM_FF,
-      i_U2X_FULL       => s_U2X_FULL,
-      i_U2X_AM_FULL    => s_U2X_AM_FULL,
-      i_X2U_FULL_IFCLK => s_X2U_FULL_IFCLK,
-      i_X2U_AM_EMPTY   => s_X2U_AM_EMPTY,
-      i_X2U_EMPTY      => s_X2U_EMPTY,
-      o_U2X_WR_EN      => s_U2X_WR_EN,
-      o_X2U_RD_EN      => s_X2U_RD_EN,
-      o_FIFOrst        => s_FIFOrst,
-      o_bus_trans_dir  => s_dbus_trans_dir,
-      o_WRX            => s_WRX,
-      o_RDYX           => s_RDYX,
-      o_ABORT          => s_ABORT_FSM,
-      o_RX             => s_RX_FSM,
-      o_TX             => s_TX_FSM
+      i_EOM              => s_EOM_FF,
+      i_U2X_FULL         => s_U2X_FULL,
+      i_U2X_AM_FULL      => s_U2X_AM_FULL,
+      i_X2U_AM_EMPTY     => s_X2U_AM_EMPTY,
+      i_X2U_EMPTY        => s_X2U_EMPTY,
+      o_U2X_WR_EN        => s_U2X_WR_EN,
+      o_X2U_RD_EN        => s_X2U_RD_EN,
+      o_dbus_out_mux_sel => s_dbus_out_mux_sel,
+      o_FIFOrst          => s_FIFOrst,
+      o_bus_trans_dir    => s_dbus_trans_dir,
+      o_WRX              => s_WRX,
+      o_RDYX             => s_RDYX,
+      o_ABORT            => s_ABORT_FSM,
+      o_RX               => s_RX_FSM,
+      o_TX               => s_TX_FSM
       );
 
 
@@ -258,13 +262,10 @@ begin
   double_buf_ifclk : process (i_IFCLK, i_nReset)
   begin
     if i_nReset = '0' then
-      s_X2U_FULL_TMP <= '0';
-      s_X2U_FULL_IFCLK <= '0';
+      s_EOM <= '0';
     elsif rising_edge(i_IFCLK) then
       s_EOM     <= s_EOM_TMP;
       s_EOM_TMP <= i_EOM;
-      s_X2U_FULL_IFCLK <= s_X2U_FULL_TMP;
-      s_X2U_FULL_TMP <= s_X2U_FULL;
     end if;
   end process double_buf_ifclk;
 
@@ -311,10 +312,22 @@ begin
       s_dbus_in <= b_gpif_bus;
 
       if s_X2U_RD_EN = '1' then
-        s_dbus_out <= s_dbus_out_fifo;
+        s_fifo_old <= s_fifo_out; 
       end if;
     end if;
   end process buf_input;
-  
 
+  -- purpose: multiplexer to select two older copies of fifo data
+  -- type   : combinational
+  -- inputs : s_dbus_out_mux_sel, s_fifo_old, s_fifo_out
+  -- outputs: s_dbus_out
+  dbus_out_mux: process (s_dbus_out_mux_sel, s_fifo_old, s_fifo_out)
+  begin  -- process dbus_out_mux
+    case s_dbus_out_mux_sel is
+      when '0' => s_dbus_out <= s_fifo_out;
+      when '1' => s_dbus_out <= s_fifo_old;
+      when others => s_dbus_out <= s_fifo_out;
+    end case;
+  end process dbus_out_mux;
+  
 end structure;

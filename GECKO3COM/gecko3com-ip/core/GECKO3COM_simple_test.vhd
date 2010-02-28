@@ -354,7 +354,8 @@ begin --  behavour
     '0';
 
 
-  -- purpose: subracts the send counter end value from the remaining transfer size value
+  -- purpose: subracts the send counter end value from the remaining transfer
+  -- size value
   -- type   : combinational
   -- inputs : s_remaining_transfer_size, s_send_counter_value
   -- outputs: s_subtract_value
