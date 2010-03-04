@@ -30,6 +30,9 @@
  *  to change the length of the value simply change the type of the value 
  *  variable.
  *
+ *  compile with: 
+ *  "gcc -o GECKO3COM_simple_prng_tb GECKO3COM_simple_prng_tb.c"
+ *
  * \author    Christoph Zimmermann bfh.ch
  * \date      26. February 2010
  *

@@ -1,5 +1,4 @@
-work	USB_TMC_IP.vhd
-work	USB_TMC_IP_Defs.vhd
-work	USB_TMC_IP_loopback.vhd
-work	USB_TMC_cmp.vhd
+work	GECKO3COM_defines.vhd
+work	fifo_dualclock.vhd
 work	gpif_com.vhd
+work	gpif_com_fsm.vhd
