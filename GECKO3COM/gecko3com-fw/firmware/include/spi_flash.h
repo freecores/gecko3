@@ -52,8 +52,8 @@
  *
  */
 
-#ifndef SPI_FLASH /* prevent circular inclusions */
-#define SPI_FLASH /* by using protection macros */
+#ifndef _SPI_FLASH_H_ /* prevent circular inclusions */
+#define _SPI_FLASH_H_
 
 #include <stdint.h>
 //#include "spi.h"
@@ -91,17 +91,17 @@ typedef struct
 #define MEMCAPACITY_32MBIT_SPA 0x15	/**< 32 MBit memory capacity */
 
 
-#define MAXADRESS_8MBIT 0x0FFFFF
+#define MAXADRESS_8MBIT 0x0FFFFF             /**< 8 Mbit device highest usable Adress */
 #define FLASH_SIZE_8MBIT (0x0100000)         /**< Total 8 Mbit device size in Bytes */
 #define FLASH_PAGE_COUNT_8MBIT (0x01000)     /**< Total 8 Mbit device size in Pages */
 #define FLASH_SECTOR_COUNT_8MBIT (0x10)      /**< Total 8 Mbit device size in Sectors */
 
-#define MAXADRESS_16MBIT 0x1FFFFF
+#define MAXADRESS_16MBIT 0x1FFFFF            /**< 16 Mbit device highest usable Adress */
 #define FLASH_SIZE_16MBIT (0x0200000)        /**< Total 16 Mbit device size in Bytes */
 #define FLASH_PAGE_COUNT_16MBIT (0x02000)    /**< Total 16 Mbit device size in Pages */
 #define FLASH_SECTOR_COUNT_16MBIT (0x20)     /**< Total 16 Mbit device size in Sectors */
 
-#define MAXADRESS_32MBIT 0x3FFFFF
+#define MAXADRESS_32MBIT 0x3FFFFF               /**< 32 Mbit device highest usable Adress */
 #define FLASH_SIZE_32MBIT (0x0400000)           /**< Total 32 Mbit device size in Bytes */
 #define FLASH_PAGE_COUNT_32MBIT (0x04000)       /**< Total 32 Mbit device size in Pages */
 #define FLASH_SECTOR_COUNT_32MBIT (0x40)        /**< Total 32 Mbit device size in Sectors */
@@ -183,7 +183,9 @@ typedef struct
  */
 #define pageEnd(adr) ((adr) | 0x000000FF)	 
 
-
+/** This struct contains all the needed information about the detected flash
+ *  chip (limits, memory structure,...) to work with it. 
+ *  Is filled during init */
 extern SPI_flash xdata flash_dr;
 
 /************************** Function Prototypes ******************************/
@@ -207,14 +209,14 @@ int8_t init_spiflash(xdata SPI_flash *flashPtr);
 
 /** \brief Reads data from the SPI flash
  *
- * \param[in] xdata SPI_flash flashPtr pointer to an SPI_flash struct
- * \param[in] xdata uint32_t *adress pointer to the flash start adress to read 
- *            from
- * \param[out] xdata uint8_t *buffer, pointer to a buffer to write the data into
- * \param[in] length of the data to read
- * \return    returns non-zero if successful, else 0
+ * \param[in]  flashPtr pointer to an SPI_flash struct
+ * \param[in]  *adress pointer to the flash start adress to read from
+ * \param[out] *buffer pointer to a buffer to write the data into
+ * \param[in]  length length of the data to read
+ * \return     returns non-zero if successful, else 0
  */
-int8_t spiflash_read(xdata SPI_flash *flashPtr, xdata uint32_t *adress, xdata uint8_t *buffer, const idata uint16_t length);
+int8_t spiflash_read(xdata SPI_flash *flashPtr, xdata uint32_t *adress, \
+		     xdata uint8_t *buffer, const idata uint16_t length);
 
 
 /** \brief deletes the whole SPI flash
@@ -249,8 +251,5 @@ int8_t spiflash_erase(xdata SPI_flash *flashPtr, xdata uint32_t *adress);
  */
 int8_t spiflash_write(xdata SPI_flash *flashPtr, xdata uint32_t *adress, xdata uint8_t *buffer, uint16_t length);
 
-#ifdef __cplusplus
-}
-#endif
 
-#endif
+#endif /* _SPI_FLASH_H_ */

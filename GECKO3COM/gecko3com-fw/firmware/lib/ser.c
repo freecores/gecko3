@@ -61,10 +61,6 @@ static __bit ser_txBusy;
  * Initializes the UART for the serial Port 0 with 115,2 Kbaud, 1 start,
  * 1 stop and no parity bit.
  *************************************************************************
- * \param[in]  
- * \param[out] 
- * \return     
- *************************************************************************
  * \author     Christoph Zimmermann, SDCC Team
  * \date       21.Nov.2008 
  ************************************************************************/
@@ -162,7 +158,7 @@ ser_putc(unsigned char c)
 /************************************************************************/
 /**  \brief receives one char from the serial line
  *************************************************************************
- * \return  receive character
+ * \return  received character
  *************************************************************************
  * \author     Christoph Zimmermann, SDCC Team
  * \date       21.Nov.2008 
@@ -187,7 +183,7 @@ ser_getc(void)
 /************************************************************************/
 /**  \brief sends a string of characters over the serial line
  *************************************************************************
- * \param[in]  string to send
+ * \param[in]  *String string to send
  *************************************************************************
  * \author     Christoph Zimmermann, SDCC Team
  * \date       21.Nov.2008 

@@ -43,13 +43,16 @@
 
 #include <gecko3com_interfaces.h>
 
-#define	MAX_EP0_PKTSIZE	      64	/* max size of EP0 packet on FX2 */
+#define	MAX_EP0_PKTSIZE	      64	/**< max size of EP0 packet on FX2 */
 
 /* ----------------------------------------------------------------
  *			Vendor bmRequestType's
  * --------------------------------------------------------------*/
 
-#define	VRT_VENDOR_IN			0xC0
+/** bmRequestType for a IN vendor specific command */
+#define	VRT_VENDOR_IN			0xC0  
+
+/** bmRequestType for a OUT vendor specific command */
 #define	VRT_VENDOR_OUT			0x40
 
 /* ----------------------------------------------------------------
@@ -67,13 +70,13 @@
 
 /* OUT commands */
 
-#define	VRQ_SET_SERIAL			0x01	
+#define	VRQ_SET_SERIAL			0x01   /**< set serial number */
 
-#define	VRQ_SET_HW_REV			0x02
+#define	VRQ_SET_HW_REV			0x02   /**< set hardware revision */
 
-#define	VRQ_SET_FPGA_TYPE		0x03	
+#define	VRQ_SET_FPGA_TYPE		0x03   /**< set fpga type */	
 
-#define	VRQ_SET_FPGA_IDCODE		0x04	
+#define	VRQ_SET_FPGA_IDCODE		0x04   /**< set fpga jtag idcode */
 
 
 #endif /* _GECKO3COM_COMMANDS_H_ */

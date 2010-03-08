@@ -41,8 +41,8 @@
 #include "i2c.h"
 #include "gecko3com_i2c.h"
 
-#define	TRUE		1
-#define	FALSE		0
+#define	TRUE		1     /**< TRUE */
+#define	FALSE		0     /**< FALSE */
 
 /* Defines for LED output colors */
 #define RED 					0x02  /**< Switch bi-color LED to RED */
@@ -50,14 +50,16 @@
 #define ORANGE 					0x06  /**< Switch bi-color LED to ORANGE */
 #define LEDS_OFF				0x00  /**< Switch bi-color LED off */
 
+/** flag to store the state of the LED */
 extern volatile uint8_t flLED;
 
 
 /* defines and global variable for context switching between EZ-USB and GPIF/FPGA */
-#define GECKO3COM_LOCAL         0 /** firmware parses commands */
-#define GECKO3COM_REMOTE        1 /** no commands parsed, data passed to fpga */
+#define GECKO3COM_LOCAL       0 /**< firmware parses commands */
+#define GECKO3COM_REMOTE      1 /**< no commands parsed, data passed to fpga */
 
-extern volatile uint8_t flLOCAL; /**< flag to signal who interpretes TMC messages */
+/** flag to signal who interpretes TMC messages */
+extern volatile uint8_t flLOCAL; 
 
 
 

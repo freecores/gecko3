@@ -50,12 +50,17 @@
 
 
 /* USBTMC MsgID. Values, Ref.: Table 2 */
-#define DEV_DEP_MSG_OUT              1   /**< device dependent command message */
-#define REQUEST_DEV_DEP_MSG_IN       2   /**< command message that requests the device to send a USBTMC response */
-#define DEV_DEP_MSG_IN               2   /**< response message to the REQUEST_DEV_DEP_MSG_IN */
-#define VENDOR_SPECIFIC_OUT          126 /**< vendor specific command message */
-#define REQUEST_VENDOR_SPECIFIC_IN   127 /**< command message that requests the device to send a vendor specific USBTMC response */
-#define VENDOR_SPECIFIC_IN           127 /**< response message to the REQUEST_VENDOR_SPECIFIC_IN */
+#define DEV_DEP_MSG_OUT             1   /**< device dependent command message */
+#define REQUEST_DEV_DEP_MSG_IN      2   /**< command message that requests the 
+					   device to send a USBTMC response */
+#define DEV_DEP_MSG_IN              2   /**< response message to the 
+					   REQUEST_DEV_DEP_MSG_IN */
+#define VENDOR_SPECIFIC_OUT         126 /**< vendor specific command message */
+#define REQUEST_VENDOR_SPECIFIC_IN  127 /**< command message that requests the
+					   device to send a vendor specific 
+					   USBTMC response */
+#define VENDOR_SPECIFIC_IN          127 /**< response message to the 
+					   REQUEST_VENDOR_SPECIFIC_IN */
 
 
 /* format of bmRequestType byte */
@@ -137,8 +142,10 @@ typedef struct
 	uint32_t TransferSize;
 	int8_t   bmTransferAttributes;
 	int8_t   Reserved[3];
-} DEV_DEP_MSG_OUT_Header, /**< \brief Bulk-OUT Header for a DEV_DEP_MSG, Ref.: Table 3 */
-  DEV_DEP_MSG_IN_Header;  /**< \brief Bulk-IN Header for a DEV_DEP_MSG, Ref.: Table 9 */
+} DEV_DEP_MSG_OUT_Header, /**< Bulk-OUT Header for a DEV_DEP_MSG, 
+			    Ref.: Table 3 */ 
+  DEV_DEP_MSG_IN_Header;  /**< Bulk-IN Header for a DEV_DEP_MSG, 
+			     Ref.: Table 9 */
 
 /** \brief Structure to handle USBTMC device dependent message IN requests. 
  *
@@ -157,12 +164,12 @@ typedef struct
 {                
 	uint32_t TransferSize;
 	int8_t   Reserved[4];
-} VENDOR_SPECIFIC_OUT_Header, /**< \brief structure to handle vendor specific 
+} VENDOR_SPECIFIC_OUT_Header, /**< structure to handle vendor specific 
 			       *IN/OUT or REQUESTS according to Ref.: Table 5 */
-  REQUEST_VENDOR_SPECIFIC_IN_Header, /**< \brief structure to handle vendor 
+  REQUEST_VENDOR_SPECIFIC_IN_Header, /**< structure to handle vendor 
 				      * specific IN/OUT or REQUESTS according 
 				      * Ref.: Table 6 */
-  VENDOR_SPECIFIC_IN_Header; /**< \brief structure to handle vendor specific 
+  VENDOR_SPECIFIC_IN_Header; /**< structure to handle vendor specific 
 			      * IN/OUT or REQUESTS according Ref.: Table 10 */
 
 /** \brief general Header structure for USBTMC bulk messages. The MsgID value 
@@ -225,9 +232,12 @@ typedef enum {
 typedef struct {
   uint8_t bTag; /**< contains the bTag value of the currently active transfer */
   uint32_t transfer_size;
-  uint8_t new_transfer; /**< flag to signal the start of a new transfer, else 0 */
-  uint32_t nbytes_rxd; /**< contains the number of bytes received in active tmc OUT transfer */
-  uint32_t nbytes_txd; /**< contains the number of bytes transmitted in active tmc IN transfer */
+  uint8_t new_transfer; /**< flag to signal the start of a new transfer, 
+			   else 0 */
+  uint32_t nbytes_rxd; /**< contains the number of bytes received in active 
+			  tmc OUT transfer */
+  uint32_t nbytes_txd; /**< contains the number of bytes transmitted in active 
+			  tmc IN transfer */
 
 } TMC_Transfer_Info;
 
@@ -240,10 +250,15 @@ typedef struct {
 
 
 /* Global variables */
-extern volatile static TMC_Status usb_tmc_status;       /**< Global variable contains the status of the last tmc operation. normally USB_TMC_SUCCESS */
-extern volatile TMC_State usb_tmc_state;         /**< Global variable contains the state of the tmc system. Example USB_TMC_IDLE or USB_TMC_IN_TRANSFER */
-extern volatile idata TMC_Transfer_Info usb_tmc_transfer; /** Global struct to hold all usb tmc transfer relevant information */    
-extern volatile idata IEEE488_status_registers ieee488_status;   /**< Struct that contains all status and enable registers for the IEEE488 status reporting capabilities */
+extern volatile static TMC_Status usb_tmc_status;       /**< Global variable 
+contains the status of the last tmc operation. normally USB_TMC_SUCCESS */
+extern volatile TMC_State usb_tmc_state;         /**< Global variable contains 
+the state of the tmc system. Example USB_TMC_IDLE or USB_TMC_IN_TRANSFER */
+extern volatile idata TMC_Transfer_Info usb_tmc_transfer; /**< Global struct 
+to hold all usb tmc transfer relevant information */    
+extern volatile idata IEEE488_status_registers ieee488_status;   /**< Struct 
+that contains all status and enable registers for the IEEE488 status reporting 
+capabilities */
 
 
 /** Makro to check if this setup package is a USBTMC request */
@@ -269,10 +284,12 @@ uint8_t usb_handle_tmc_packet (void);
 /** \brief clears all global variables to known states. sets the POWER_ON bit */
 void init_usb_tmc();
 
-/** set the mav bit (Message available or "Queue not empty") in the IEEE488 status structure */
+/** set the mav bit (Message available or "Queue not empty") in the IEEE488 
+    status structure */
 #define IEEE488_set_mav() (ieee488_status.StatusByteRegister |= 0x10)
 
-/** clear the mav bit (Message available or "Queue not empty") in the IEEE488 status structure */
+/** clear the mav bit (Message available or "Queue not empty") in the IEEE488 
+    status structure */
 #define IEEE488_clear_mav() (ieee488_status.StatusByteRegister &= 0xEF)
 
 /** \brief evalutates the status IEEE488 status byte. represents the current 
@@ -288,4 +305,4 @@ void init_usb_tmc();
  */
 uint8_t IEEE488_status_query(idata IEEE488_status_registers *status);
 
-#endif
+#endif /* _USBTMC_H_ */

@@ -44,13 +44,18 @@
 /** 
  * offsets into boot eeprom for configuration values
  */
-#define FPGA_TYPE_OFFSET        0x3FDD /**< ASCII string with the fpga type as it is in the bit file */
-#define FPGA_TYPE_LEN           16
-#define FPGA_IDCODE_OFFSET      0x3FED /**< the JTAG chip IDCODE is a 32 bit integer stored as 0x11223344 */
-#define FPGA_IDCODE_LEN         10
+/** ASCII string with the fpga type as it is in the bit file */
+#define FPGA_TYPE_OFFSET        0x3FDD 
+#define FPGA_TYPE_LEN           16  /**< length of the FPGA type string */
+
+/** the JTAG chip IDCODE is a 32 bit integer stored as 0x11223344 */
+#define FPGA_IDCODE_OFFSET      0x3FED 
+#define FPGA_IDCODE_LEN         10  /**< length of the IDCODE string */
+
+/** the hardware revision of this board, one char */
 #define	HW_REV_OFFSET		0x3FF7  
-#define SERIAL_NO_OFFSET	0x3FF8
-#define SERIAL_NO_LEN		8
+#define SERIAL_NO_OFFSET	0x3FF8 /**< place to store the serial number */
+#define SERIAL_NO_LEN		8   /**< length of the serial number string */
 
 #endif /* INCLUDED_GECKO3COM_I2C_H */
 

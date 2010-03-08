@@ -95,6 +95,7 @@ setup_enables (unsigned char enables)
   }
 }
 
+/** \brief disables all devices on the SPI bus */
 #define disable_all()	setup_enables (0)
 
 void

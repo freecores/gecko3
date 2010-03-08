@@ -172,6 +172,7 @@ toggle_led_1 (void)
   LED_PORT ^= bmPC_LED1;
 }
 
+/** unused function on GECKO3COM */
 void
 set_sleep_bits (uint8_t bits, uint8_t  mask)
 {

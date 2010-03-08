@@ -69,16 +69,26 @@
 #include "ser.h"
 #endif
 
-/* -------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 
 #define WATCHDOG_TIME           100 /**< time until the watchdog times out, 100 equals 1 second */
 
-/* Global variables */
-volatile uint8_t watchdog_count = WATCHDOG_TIME;
-idata int32_t file_size;
-xdata uint32_t flash_adress;
-xdata unsigned char *buffer;
-xdata TMC_Response_Queue response_queue;
+
+/* Global variables --------------------------------------------------------- */
+
+/** watchdog counter variable (UNUSED) */ 
+volatile uint8_t watchdog_count = WATCHDOG_TIME; 
+
+/** the filesize of an fpga configuration file, read from the bit file header */
+idata int32_t file_size; 
+
+/** stores the current used addres for spi flash access */
+xdata uint32_t flash_adress; 
+/** general pointer to pass the place where to read data to different 
+functions (normally endpoint buffer) */
+xdata unsigned char *buffer; 
+
+xdata TMC_Response_Queue response_queue; /**< buffer to hold the TMC response */
 
 
 /** \brief with executing this function, we confirm that we handled the 
@@ -114,9 +124,10 @@ char getchar (void)
 
 
 #ifdef USB_DFU_SUPPORT
-/** \brief this function writes the new firmware data in endpoint 0 to the I2C eeprom
- * \note this function is only available when the DFU (device firware upgrade) class 
- * support is enabled.
+/** \brief this function writes the new firmware data in endpoint 0 to the I2C \
+ *  eeprom.
+ * \note this function is only available when the DFU (device firware upgrade) \
+ * class support is enabled.
  */
 uint8_t app_firmware_write (void)
 {
@@ -143,16 +154,12 @@ uint8_t app_firmware_write (void)
 /** \brief analyze the header from the fpga configuration file and compares the 
  *  the fpga type with the on board fpga and returs the configuration file size.
  *
- * \param[in] xdata unsigned char *buffer pointer to the buffer to read from 
- *            (normally endpoint buffer)
- * \param[in] idata uint16_t *offset pointer to the offset, buffer[offset] 
+ * \param[in] *offset pointer to the offset, buffer[offset] 
  *            is the current position, anything before this is already consumed.
- * \param[in] idata uint16_t *byte_count pointer to the length of the whole 
- *            buffer.
+ * \param[in] *byte_count pointer to the length of the whole buffer.
  * \return    returns non-zero if successful, else 0
  */
-uint8_t app_check_fpga_type_from_header(/*xdata unsigned char *buffer,*/ \
-					idata uint16_t *offset,		\
+uint8_t app_check_fpga_type_from_header(idata uint16_t *offset,		\
 					idata uint16_t *byte_count) 
 {
   static xdata Fpga_Info fpga_file_header;
@@ -217,16 +224,12 @@ uint8_t app_check_fpga_type_from_header(/*xdata unsigned char *buffer,*/ \
 
 /** \brief function to configure an fpga with data from usb 
  *
- * \param[in] xdata unsigned char *buffer pointer to the buffer to read from 
- *            (normally endpoint buffer)
- * \param[in] idata uint16_t *offset pointer to the offset, buffer[offset] 
+ * \param[in] *offset pointer to the offset, buffer[offset] 
  *            is the current position, anything before this is already consumed.
- * \param[in] idata uint16_t *byte_count pointer to the length of the whole 
- *            buffer.
+ * \param[in] *byte_count pointer to the length of the whole buffer.
  * \return    returns non-zero if successful, else 0
  */
-uint8_t app_configure_fpga(/* xdata unsigned char *buffer,*/	\
-			   idata uint16_t *offset,	\
+uint8_t app_configure_fpga(idata uint16_t *offset,	\
 			   idata uint16_t *byte_count)
 { 
   /* Is this the first part of configuration? */
@@ -276,23 +279,19 @@ uint8_t app_configure_fpga(/* xdata unsigned char *buffer,*/	\
 
 /** \brief function to write an fpga configuration from usb to the spi flash
  *
- * \detail The SPI flash is big enough to hold store two different fpga
+ * The SPI flash is big enough to hold store two different fpga
  * configuration files. To handle this, we split the SPI flash address
  * space simply at the half. \n
  * The data structure in the SPI flash is really simple:\n
  * \li 32bit file size value (little endian, as used by the fx2)
  * \li binary data from the fpga configuration file
  *
- * \param[in] xdata unsigned char *buffer pointer to the buffer to read from 
- *            (normally endpoint buffer)
- * \param[in] idata uint16_t *offset pointer to the offset, buffer[offset] 
+ * \param[in] *offset pointer to the offset, buffer[offset] 
  *            is the current position, anything before this is already consumed.
- * \param[in] idata uint16_t *byte_count pointer to the length of the whole 
- *            buffer.
+ * \param[in] *byte_count pointer to the length of the whole buffer.
  * \return    returns non-zero if successful, else 0
  */
-uint8_t app_write_conf_to_flash(/* xdata unsigned char *buffer,*/	\
-				idata uint16_t *offset, \
+uint8_t app_write_conf_to_flash(idata uint16_t *offset, \
 				idata uint16_t *byte_count)
 {
   idata uint16_t length;
@@ -379,19 +378,18 @@ uint8_t app_write_conf_to_flash(/* xdata unsigned char *buffer,*/	\
 
 
 /** \brief  erases the desired file slot in spi flash
- * \detail send the erase command for one spi flash memory block and loop 
- *         through the main_loop untill we finished erasing the whole fpga 
- *         configuration file slot.
+ * 
+ *  send the erase command for one spi flash memory block and loop 
+ *  through the main_loop untill we finished erasing the whole fpga 
+ *  configuration file slot.
  *
- * \param[in] xdata unsigned char *buffer pointer to the buffer to read from 
- *            (normally endpoint buffer)
- * \param[in] idata uint16_t *offset pointer to the offset, buffer[offset] 
+ * \param[in] *offset pointer to the offset, buffer[offset] 
  *            is the current position, anything before this is already consumed.
  * \return    returns non-zero if successful, else 0
  *
  * \todo   uncomment this function after finishing debuging, else no space left!
  */ 
-uint8_t app_gecko3com_flash_delete(/* uint8_t *buffer,*/ idata uint16_t *offset) {
+uint8_t app_gecko3com_flash_delete(idata uint16_t *offset) {
 
   xdata uint32_t flash_adress;
   xdata uint32_t local_uint32_var;

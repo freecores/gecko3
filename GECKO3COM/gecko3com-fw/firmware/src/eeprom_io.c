@@ -36,10 +36,12 @@
 #include "delay.h"
 #include "debugprint.h"
 
-#define EEPROM_HIGH_ADDR 0x3FFF
-#define PAGE_LEN  0x40
-#define PAGE_START_MASK 0xFFC0
-#define PAGE_MASK 0x003F
+#define EEPROM_HIGH_ADDR 0x3FFF /**< highest available addres, length */
+#define PAGE_LEN  0x40          /**< lenght of a memory page */
+/** bit mask to get the corresponding page start adress */
+#define PAGE_START_MASK 0xFFC0  
+/** bit mask to select the adress inside a memory page */
+#define PAGE_MASK 0x003F        
 
 
 /* returns non-zero if successful, else 0 */

@@ -37,9 +37,12 @@
 #ifndef INCLUDED_GECKO3COM_GPIF_H
 #define INCLUDED_GECKO3COM_GPIF_H
 
+/** signal that a read (data flows from the FPGA to the FX2) in in progress */
+#define bmGPIF_READ_IN_PROGRESS 1  
 
-#define bmGPIF_READ_IN_PROGRESS 1
+/** signal that there is data waiting in the OUT fifo to be handled */
 #define bmGPIF_PENDING_DATA 2
+
 
 /** flag to signal, that the GPIF receives data from the FPGA */
 volatile static idata uint8_t flGPIF;

@@ -37,16 +37,17 @@
 void fx2_stall_ep0 (void);
 
 /** 
- * Resets the data toggle bit of the endpoint ep
+ * \brief Resets the data toggle bit of the endpoint ep
  *
- * \detail A description of the function and purpose of the toggle bit and
-           when the firmware has to reset it is in the EZ-USB Technical 
-           Reference Manual. Chapter 8 Page 16
+ *  A description of the function and purpose of the toggle bit and
+ *  when the firmware has to reset it is in the EZ-USB Technical 
+ *  Reference Manual. Chapter 8 Page 16
  * \param[in] ep Endpoint number
  */
 void fx2_reset_data_toggle (unsigned char ep);
 
-/* Renumerate the FX2. This means a disconnect and reconnect from the USB bus */
+/** \brief  Renumerate the FX2. 
+ * This means a disconnect and reconnect from the USB bus */
 void fx2_renumerate (void);
 
 

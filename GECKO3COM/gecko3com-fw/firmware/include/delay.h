@@ -35,14 +35,14 @@
 
 /**
  * delay for approximately usecs microseconds
- * \param[in] unsigned char usecs number of microseconds  to wait
+ * \param[in] usecs number of microseconds  to wait
  * \warning limit of 255 usecs.
  */
 void udelay (unsigned char usecs);
 
 /**
  * delay for approximately msecs milliseconds
- * \param[in] unsigned short msecs number of milliseconds to wait
+ * \param[in] msecs number of milliseconds to wait
  */
 void mdelay (unsigned short msecs);
 

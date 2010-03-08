@@ -81,11 +81,11 @@ typedef struct Scanner {
  *  implemented (due to memory restrictions) and all of them are handled in
  *  the parser. Device dependent commands are handled outside of the parser.
  *  
- * \param[in] idata uint16_t *offset pointer to the offset, buffer[offset] is 
+ * \param[in] *offset pointer to the offset, buffer[offset] is 
  *            the current position, anything before this is already consumed.
- * \param[in] xdata Scanner *s a Scanner struct with the member *source set to 
+ * \param[in] *s a Scanner struct with the member *source set to 
  *            the start of the scpi message
- * \param[in] xdata TMC_Response_Queue *queue pointer to a TMC_Response_Queue
+ * \param[in] *queue pointer to a TMC_Response_Queue
  * \return    Status value, 0 if an error occoured in this case the error is 
  *            written to the IEEE488 event register. */
 int8_t scpi_scan(idata uint16_t *offset, xdata Scanner *s, xdata TMC_Response_Queue *queue);

@@ -56,6 +56,7 @@
 /** print debug information */
 #define print_info(String) ser_printString("INFO: "); printf_tiny(String)
 #else
+/** print debug information */
 #define print_info(String) 
 #endif
          
@@ -63,13 +64,15 @@
 /** print debug warnings */
 #define print_warn(String) ser_printString("WARNING: "); printf_tiny(String)
 #else
+/** print debug warnings */
 #define print_warn(String) 
 #endif
 
 #ifdef DEBUG_LEVEL_ERROR
-/* print debug errors */
+/** print debug errors */
 #define print_err(String) ser_printString("ERROR: "); printf_tiny(String)
 #else
+/** print debug errors */
 #define print_err(String) 
 #endif
 

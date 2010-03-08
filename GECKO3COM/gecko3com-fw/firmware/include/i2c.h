@@ -37,7 +37,7 @@
 /**
  * i2c read function. reads a block of data with the length len
  *
- * \param[in] i2c_addr device adress on the i2c bus
+ * \param[in] addr device adress on the i2c bus
  * \param[out] buf result buffer, contains the readed data when successful 
  * \param[in] len length of the block to read 
  * \return returns non-zero if successful, else 0
@@ -47,7 +47,7 @@ unsigned char i2c_read (unsigned char addr, xdata unsigned char *buf, unsigned c
 /**
  * i2c write function. writes a block of data with the length len
  *
- * \param[in] i2c_addr device adress on the i2c bus
+ * \param[in] addr device adress on the i2c bus
  * \param[in] buf data buffer, contains the data to be written 
  * \param[in] len length of the block to write 
  * \return returns non-zero if successful, else 0

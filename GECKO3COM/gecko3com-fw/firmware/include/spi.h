@@ -27,7 +27,7 @@
  *   
  *  \details Library to communicate with SPI devices
  *
- *  \author  GNU Radio guys
+ *  \author  GNU Radio team
  *
  *  \note to use this SPI library you have to define the following 
  *        keywords in your pinmapping header file. For GECKO3COM
@@ -54,10 +54,10 @@
 /*
  * SPI_FMT_* goes in wIndexL
  */
-#define bmSPI_FORMAT	         0x80
+#define bmSPI_FORMAT	         0x80   /**< bitmask to work on the format */
 #  define	bmSPI_FORMAT_LSB 0x80	/**< least signficant bit first */
 #  define	bmSPI_FORMAT_MSB 0x00   /**< most significant bit first */
-#define	bmSPI_HEADER      	 0x60
+#define	bmSPI_HEADER      	 0x60   /**< bits to select the header bytes */
 #  define	bmSPI_HEADER_0	 0x00	/**< 0 header bytes */
 #  define	bmSPI_HEADER_1	 0x20	/**< 1 header byte */
 #  define	bmSPI_HEADER_2	 0x40	/**< 2 header bytes */
@@ -67,13 +67,13 @@
 void init_spi (void);		
 
 /** \brief basic function to read data from the SPI bus
- * \param[in] unsigned char header_hi, high byte of the header to send
- * \param[in[ unsigned char header_lo, low byte of the header to send
- * \param[in] unsigned char enables, bitmask with the correct device selected
- * \param[in] unsigned char format, bitmask byte to select byte order 
- *            and number of header bytes
- * \param[out]*buf pointer to a buffer to write the received data in it
- * \param[in] unsigned char len, number of bytes to be read from bus
+ * \param[in]  header_hi high byte of the header to send
+ * \param[in]  header_lo low byte of the header to send
+ * \param[in]  enables bitmask with the correct device selected
+ * \param[in]  format bitmask byte to select byte order 
+ *             and number of header bytes
+ * \param[out] *buf pointer to a buffer to write the received data in it
+ * \param[in]  len number of bytes to be read from bus
  *
  * \return returns non-zero if successful, else 0 */
 unsigned char
@@ -82,13 +82,13 @@ spi_read (unsigned char header_hi, unsigned char header_lo,
 	  xdata unsigned char *buf, unsigned char len);
 
 /** \brief basic function to write data to the SPI bus
- * \param[in] unsigned char header_hi, high byte of the header to send
- * \param[in[ unsigned char header_lo, low byte of the header to send
- * \param[in] unsigned char enables, bitmask with the correct device selected
- * \param[in] unsigned char format, bitmask byte to select byte order 
+ * \param[in] header_hi high byte of the header to send
+ * \param[in] header_lo low byte of the header to send
+ * \param[in] enables bitmask with the correct device selected
+ * \param[in] format bitmask byte to select byte order 
  *            and number of header bytes
- * \param[in]*buf pointer to a buffer which holds the data to send
- * \param[in] unsigned char len, number of bytes to be written to the bus
+ * \param[in] *buf pointer to a buffer which holds the data to send
+ * \param[in] len number of bytes to be written to the bus
  *
  * \return returns non-zero if successful, else 0 */
 unsigned char
