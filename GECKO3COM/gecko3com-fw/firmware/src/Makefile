@@ -26,8 +26,8 @@ PACKAGE = gecko3com.hex
 
 BOARD = GECKO3MAIN #currently the only supported board 
 
-DEBUG = --debug -DDEBUG_LEVEL_INFO
-#DEBUG =  
+#DEBUG = --debug -DDEBUG_LEVEL_INFO
+DEBUG =  
 
 MEMOPTS = --code-loc 0x0000 --code-size 0x3A00 --xram-loc 0x3A00 --xram-size 0x0600 -Wl '-b USBDESCSEG = 0xE000'
 

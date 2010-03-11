@@ -85,9 +85,6 @@
       <association xil_pn:name="PostMapSimulation"/>
       <association xil_pn:name="PostTranslateSimulation"/>
     </file>
-    <file xil_pn:name="GECKO3COM_simple_test.cdc" xil_pn:type="FILE_CDC">
-      <association xil_pn:name="Implementation"/>
-    </file>
     <file xil_pn:name="coregenerator/coregenerator_fifo_receive.ise" xil_pn:type="FILE_COREGENISE">
       <association xil_pn:name="Implementation"/>
     </file>
@@ -161,7 +158,6 @@
   <bindings>
     <binding xil_pn:location="/gpif_com_test" xil_pn:name="GECKO3COM_simple_test.ucf"/>
     <binding xil_pn:location="/GECKO3COM_simple_test" xil_pn:name="GECKO3main_v1.ucf"/>
-    <binding xil_pn:location="/GECKO3COM_simple_test" xil_pn:name="GECKO3COM_simple_test.cdc"/>
   </bindings>
 
   <libraries/>

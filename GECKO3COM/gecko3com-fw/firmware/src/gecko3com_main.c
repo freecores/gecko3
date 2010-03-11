@@ -170,13 +170,14 @@ uint8_t app_check_fpga_type_from_header(idata uint16_t *offset,		\
   if(usb_tmc_transfer.new_transfer == NEWTRANSFER) {
     continue_analyse = 0;
     fpga_file_header.type = FPGA_TYPE;
+    usb_tmc_transfer.transfer_size += USB_TMC_HEADER_SIZE;
   }
-  
+
   /* first value to read from the header file is the fpga type */
   if(fpga_file_header.type == FPGA_TYPE){
+
     if(fpga_scan_file(buffer, offset, byte_count, &fpga_file_header)	\
        == FPGA_INFO_COMPLETE) {
-      
       /* compare fpga type from header with value in eeprom */
       if(!eeprom_read(FPGA_TYPE_OFFSET, fpga_type, FPGA_TYPE_LEN)){
 	return 0;
@@ -198,9 +199,9 @@ uint8_t app_check_fpga_type_from_header(idata uint16_t *offset,		\
 
   /* second value to read from the header file is the file length */
   if(fpga_file_header.type == FILE_LENGTH){
+
     if(fpga_scan_file(buffer, offset, byte_count, &fpga_file_header)	\
        == FPGA_INFO_COMPLETE) {
-      
       ((uint8_t*)&file_size)[0] = fpga_file_header.info[2];
       ((uint8_t*)&file_size)[1] = fpga_file_header.info[1];	
       ((uint8_t*)&file_size)[2] = fpga_file_header.info[0];
@@ -215,7 +216,6 @@ uint8_t app_check_fpga_type_from_header(idata uint16_t *offset,		\
 
   /* adjust the offset and byte_count variables to point to the 
    * binary data after the header */
-  usb_tmc_transfer.transfer_size += USB_TMC_HEADER_SIZE;
   usb_tmc_transfer.transfer_size -= *offset;
 
   return continue_analyse;
@@ -241,6 +241,7 @@ uint8_t app_configure_fpga(idata uint16_t *offset,	\
   /* do we still analyze the file header? */
   if(file_size == 0) {
     if(!app_check_fpga_type_from_header(offset, byte_count)) {
+      //print_err("bad\n");
       return 0;
     }
 
@@ -266,6 +267,7 @@ uint8_t app_configure_fpga(idata uint16_t *offset,	\
     
     /* transfer finished, finishing configuration */
     if(file_size == 0) {
+      //print_info("end\n");
       if(!fpga_load_end()) {
 	return 0;
       }
@@ -416,8 +418,8 @@ uint8_t app_gecko3com_flash_delete(idata uint16_t *offset) {
     }
   }
 
-  /* to "delete" means to set the file_size at the beginning of the confguration 
-     file slot to zero */
+  /* to "delete" means to set the file_size at the beginning of the confguration
+   * file slot to zero */
   local_uint32_var = 0;
   spiflash_write(&flash_dr, &flash_adress, (uint8_t*)&local_uint32_var,4);
   usb_tmc_state = TMC_STATE_IDLE;
@@ -591,7 +593,8 @@ static void main_loop (void)
       
       if(usb_tmc_state == TMC_STATE_IDLE || usb_tmc_transfer.transfer_size == 0){
 
-	/* start to analyze the data in Endpoint 2 if it is a correct TMC header */
+	/* start to analyze the data in Endpoint 2 if it is a correct TMC 
+	 * header */
 	tmc_header = (tHeader*)EP2FIFOBUF;
 
 	/* bTag sanity check. store bTag for correct IN transfer response */
@@ -616,7 +619,7 @@ static void main_loop (void)
 	      usb_tmc_state = TMC_STATE_OUT_TRANSFER;
 	      usb_tmc_transfer.nbytes_rxd = 0;
 	      
-	      /* when we receive an new out message before we sent the response, 
+	      /* when we receive an new out message before we sent the response,
 	       * we have to clear the response queue first*/
 	      IEEE488_clear_mav();
 	      usb_tmc_transfer.nbytes_txd = 0;
@@ -775,7 +778,8 @@ static void main_loop (void)
 	}
       }
       
-      usb_tmc_transfer.nbytes_rxd += ((EP2BCH << 8) + EP2BCL - USB_TMC_HEADER_SIZE);
+      usb_tmc_transfer.nbytes_rxd += ((EP2BCH << 8) + EP2BCL - \ 
+				      USB_TMC_HEADER_SIZE);
 
       /* finished handling usb package. 
        * rearm OUT endpoint to receive new data */
@@ -914,10 +918,13 @@ void isr_tick (void) interrupt
   //    clear_timer_irq(); 
   //  #ifdef DEBUG_LEVEL_ERROR
     //  print_err("Watchdog timed out! System reset\n");
-  //mdelay(100);             /* wait 100 ms to give the uart some time to transmit */
+  //mdelay(100);             /* wait 100 ms to give the uart some time to 
+  //                          * transmit */
   //  #endif
 
-      /* simulate CPU reset */  /* FIXME this stuff here does not work. no idea how to simulate an CPU reset instead... */
+      /* simulate CPU reset */  /* FIXME this stuff here does not work. 
+				 * no idea how to simulate an CPU reset 
+				 * instead... */
       /* _asm
       ljmp    __reset_vector
       _endasm;*/
@@ -958,7 +965,7 @@ void main(void)
   USBCS |= bmDISCON;    
 
 #ifdef DEBUG_LEVEL_ERROR
-  //ser_init();
+  ser_init();
   //printf_tiny("hi\n");
 #endif
 
@@ -1000,9 +1007,9 @@ void main(void)
   spi_base_adress += 4;
 
   /* debug stuff */
-  response_queue.buf[0] = init_spiflash(&flash_dr);
-  IEEE488_set_mav();
-  response_queue.length = 1;
+  //response_queue.buf[0] = init_spiflash(&flash_dr);
+  //IEEE488_set_mav();
+  //response_queue.length = 1;
 
   /* there is nothing to configure when the filesize is 0 or 0xFFFFFFFF */
   if(file_size == 0 || file_size == 0xFFFFFFFF) {
@@ -1014,9 +1021,9 @@ void main(void)
     i = TMC_RESPONSE_QUEUE_LENGTH-1;
     while(file_size > 0) {
       set_led_ext(led_color); /* show which config we load */
-
+      
       if(i > file_size) {
-	i = (uint8_t)file_size;
+  	i = (uint8_t)file_size;
       }
       spiflash_read(&flash_dr, &spi_base_adress, response_queue.buf, i);
       

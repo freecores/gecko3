@@ -36,6 +36,6 @@
 #define _FIRMWARE_VERSION_H_
 
 /** Version number of this firmware release */
-#define FIRMWARE_VERSION "0.5rc1\n"
+#define FIRMWARE_VERSION "0.5rc2\n"
 
 #endif

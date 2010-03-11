@@ -51,7 +51,7 @@ use work.GECKO3COM_defines.all;
 
 entity GECKO3COM_simple is
   generic (
-    BUSWIDTH : integer := 16);          -- vector size of the FIFO databusses
+    BUSWIDTH : integer := 32);          -- vector size of the FIFO databusses
   port (
     i_nReset : in std_logic;
     i_sysclk : in std_logic;            -- FPGA System CLK

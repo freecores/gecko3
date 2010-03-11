@@ -69,19 +69,23 @@ void init_fpga_interface(void) {
 int8_t fpga_scan_file(const xdata unsigned char *p, idata uint16_t *offset, \
 		       idata uint16_t *length, xdata Fpga_Info* info)
 {
-  idata uint8_t string_length = 0, chars_left_to_read = 0;
+  static idata uint8_t string_length = 0, chars_left_to_read = 0;
   xdata uint16_t local_position = *offset;
 
   for(local_position; local_position < *length; local_position++) {
-    //printf_tiny("fi: %d\n",local_position);
+   
     /* information found, copy data to output array */
     if(chars_left_to_read < string_length) {
+      //printf_tiny("fi: %d\n",local_position);
       info->info[chars_left_to_read++] = p[local_position];
             
       /* end of information, return successfull */
       if(chars_left_to_read == string_length) {
+	//print_info("l\n");
 	info->position = local_position;
 	*offset = local_position+1;
+	string_length = 0;
+	chars_left_to_read = 0;
 	return FPGA_INFO_COMPLETE;
       }
       else {
