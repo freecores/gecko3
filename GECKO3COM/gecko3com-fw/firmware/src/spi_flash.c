@@ -75,23 +75,22 @@ setup_enables (unsigned char enables)
   }
   else {
     bitSPI_CLK = 0; //make shure spi_clk is low before we activate a device
-    SPI_OE |= bmSPI_MASK;  //activate spi bus
+    SPI_OE |= bmSPI_OE_MASK;  //activate spi bus
     enables &= bmSPI_CS_MASK;
     SPI_CS_PORT |= bmSPI_CS_MASK;   //disable all chipselect signals
     SPI_CS_PORT &= ~enables;
-    //SPI_CS_OE |= enables;
+    SPI_CS_OE |= enables;
     SPI_CS_OE |= bmSPI_CS_MASK;
   }
 }
 
-
+  //    setup_enables (0); SPI_CS_PORT |= bmSPI_CS_MASK; \						\
 /** disables all SPI devices and sets the SPI and SPI CS signals to tri-state */
 #define disable_all()	{	 \
-    setup_enables (0);		 \
-    }    /*    SPI_OE &= ~bmSPI_MASK;		\
+    setup_enables (0);           \
     SPI_CS_OE &= ~bmSPI_CS_MASK; \
-    }  */
-
+    SPI_OE &= ~bmSPI_OE_MASK;    \
+}
 
 /** \brief Internal: Writes one byte to the SPI bus
  *

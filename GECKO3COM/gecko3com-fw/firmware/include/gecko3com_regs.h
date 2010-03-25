@@ -73,6 +73,7 @@
 #define	bmSPI_MOSI	        bmBIT1 /**< bitmask for SPI MOSI pin, Master Out, Slave In */
 #define bmSPI_MISO	        bmBIT2 /**< bitmask for SPI MISO pin, Master In, Slave Out */
 #define bmSPI_MASK		(bmSPI_CLK | bmSPI_MOSI | bmSPI_MISO)/**< SPI bus pin mask */
+#define bmSPI_OE_MASK		(bmSPI_CLK | bmSPI_MOSI)/**< SPI bus output pin mask */
 
 sbit at 0x80+0 bitSPI_CLK;	       /**< \define 0x80 is the bit address of PORT A */
 sbit at 0x80+1 bitSPI_MOSI;	       /**< \define Output from FX2 point of view, Master Out, Slave In */
