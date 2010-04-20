@@ -305,12 +305,14 @@ uint8_t app_write_conf_to_flash(idata uint16_t *offset, \
     /* setup all stuff */
     file_size = 0; 
     
-    /* select which file slot we have to delete */
+    /* select which file slot we have to use */
     if(buffer[*offset] == '0') {
       flash_adress = start_adress_slot0(flash_dr);
+      set_led_ext(GREEN);
     }
     else if(buffer[*offset] == '1'){
       flash_adress = start_adress_slot1(flash_dr);
+      set_led_ext(RED);
     }
     else {
       //print_err("slot\n");
@@ -371,6 +373,7 @@ uint8_t app_write_conf_to_flash(idata uint16_t *offset, \
     /* if transfer finished, back to TMC idle state */
     if(file_size <= 0) {
       file_size = 0;
+      fpga_load_end();
       usb_tmc_state = TMC_STATE_IDLE;
     }
   }
@@ -406,9 +409,11 @@ uint8_t app_gecko3com_flash_delete(idata uint16_t *offset) {
     slot = buffer[*offset];
     if(slot == '0') {
       flash_adress = start_adress_slot0(flash_dr);
+      set_led_ext(GREEN);
     }
     else if(slot == '1'){
       flash_adress = start_adress_slot1(flash_dr);
+      set_led_ext(RED);
     }
     else {
       //print_err("del\n");
@@ -988,7 +993,7 @@ void main(void)
   /*------------------------------------------------------------------------*/
 
   /* start to configure the FPGA from the configuration SPI flash */
-  /* read which configuration, the first or second, we should use */
+  /* read which configuration, the first or second, we should use: */
   if(get_switch()){
     led_color = GREEN;
     spi_base_adress = start_adress_slot0(flash_dr);
